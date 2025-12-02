@@ -1,0 +1,17 @@
+<div class="col-12" id="content_header_img">
+    {% if article.headerName is null %}
+        <img id="college_header" class="img-fluid" src="{{ asset('/uploads/images/fixes/logo-radio-francas.png') | imagine_filter('thumb_bandeau_college')  }}" alt="logo-radio-francas">
+    {% else %}
+        <img id="college_header" class="img-fluid" src="{{ vich_uploader_asset(article, 'headerFile', 'App\\Entity\\Admin\\College' ) | imagine_filter('thumb_bandeau_college') }}" alt="{{ article.headerName }}">
+    {% endif %}
+    <div id="college_logo">
+        <img class="img-fluid" src="{{ vich_uploader_asset(article, 'logoFile', 'App\\Entity\\Admin\\College' ) | imagine_filter('thumb_logo_college') }}" alt="{{ article.logoName }}">
+    </div>
+    <div id="college_titre">
+        {% if article.collegeId == 29 %}
+            <h3>{{ article.name }}</h3>
+        {% else %}
+            <h3>Collège {{ article.name }}</h3>
+        {% endif %}
+    </div>
+</div>

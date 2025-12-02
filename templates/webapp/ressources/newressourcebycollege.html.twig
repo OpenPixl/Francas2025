@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Ressources{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        window.onload = function(){
+            ClassicEditor
+                .create(document.querySelector('#ressources_content'), {
+                    toolbar: [ 'heading','bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment' ],
+                    height: 50
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+    </script>
+{% endblock %}
+
+{% block main %}
+    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="row" id="content">
+            {{ include('espacecollege/dashboard/_header_college.html.twig') }}
+        </div>
+    </section>
+    <section class="my-4 mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 border-b border-b-gray-700 text-gray-700 flex justify-between items-center">
+        <h2 class="font-normal uppercase text-2xl">Tableau de bord | collège {{ college.name }}</h2>
+        <a href="{{ path('op_admin_security_logout') }}"><i class="fa-duotone fa-solid fa-right-from-bracket"></i> Se déconnecter</a>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8" id="espace_college_content">
+        <div class="grid grid-cols-4 gap-4">
+            <div class="col-span-3">
+                <h5 class="text-xl font-normal text-[#d84519] uppercase">Créer une nouvelle ressource</h5>
+                <div>
+                    {{ include('webapp/ressources/_form.html.twig') }}
+                </div>
+            </div>
+            <div>
+                {{ include('espacecollege/dashboard/_blocAdminCollege.html.twig') }}
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,124 @@
+{{ form_start(form, {attr: {'novalidate': 'novalidate'}}) }}
+<div class="grid grid-cols-5 gap-4">
+    <div class="col-span-3">
+        <h2 class="font-normal border-b border-slate-900 mb-2">Contenu</h2>
+
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Titre',
+                form : form.title,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_textarea.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Text d\'intro',
+                form : form.intro,
+                'placeholder': 'Nom ?',
+                'input_width' : 'w-full',
+                'rows': 6,
+                'oninput': ''
+            } %}
+        </div>
+    </div>
+    <div class="col-span-2">
+        <h5 class="font-normal border-b border-slate-900 mb-2">Options de la page</h5>
+
+        <div class="mt-1 mb-3">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Etat',
+                form : form.state,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_switch.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                form : form.isTitleShow,
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_switch.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                form : form.isIntroShow,
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_switch.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                form : form.isMenu,
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_switch.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                form : form.isPublish,
+                'oninput': ''
+            } %}
+        </div>
+        <h6 class="font-normal text-shadow-slate-900">Dates de publication de la page</h6>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Du',
+                form : form.publishAt,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Au',
+                form : form.publishEnd,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+
+        <div class="mt-1 mb-3">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Mots clefs',
+                form : form.metaKeywords,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+    </div>
+
+    <div id="bouton_form">
+        {% include 'composants/buttons/button_submit.html.twig' with {
+            'id': null,
+            'button_width': null,
+            'icon': null,
+            'text': button_label|default('Enregistrer')
+        } %}
+    </div>
+
+</div>
+{{ form_rest(form) }}
+{{ form_end(form) }}

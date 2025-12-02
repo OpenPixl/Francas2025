@@ -1,0 +1,47 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}Hello AdminController!{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
+    <script>
+        window.onload = function(){
+
+        }
+    </script>
+{% endblock %}
+
+    {% block header %}
+        {{ include('admin/dashboard/include/header.html.twig', {'title' : 'Tableau de bord', 'btns': null}) }}
+    {% endblock %}
+
+{% block main %}
+
+    <div class="sm:px-3 lg:px-4">
+        <h2>Les 10 derniers articles des collèges</h2>
+    </div>
+    <div class="inline-block min-w-full py-2 align-middle sm:px-3 lg:px-4">
+        <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+            <thead>
+                <tr>
+                    <th class="px-1.5 py-1.5"></th>
+                    <th class="py-1.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Titre</th>
+                    <th class="py-1.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Collège</th>
+                    <th class="py-1.5 text-left text-sm font-semibold text-gray-900 dark:text-white">publié le</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+            {% for a in articles %}
+                <tr>
+                    <td class="px-1.5 py-1.5 text-center"><input type="checkbox" class="border border-b-gray-100 rounded-sm"></td>
+                    <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ a.title }}</td>
+                    <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ a.college.name }}</td>
+                    <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ a.updatedAt|date('d-m-Y') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+    </div>
+{% endblock %}

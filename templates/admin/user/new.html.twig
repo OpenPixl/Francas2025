@@ -1,0 +1,16 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}New user{% endblock %}
+
+{% block main %}
+
+    <section id="op_admin_content_body">
+
+        <h2 class="font-normal uppercase text-xl text-sky-700">Ajouter un compte utilisateur une page</h2>
+
+        <div class="mt-3">
+            {{ include('admin/user/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+        </div>
+
+    </section>
+{% endblock %}

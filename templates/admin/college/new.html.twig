@@ -1,0 +1,42 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}New College{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{%  endblock %}
+
+{% block header %}
+    {{ include('admin/dashboard/include/header.html.twig', {
+        'title' : 'Gestions des colleges',
+        'btns' : {
+            'new': {
+                'id' : null,
+                'href' : path('op_webapp_college_newcollege'),
+                'icon' : '<i class="fa-duotone fa-solid fa-square-plus"></i>',
+                'text' : 'Créer un nouveau college',
+                'array':null
+            },
+            'return': {
+                'id' : null,
+                'href' : path('op_admin_college_index'),
+                'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
+                'text' : 'Retour',
+                'array':null
+            }
+        }
+    }) }}
+{% endblock %}
+
+{% block main %}
+    <section id="op_admin_content_body">
+
+        <h2 class="font-normal uppercase text-xl text-sky-700">Ajouter un nouvel établissement</h2>
+
+        <div class="mt-3">
+            {{ include('admin/college/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+        </div>
+
+
+    </section>
+{% endblock %}

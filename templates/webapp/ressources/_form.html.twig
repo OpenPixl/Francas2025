@@ -1,0 +1,94 @@
+{{ form_start(form) }}
+    <p class="text-start text-sm font-light text-slate-900 mb-3">
+        Vous allez pouvoir créer/modifier une ressource pédagogique. <br>Vous êtes à l'aise avec un outil, un logiciel ou une méthode... Vous désirez partager votre connaissance avec d'autres groupes pour les aider à réaliser une action, cet espace est dédié pour créer des ressources pédagogique.
+    </p>
+    {% if form_errors(form) %}
+        <p class="mt-1 text-sm text-red-600">
+            {{ form_errors(form) }}
+        </p>
+    {% endif %}
+    <div class="mb-1">
+        {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Ressource',
+            form : form.name,
+            'placeholder': 'inscrire le titre',
+            'input_width' : 'w-full',
+            'oninput': ''
+        } %}
+    </div>
+    <div class="mb-1">
+        {% include 'composants/forms/input_textarea.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Contenu',
+            form : form.content,
+            'rows': 10,
+            'placeholder': 'inscrire le titre',
+            'input_width' : 'w-full',
+            'oninput': ''
+        } %}
+    </div>
+    <div class="mb-1">
+        {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Catégorie',
+            form : form.category,
+            'placeholder': 'inscrire le titre',
+            'input_width' : 'w-full',
+            'oninput': ''
+        } %}
+    </div>
+    <h3 class="mt-3">Image de présentation de la ressource</h3>
+    <div class="mb-1">
+        {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Insertion de l\'image',
+            'entity_id': ressource.id,
+            'entity_name': ressource.imageName,
+            'url_file': 'uploads/images/articles/',
+            form : form.imageFile,
+            'input_width' : 'w-full',
+            'routename' : 'op_webapp_message_new',
+        } %}
+    </div>
+    <h3 class="mt-3">Support pédagogique</h3>
+    <p class="text-sm text-slate-900">Vous pouvez télécharger sur le site le support de votre ressource soit au format d'un traitement de text (doc, docx, odt) ou en Pdf.</p>
+    <div class="mb-1">
+        {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Insertion du support',
+            'entity_id': ressource.id,
+            'entity_name': ressource.doc,
+            'url_file': 'uploads/images/articles/',
+            form : form.docFile,
+            'input_width' : 'w-full',
+            'routename' : 'op_webapp_message_new',
+        } %}
+    </div>
+    <p class="text-sm text-slate-900 mt-3">Autrement, si vous avez trouvé une vidéo sur internet, vous pouvez glisser sur adresse de partage dans le cadre ci-dessous.</p>
+    <div class="mb-1">
+        {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Ressource',
+            form : form.Linkmedia,
+            'placeholder': 'inscrire le titre',
+            'input_width' : 'w-full',
+            'oninput': ''
+        } %}
+    </div>
+
+    <div id="bouton_form">
+        {% include 'composants/buttons/button_submit.html.twig' with {
+            'id': null,
+            'button_width': null,
+            'icon': null,
+            'text': button_label|default('Enregistrer')
+        } %}
+    </div>
+{{ form_end(form) }}

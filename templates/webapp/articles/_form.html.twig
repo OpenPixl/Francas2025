@@ -1,0 +1,92 @@
+{{ form_start(form) }}
+<div>
+    <div class="mb-1">
+        {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Titre',
+            form : form.title,
+            'placeholder': 'inscrire le titre',
+            'input_width' : 'w-60',
+            'oninput': ''
+        } %}
+    </div>
+    <div class="mb-1">
+        {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Thème',
+            form : form.theme,
+            'placeholder': 'inscrire le titre',
+            'input_width' : 'w-60',
+            'oninput': ''
+        } %}
+    </div>
+    <div class="mb-1">
+        {% include 'composants/forms/input_textarea.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Contenu de l\'article',
+            form : form.content,
+            'placeholder': 'Nom ?',
+            'input_width' : 'w-full',
+            'rows': 10,
+            'oninput': ''
+        } %}
+    </div>
+
+    <div class="mb-1">
+        {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Image',
+            'entity_id': article.id,
+            'entity_name': article.imageName,
+            form : form.imageFile,
+            'input_width' : 'w-full',
+            'routename' : 'op_webapp_message_new',
+        } %}
+    </div>
+
+    <div class="my-2">
+        <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mb-1 uppercase">Support</h3>
+        <p class="text-sm text-slate-900 mb-2">Nous vous donnons la possibilité d'ajouter un support (document, vidéo, audio...) à votre article. Pensez à selectionner le bon support sur la liste de choix.</p>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Quel type de support ?',
+                form : form.support,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Insertion du support',
+                'entity_id': article.id,
+                'entity_name': article.doc,
+                'url_file': 'uploads/images/articles/',
+                form : form.docFile,
+                'input_width' : 'w-full',
+                'routename' : 'op_webapp_message_new',
+            } %}
+        </div>
+    </div>
+
+    <div id="bouton_form">
+        {% include 'composants/buttons/button_submit.html.twig' with {
+            'id': null,
+            'button_width': null,
+            'icon': null,
+            'text': button_label|default('Enregistrer')
+        } %}
+    </div>
+
+</div>
+
+
+{{ form_end(form) }}

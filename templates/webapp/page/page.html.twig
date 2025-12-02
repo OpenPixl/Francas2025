@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Collégiens-Citoyens{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+{% block main %}
+<section class="mx-auto mt-8 max-w-7xl px-2 py-2 sm:px-6 lg:px-8">
+
+    {% if page.isTitleShow == 1 %}
+        <h1 class="font-semibold text-xl text-gray-700 border-b border-b-gray-700">{{ page.title|upper }}</h1>
+    {% endif %}
+    {% if page.isIntroShow == 1 %}
+        <p>{{ page.intro|raw }}</p>
+    {% endif %}
+
+</section>
+{{ render(controller('App\\Controller\\Webapp\\SectionController::ListAllSections', {page: page.id})) }}
+{% endblock %}

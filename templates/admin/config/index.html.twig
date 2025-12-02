@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Config index{% endblock %}
+
+{% block main %}
+    <h1>Config index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>IsOffline</th>
+                <th>HeaderName</th>
+                <th>HeaderSize</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for config in configs %}
+            <tr>
+                <td>{{ config.id }}</td>
+                <td>{{ config.name }}</td>
+                <td>{{ config.description }}</td>
+                <td>{{ config.isOffline ? 'Yes' : 'No' }}</td>
+                <td>{{ config.headerName }}</td>
+                <td>{{ config.headerSize }}</td>
+                <td>{{ config.updatedAt ? config.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('admin_config_show', {'id': config.id}) }}">show</a>
+                    <a href="{{ path('admin_config_edit', {'id': config.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_config_new') }}">Create new</a>
+{% endblock %}

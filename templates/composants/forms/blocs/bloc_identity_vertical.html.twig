@@ -1,0 +1,23 @@
+<div class="w-full flex flex-col bg-white">
+    <div class="{{ legend_width }}">
+        <label class="text-sm text-slate-700" for="{{ firstname.vars.id }}">
+            {{ firstname.vars.label }}
+        </label>
+    </div>
+    <div class="{{ col_width }} inline-flex justify-start overflow-hidden">
+        {% for child in civility %}
+            <label for="{{ child.vars.id }}"
+                   class="flex items-center cursor-pointer">
+
+                {{ form_widget(child, { attr: { class: 'hidden peer' } }) }}
+
+                <span class="px-3 py-1 text-sm border-gray-300 {% if loop.first %}border-l border-t border-b rounded-l-lg {% else %}border {% endif%}transition peer-checked:border-sky-700 peer-checked:border-t peer-checked:border-r peer-checked:text-sky-700 font-medium uppercase">
+                {{ child.vars.label }}
+            </span>
+            </label>
+        {% endfor %}
+        {{ form_widget(firstname, { attr: { class: firstname_width ~ 'border-t border-b border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 focus:outline-none focus:bg-white' } }) }}
+        {{ form_widget(lastname, { attr: { class: lastname_width ~ 'border border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 rounded-r-lg focus:outline-none focus:bg-white' } }) }}
+    </div>
+
+</div>

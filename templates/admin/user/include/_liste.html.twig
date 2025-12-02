@@ -1,0 +1,49 @@
+
+    <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/1">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Nom</th>
+            <th>Identifiant</th>
+            <th>Collège</th>
+            <th>Actif</th>
+            <th>actions</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+        {% for user in users %}
+            <tr class="hover:bg-gray-100">
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><input type="checkbox" id="check-liste"></td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ user.loginName }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ user.email }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    {% if user.college is null %}
+                    <a href="{{ path('op_admin_college_newcollegeadmin', {'iduser': user.id}) }}" class="btn btn-secondary btn-sm">Ajout du college</a>
+                    {% else %}
+                    {{ user.college }}
+                    {% endif %}
+                </td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    {% if user.isVerified == 0 %}
+                        <a class="js-verified" href="{{ path('op_admin_user_verified', {'id': user.id}) }}"><i class="far fa-times-circle text-danger"></i></a>
+                    {% elseif user.isVerified == 1 %}
+                        <a class="js-verified" href="{{ path('op_admin_user_verified', {'id': user.id}) }}"><i class="far fa-check-circle text-success"></i></a>
+                    {% endif %}
+                </td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    <a href="{{ path('op_admin_user_show', {'id': user.id}) }}"><i class="far fa-eye"></i></a>&nbsp;
+                    <a href="{{ path('op_admin_user_edit', {'id': user.id}) }}"><i class="far fa-edit"></i></a>&nbsp;
+                    <a href="{{ path('op_admin_security_resetting', {'id': user.id}) }}"><i class="fas fa-key"></i></a>&nbsp;|&nbsp;
+                    <a href="#" class="js-modalSuppr text-danger" type="button" data-bs-toggle="modal" data-bs-target="#Suppr" data-bs-whatever="{{ user.id }}">
+                        <i class="fas fa-eraser"></i>
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+

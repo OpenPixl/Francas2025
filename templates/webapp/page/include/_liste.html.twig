@@ -1,0 +1,62 @@
+<div class="table-responsive">
+    <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+        <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th class="text-start">Titre</th>
+            <th class="text-start">Etat</th>
+            <th class="text-start">Sections</th>
+            <th class="text-start">menu</th>
+            <th class="text-start">Publié</th>
+            <th class="text-start">Créer le</th>
+            <th class="text-start">Mise à jour</th>
+            <th class="text-start">actions</th>
+            <th></th>
+        </tr>
+        </thead>
+        {% set lastposition = '' %}
+        <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+        {% for page in pages %}
+            <tr class="hover:bg-gray-100">
+
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    <i class="fa-duotone fa-light fa-grip-dots-vertical"></i>
+                </td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><input id="pageId" type="checkbox" value="{{ page.id }}"></td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><a href="{{ path('op_webapp_page_show', {'id': page.id}) }}">{{ page.title }}</a> (<small class="text-dark">{{ page.slug }}</small>)</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{% if page.state == 'finished' %}Finalisée{% else %}Brouillon{% endif %}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><span class="badge bg-info">{{ page.sections|length }}</span></td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    {% if page.ismenu == 1 %}
+                        <a class="js-menu" href="{{path('op_webapp_page_menu', {'id' : page.id})}}"><i class="far fa-check-circle text-success"></i></a>
+                    {% else %}
+                        <a class="js-menu" href="{{path('op_webapp_page_menu', {'id' : page.id})}}"><i class="far fa-times-circle text-danger"></i></a>
+                    {% endif %}
+                </td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    {% if page.isPublish == 1 %}
+                        <a class="js-publish" href="{{ path('op_webapp_page_publish', {'id': page.id}) }}"><i class="far fa-check-circle text-success"></i></a>
+                    {% else %}
+                        <a class="js-publish" href="{{ path('op_webapp_page_publish', {'id': page.id}) }}"><i class="far fa-times-circle text-danger"></i></a>
+                    {% endif %}
+                </td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ page.createdAt ? page.createdAt|format_datetime('medium', 'none', locale='fr') : '' }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ page.updatedAt ? page.updatedAt|format_datetime('medium', 'none', locale='fr') : '' }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    <a href="{{ path('op_webapp_page_show', {'id': page.id}) }}"><i class="far fa-eye"></i></a>
+                    <a href="{{ path('op_webapp_page_edit', {'id': page.id}) }}"><i class="far fa-edit"></i></a>
+                    <a href="#" class="js-modalSuppr text-danger" type="button" data-bs-toggle="modal" data-bs-target="#Suppr" data-bs-whatever="{{ page.id }}">
+                        <i class="bi bi-eraser text-danger"></i>
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="13">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+

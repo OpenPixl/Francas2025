@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Config{% endblock %}
+
+{% block main %}
+    <h1>Config</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ config.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ config.name }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ config.description }}</td>
+            </tr>
+            <tr>
+                <th>IsOffline</th>
+                <td>{{ config.isOffline ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>HeaderName</th>
+                <td>{{ config.headerName }}</td>
+            </tr>
+            <tr>
+                <th>HeaderSize</th>
+                <td>{{ config.headerSize }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ config.updatedAt ? config.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_config_index') }}">back to list</a>
+
+    <a href="{{ path('admin_config_edit', {'id': config.id}) }}">edit</a>
+
+    {{ include('admin_config/_delete_form.html.twig') }}
+{% endblock %}

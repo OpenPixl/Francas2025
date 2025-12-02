@@ -1,0 +1,6 @@
+<button
+    id="{{ id }}"
+    class="{% if button_width is not null %}{{ button_width }} {% endif %}border border-sky-700 text-sm text-sky-700 rounded px-1.5 py-1.5 hover:bg-sky-700 hover:text-white"
+>
+    {{ icon|raw }} {{ text }}
+</button>

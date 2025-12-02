@@ -1,0 +1,43 @@
+<table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+    <thead>
+    <tr>
+        <th></th>
+        <th class="text-start">Etablissement</th>
+        <th class="text-start">Commune</th>
+        <th class="text-start">Animateur</th>
+        <th class="text-center">publié</th>
+        <th class="text-center">actions</th>
+    </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+    {% for college in colleges %}
+        <tr class="hover:bg-gray-100">
+            <td></td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ college.name }}</td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ college.city }}</td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ college.animateur }}</td>
+            <td class="py-1.5 text-sm text-center whitespace-nowrap text-gray-500 dark:text-gray-400">
+                {% if college.isActive == 0 %}
+                    <a class="js-verified text-red-800" href="{{ path('op_admin_college_verified', {'id': college.id}) }}"><i class="far fa-times-circle"></i></a>
+                {% elseif college.isActive == 1 %}
+                    <a class="js-verified text-green-800" href="{{ path('op_admin_college_verified', {'id': college.id}) }}"><i class="far fa-check-circle"></i></a>
+                {% endif %}
+            </td>
+            <td class="py-1.5 text-sm text-center whitespace-nowrap text-gray-500 dark:text-gray-400">
+                <a href="{{ path('op_admin_college_show', {'id': college.id}) }}"><i class="far fa-eye"></i></a>&nbsp;
+                <a href="{{ path('op_admin_college_edit', {'id': college.id}) }}"><i class="far fa-edit"></i></a>
+                {#
+                &nbsp;|&nbsp;
+            <a href="#" class="js-modalSuppr text-danger" type="button" data-bs-toggle="modal" data-bs-target="#Suppr" data-bs-whatever="{{ college.id }}">
+                <i class="fas fa-eraser"></i>
+            </a>
+                #}
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="6">no records found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

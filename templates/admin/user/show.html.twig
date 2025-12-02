@@ -1,0 +1,100 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}user{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        window.onload = function(){
+
+        }
+    </script>
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid">
+        {{ include('admin/user/include/_section_content_header.html.twig') }}
+        <section id="op_admin_content_body">
+            <div class="row g-2">
+                {{ include('admin/user/include/_section_content_aside.html.twig') }}
+                <div class="col-10">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>Profil de : {{ user.firstName }} {{ user.lastName }}</h4>
+                            <p>Sur cette page vous pouvez voir et modifier les informations vous concernant.</p>
+                            <div class="row">
+                                <div class="col-2">
+                                    {% if user.avatarName is null %}
+                                        <img class="img-fluid" src="{{ asset('uploads/images/svg/user.svg') }}" alt="sans_avatar">
+                                    {% else %}
+                                        <img class="img-fluid" src="{{ vich_uploader_asset(user) }}" alt="{{ user.avatarName }}">
+                                    {% endif %}
+                                </div>
+                                <div class="col-4">
+                                    <table class="table">
+                                        <tbody class="align-middle">
+                                        <tr>
+                                            <th>Identifiant</th>
+                                            <td>{{ user.username }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Prénom & Nom</th>
+                                            <td>{{ user.firstName }} {{ user.lastName }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Email</th>
+                                            <td>{{ user.email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Roles</th>
+                                            <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-3">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <th>Adresse</th>
+                                            <td>
+                                                {{ user.adress1 }}<br>{{ user.Adress2 }}<br>{{ user.zipcode }} {{ user.city }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Contacts</th>
+                                            <td>{{ user.phoneDesk }} / {{ user.phoneGsm }}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-3">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <th>Adresse vérifiée le</th>
+                                            <td>
+                                                {% if user.isVerified == 1  %}
+                                                    <i class="far fa-check-circle text-success"></i>
+                                                {% elseif user.isVerified == 0 %}
+                                                    <i class="far fa-times-circle text-danger"></i>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a class="btn btn-secondary btn-sm" href="{{ path('op_admin_user_index') }}">Retour à la liste</a>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a class="btn btn-sm btn-primary" href="{{ path('op_admin_user_edit', {'id':user.id}) }}">modifier sa fiche</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

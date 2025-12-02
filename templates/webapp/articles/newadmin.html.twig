@@ -1,0 +1,54 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}Collégiens-citoyens{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        window.onload = function() {
+            ClassicEditor
+                .create(document.querySelector('#articles_content'), {
+                    height: 50
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+    </script>
+{% endblock %}
+
+{% block header %}
+    {{ include('admin/dashboard/include/header.html.twig', {
+        'title' : 'Gestions des articles',
+        'btns' : {
+            'new': {
+                'id' : null,
+                'href' : path('op_webapp_articles_newadmin'),
+                'icon' : '<i class="fa-duotone fa-solid fa-square-plus"></i>',
+                'text' : 'Créer un nouvel article',
+                'array':null
+            },
+            'return': {
+                'id' : null,
+                'href' : path('op_admin_dashboard_index'),
+                'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
+                'text' : 'Retour',
+                'array':null
+            }
+        }
+    }) }}
+{% endblock %}
+
+{% block main %}
+    <section id="op_admin_content_body">
+
+        <h2 class="font-normal uppercase text-xl text-sky-700">Créer un article</h2>
+
+
+        <div class="mt-3">
+            {{ include('webapp/articles/_form2.html.twig', {'button_label': 'Mettre à jour'}) }}
+        </div>
+
+
+    </section>
+{% endblock %}

@@ -1,0 +1,70 @@
+{{ form_start(form) }}
+
+<div class="grid grid-cols-5 gap-4">
+    <div class="col-span-5">
+        <h2 class="font-normal border-b border-slate-900 mb-2">Edition des paramètres du site</h2>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-2/12',
+                'col_width' : 'w-10/12',
+                'label' : 'Nom de votre site',
+                form : form.name,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_textarea.html.twig' with {
+                'legend_width' : 'w-2/12',
+                'col_width' : 'w-10/12',
+                'label' : 'Description de votre site',
+                form : form.description,
+                'placeholder': 'Nom ?',
+                'input_width' : 'w-200',
+                'rows': 6,
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_switch.html.twig' with {
+                'legend_width' : 'w-2/12',
+                'col_width' : 'w-10/12',
+                form : form.isOffline,
+                'oninput': ''
+            } %}
+        </div>
+        <h2 class="font-normal border-b border-slate-900 mt-3 mb-2">Médias du site</h2>
+
+        <div class="mb-1">
+            {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+                'legend_width' : 'w-2/12',
+                'col_width' : 'w-10/12',
+                'label' : 'Bandeau du site',
+                'entity_id': config.id,
+                'entity_name': config.headerName,
+                form : form.headerFile,
+                'url_file': '/uploads/images/config/',
+                'input_width' : 'w-200',
+                'routename' : 'op_webapp_message_new',
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+                'legend_width' : 'w-2/12',
+                'col_width' : 'w-10/12',
+                'label' : 'Chargement du support de l\'article',
+                'entity_id': config.id,
+                'entity_name': config.vignetteName,
+                form : form.vignetteFile,
+                'url_file': '/uploads/images/config/',
+                'input_width' : 'w-200',
+                'routename' : 'op_webapp_message_new',
+            } %}
+        </div>
+    </div>
+
+</div>
+
+
+{{ form_end(form) }}

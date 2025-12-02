@@ -1,0 +1,19 @@
+<div class="w-full inline-flex bg-white items-center hidden">
+    <div class="{{ legend_width }}">
+        <label class="text-sm text-slate-700" for="{{ form.vars.id }}">
+            {{ label }}
+        </label>
+    </div>
+    <div class="{{ col_width }} inline-flex justify-start overflow-hidden">
+        {{ form_widget(form, { attr: { class: input_width ~ ' border text-gray-900 text-sm px-2 py-1 rounded-lg focus:outline-none focus:bg-white ' ~ (form_errors(form) ? 'border-orange-300 bg-white' : 'border-gray-300 bg-gray-100/70'), 'oninput': oninput } }) }}
+    </div>
+</div>
+{% if form.vars.help is not empty %}
+<div class="w-full inline-flex bg-white items-center hidden">
+    <div class="inline-flex justify-start text-justify overflow-hidden">
+            <small class="form-text text-xs text-slate-500">
+                {{ form_help(form) }}
+            </small>
+    </div>
+</div>
+{% endif %}

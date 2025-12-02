@@ -1,0 +1,44 @@
+<table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+    <thead>
+        <tr>
+            <th class="px-1 py-1.5"></th>
+            <th class="px-1 text-start">Titre de l'article</th>
+            <th></th>
+            <th>publié</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+    {% for article in articles %}
+        <tr class="hover:bg-gray-100">
+            <td class="px-1 py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                {% if article.imageName is null %}
+                    <img src="{{ asset('uploads/images/fixes/img_article_none.png') }}" alt="avatar de l'image de l'article" class="h-10 object-cover rounded-sm">
+                {% else %}
+                    <img src="{{ asset('uploads/images/articles/' ~ article.imageName) }}" alt="avatar de l'image de l'article" class="h-10 object-cover rounded-sm">
+                {% endif %}
+            </td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                <p class="px-1 font-semibold text-slate-900 text-sm">{{ article.title }}</p>
+                <p>
+                    <span class="inline-flex items-center gap-x-1.5 rounded-full px-2 py-1 text-xs font-normal text-gray-900 inset-ring inset-ring-gray-200 dark:text-gray-200 dark:inset-ring-white/10">
+                        <svg viewBox="0 0 6 6" aria-hidden="true" class="size-1.5 fill-red-500 dark:fill-red-400">
+                            <circle r="3" cx="3" cy="3" />
+                        </svg>
+                        {{ article.theme }}
+                    </span>
+
+                </p>
+            </td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                {{ article.content|u.truncate(50, ' ...') | raw }}
+            </td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ article.updatedAt|date('d-m-Y') }}</td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400 text-end">
+                <a href="{{ path('op_webapp_articles_edit', {'id' : article.id}) }}"><i class="far fa-edit"></i> Modifier</a> |
+                <a class="btnArchived" href="{{ path('op_webapp_articles_archived', {'id': article.id, 'idcollege': college.id}) }}"><i class="fa fa-eraser"></i> Archiver</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

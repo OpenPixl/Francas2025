@@ -1,0 +1,96 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}New Ressources{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+<script>
+    window.onload = function(){
+
+        function onClickaddCategory(event){
+            event.preventDefault();
+            const name = document.getElementById('ressource_cat_name').value;
+            const parent = document.getElementById('ressource_cat_parent').value;
+            const url = "/admin/ressourcescat/new";
+            axios
+                .post(url,{name:name, parent:parent})
+                .then(function(response)
+                {
+                    const select = document.getElementById('ressources_category');
+                    const options = document.createElement("option");
+                    options.text = response.data.category;
+                    select.add(options)
+
+                    var option = {
+                        animation : true,
+                        autohide: true,
+                        delay : 3000,
+                    };
+
+                    var toastHTMLElement = document.getElementById("toaster");
+                    var message = response.data.message;
+                    var toastBody = toastHTMLElement.querySelector('.toast-body') // selection de l'élément possédant le message
+                    toastBody.textContent = message;
+                    var toastElement = new bootstrap.Toast(toastHTMLElement, option);
+                    toastElement.show();
+                })
+        }
+
+        // déclaration de l'event sur js-add-catégory
+        document.querySelectorAll('a.js-add-category').forEach(function(link){
+            link.addEventListener('click', onClickaddCategory)
+        })
+
+        ClassicEditor
+            .create(document.querySelector('#ressources_content'), {
+                height: 50
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+</script>
+{% endblock %}
+
+{% block header %}
+    {{ include('admin/dashboard/include/header.html.twig', {
+        'title' : 'Gestions des ressources',
+        'btns' : {
+            'new': {
+                'id' : null,
+                'href' : path('op_webapp_ressources_new'),
+                'icon' : '<i class="fa-duotone fa-solid fa-square-plus"></i>',
+                'text' : 'Créer une nouvelle ressource',
+                'array':null
+            },
+            'return': {
+                'id' : null,
+                'href' : path('op_webapp_ressources_index'),
+                'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
+                'text' : 'Retour',
+                'array':null
+            }
+        }
+    }) }}
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+    {{ include('webapp/ressources/include/_section_content_header.html.twig') }}
+    <section id="op_admin_content_body">
+        <div class="row g-2">
+            <div class="col-2">
+                {{ include('webapp/ressources/include/_section_content_aside.html.twig') }}
+            </div>
+            <div class="col-10">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Créer une ressources</h3>
+                    </div>
+                    {{ include('webapp/ressources/_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

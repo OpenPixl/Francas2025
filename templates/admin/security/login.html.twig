@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Collégiens-citoyens{% endblock %}
+
+{% block main %}
+    <section class="mx-auto max-w-4xl px-2 sm:px-6 lg:px-8 my-4 h-full items-center">
+        <div class="h-full flex flex-row items-center space-y-4 justify-center">
+            <div class="w-2/4 flex items-center justify-center">
+                <img src="{{ asset('uploads/images/fixes/logo-cc.png') }}" alt="Logo du dispositif Collégiens-citoyens">
+            </div>
+            <div class="w-2/4">
+                <form method="post" class="space-y-4">
+                    {% if error %}
+                        <div class="text-red-800 text-center text-sm">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+
+                    {% if app.user %}
+                        <div class="mb-3">
+                            Vous êtes connecté sous le compte : {{ app.user.loginName }}, <a href="{{ path('op_admin_security_logout') }}">Se déconnecter</a>
+                        </div>
+                    {% endif %}
+
+                    <h1 class="text-2xl text-center border-b border-b-slate-900">Espace de connexion</h1>
+
+                    <div>
+                        <label class="block text-sm/6 font-medium text-gray-900" for="username">Email</label>
+                        <div class="mt-1">
+                            <input type="email" value="{{ last_username }}" name="_username" id="username" class="block w-full rounded-md bg-white border border-gray-200 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" autocomplete="off" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm/6 font-medium text-gray-900" for="password">Mot de passe</label>
+                        <div class="mt-1">
+                            <input type="password" name="_password" id="password" class="block w-full rounded-md bg-white border border-gray-200 px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" autocomplete="current-password" required>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token"
+                           value="{{ csrf_token('authenticate') }}"
+                    >
+
+                    {#
+                    Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+                    See https://symfony.com/doc/current/security/remember_me.html
+
+                    <div class="checkbox mb-3">
+                        <label>
+                            <input type="checkbox" name="_remember_me"> Remember me
+                        </label>
+                    </div>
+                    #}
+
+                    <button class="flex w-full justify-center rounded-md bg-sky-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" type="submit">
+                        Se connecter
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </section>
+
+{% endblock %}

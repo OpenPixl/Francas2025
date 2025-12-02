@@ -1,0 +1,46 @@
+<section class="container" id="college_page_header">
+    <div class="row" id="content">
+        {% if college.headerName is null %}
+        {% elseif college.logoName is null %}
+            <div class="col-12" id="content_header_img">
+                <img id="college_header" class="img-fluid" src="{{ vich_uploader_asset(college, 'headerFile' ) }}" alt="{{ college.headerName }}">
+                <div id="college_logo">
+                    <img class="img-fluid" src="/uploads/images/fixes/logo-radio-francas" alt="logo_cc">
+                </div>
+                <div id="college_titre">
+                    {% if college.id == 29 %}
+                        <h3>{{ college.name }}</h3>
+                    {% else %}
+                        <h3>Collège {{ college.name }}</h3>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12" id="content_header_img">
+                <img id="college_header" class="img-fluid" src="{{ vich_uploader_asset(college, 'headerFile' ) }}" alt="{{ college.headerName }}">
+                <div id="college_logo">
+                    <img class="img-fluid" src="{{ vich_uploader_asset(college, 'logoFile' ) }}" alt="{{ college.logoName }}">
+                </div>
+                <div id="college_titre">
+                    {% if college.id == 29 %}
+                        <h3>{{ college.name }}</h3>
+                    {% else %}
+                        <h3>Collège {{ college.name }}</h3>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        <div class="col-12" id="college_intro">
+            <div id="content_text">
+                {{ college.GroupDescription|raw }}
+            </div>
+        </div>
+    </div>
+
+</section>
+<section class="container" id="college_page_content">
+   {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesByPageCollege', {'idcollege': college.id})) }}
+</section>
+
+
+

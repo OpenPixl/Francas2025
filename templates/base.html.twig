@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+            <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
+            <script src="https://kit.fontawesome.com/1fb9149f4c.js" crossorigin="anonymous"></script>
+            <script src="https://cdn.ckeditor.com/ckeditor5/22.0.0/classic/ckeditor.js"></script>
+        {% endblock %}
+    </head>
+    <body data-page="{{ app.current_route }}">
+            <header>
+                {% block header %}
+                    {% if app.request.attributes.get('_route') == 'op_webapp_public_homepage'%}
+                        {{ render(controller('App\\Controller\\Admin\\ConfigController::headerShow')) }}
+                    {% endif %}
+                {% endblock %}
+                {% block mainnav %}
+                    {{ render(controller('App\\Controller\\Webapp\\PageController::listmenu')) }}
+                {% endblock %}
+            </header>
+            <main>
+                {% block main %}
+                {% endblock %}
+                <section id="spinner" class="hidden">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div>Veuillez patienter ... &nbsp;</div>
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </section>
+            </main>
+            <footer>
+                {% block Modals %}
+                    <section class="hidden">
+                        <div class="modal fade" id="ModalWarning" tabindex="-1" aria-labelledby="ModalAlert" aria-hidden="true">
+                            <div class="modal-dialog bg-warning">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Attention</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermeture</button>
+                                        <button id="btnPushReq" type="submit" class="btn btn-primary">Envoyer</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div aria-live="polite" aria-atomic="true" class="bg-dark position-relative">
+                            <div class="toast-container position-absolute bottom-100 end-0 p-3">
+                                <div id="toaster" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header">
+                                        <img style="height:1rem" src="{{ asset('uploads/images/fixes/img_ressource_none.png') }}" class="rounded me-2" alt="...">
+                                        <strong class="me-auto">Collégiens-citoyens</strong>
+                                        <small class="text-muted">A l'instant</small>
+                                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                    <div class="toast-body">
+                                        Hello, world! This is a toast message.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {% endblock %}
+                {% block footer %}
+                    <div class="bg-[#ffd100] border-b border-white">
+                        <div class="mx-auto max-w-7xl p-2 sm:px-6 lg:px-8">
+                            <div class="grid grid-cols-4 gap-1">
+                                <div class="">
+                                    <img src="{{ asset('uploads/images/fixes/logo-footer.png') }}" alt="Francas">
+                                </div>
+                                <div>
+                                    <h6 class="font-semibold text-[#d84519]">FRANCAS DES LANDES</h6>
+                                    <p class="text-sm text-[#d84519]">3, Allée de la solidarité<br/>
+                                        40000 MONT DE MARSAN</p>
+                                    <p class="text-sm text-[#d84519]">Tel : 05 58 46 33 54</p>
+                                </div>
+                                <div></div>
+                                <div>
+                                    <h6 class="font-semibold text-[#d84519]">Partenaires</h6>
+                                    <img src="/uploads/images/fixes/CD40.png" alt="Conseil départemental des Landes">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-[#ffd100]">
+                        <div class="mx-auto max-w-7xl p-2 sm:px-6 lg:px-8">
+                            <div class="grid grid-cols-2 gap-1 ">
+                                <div>
+                                    <p class="text-sm text-[#d84519]">&copy; Collégiens-Citoyens 2020 - Site réalisé par <a href="https://www.openpixl.fr">OpenPixl</a></p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-end text-[#d84519]">
+                                        <a href="{{ path('op_webapp_page', {'slug':'mentions'}) }}">Mentions légales</a> |
+                                        <a href="">contacts</a> |
+                                        {% if not app.user %}
+                                            <a href="{{ path('op_admin_security_redirect_login') }}">se connecter</a>
+                                        {% endif %}
+                                        {% if app.user %}
+                                            <a href="{{ path('op_webapp_espcoll') }}">Espace collégiens</a> |
+                                            <a href="{{ path('op_admin_security_logout') }}">se déconnecter</a>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% endblock %}
+
+            </footer>
+    </body>
+</html>

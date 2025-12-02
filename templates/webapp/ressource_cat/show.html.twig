@@ -1,0 +1,28 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}RessourceCat{% endblock %}
+
+{% block main %}
+    <h1>RessourceCat</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ ressource_cat.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ ressource_cat.name }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ ressource_cat.slug }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('op_webapp_ressource_cat_index') }}">back to list</a>
+
+    <a href="{{ path('op_webapp_ressource_cat_edit', {'id': ressource_cat.id}) }}">edit</a>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Message{% endblock %}
+
+{% block main %}
+    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="row" id="content">
+            {{ include('espacecollege/dashboard/_header_college.html.twig') }}
+        </div>
+    </section>
+    <section class="my-4 mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 border-b border-b-gray-700 text-gray-700 flex justify-between items-center">
+        <h2 class="font-normal uppercase text-2xl">Tableau de bord | collège {{ college.name }}</h2>
+        <a href="{{ path('op_admin_security_logout') }}"><i class="fa-duotone fa-solid fa-right-from-bracket"></i> Se déconnecter</a>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8" id="espace_college_content">
+        <div class="grid grid-cols-4 gap-4">
+            <div class="col-span-3">
+                <h5 class="text-xl font-normal text-[#d84519] uppercase">Le message</h5>
+                <div class="mt-4 border border-gray-700 rounded-sm flex flex-row divide-x divide-gray-700 ">
+                    <div class="p-2 hover:bg-gray-100">
+                        <a href="{{ path('op_webapp_message_reply_mail', {'id' : message.id}) }}" class="" ><i class="fas fa-angle-left"></i> Répondre</a>
+                    </div>
+                    <div class="p-2 hover:bg-gray-100">
+                        <a href="{{ path('op_webapp_message_trans_mail', {'id' : message.id}) }}" class="btn btn-outline-dark btn-sm" ><i class="fas fa-angle-double-left"></i>Transférer</a>
+                    </div>
+                    <div class="flex-1">
+
+                    </div>
+                    <div class="p-2 hover:bg-gray-100">
+                        <a href="{{ path('op_webapp_message_delete', {'id': message.id}) }}" class="btn btn-outline-danger btn-sm" ><i class="fas fa-trash"></i> Supprimer</a>
+                    </div>
+
+                </div>
+                <div class="mt-2 border border-gray-300 bg-gray-50 rounded-sm p-2">
+                    <div class="mb-2">
+                        <p class="text-sm text-gray-500">Message envoyé le : {{ message.createdAt | date('d M y', "Europe/Paris") }}</p>
+                    </div>
+                    <div class="">
+                        <p class="text-sm text-shadow-slate-900"><span class="text-gray-700">De :</span> {{ message.author }}</p>
+                        <p class="text-sm text-shadow-slate-900"><span class="text-gray-700">Sujet :</span> {{ message.subject }}</p>
+                        <div class="mt-2">
+                            <h5 class="text-sm text-gray-700">Contenu :</h5>
+                            <p class="text-sm text-slate-900">{{ message.content | raw }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                {{ include('espacecollege/dashboard/_blocAdminCollege.html.twig') }}
+            </div>
+        </div>
+
+    </section>
+{% endblock %}

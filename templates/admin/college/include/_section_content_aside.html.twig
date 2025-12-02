@@ -1,0 +1,20 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
+    <div class="card" >
+        <div class="card-body">
+            {% if app.request.get('_route') == 'op_admin_college_new' or app.request.get('_route') == 'op_admin_user_edit' %}
+                <h4 class="text-muted"><i class="far fa-plus-square text-muted"></i> Nouveau collège</h4>
+            {% else %}
+                <h4><a href="{{ path('op_admin_college_new') }}"><i class="far fa-plus-square"></i> Nouveau collège</a></h4>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h3>{% if app.request.get('_route') == 'op_admin_college_index'%}
+                    <a href="{{ path('op_admin_dashboard_index') }}"><i class="fas fa-chevron-circle-left"></i> Retour</a>
+                {% else %}
+                    <a href="{{ path('op_admin_college_index') }}"><i class="fas fa-chevron-circle-left"></i> Retour</a>
+                {% endif %}</h3>
+        </div>
+    </div>
+</div>

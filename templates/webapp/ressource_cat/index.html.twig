@@ -1,0 +1,35 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}RessourceCat index{% endblock %}
+
+{% block main %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ressource_cat in ressource_cats %}
+            <tr>
+                <td>{{ ressource_cat.id }}</td>
+                <td>{{ ressource_cat.name }}</td>
+                <td>{{ ressource_cat.slug }}</td>
+                <td>
+                    <a href="{{ path('op_webapp_ressource_cat_show', {'id': ressource_cat.id}) }}">show</a>
+                    <a href="{{ path('op_webapp_ressource_cat_edit', {'id': ressource_cat.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('op_webapp_ressource_cat_new') }}">Create new</a>
+{% endblock %}

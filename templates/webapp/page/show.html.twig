@@ -1,0 +1,282 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}OpenGaia | {{ page.title }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        window.onload = function(){
+            // --------------------------------------------------------------------------
+            // Fonction OnClickBtnMenu - Mettre en page d'accueil la section sélectionnée
+            // --------------------------------------------------------------------------
+            function onClickBtnStar(event){
+                event.preventDefault();
+                const url = this.href;                                          // variable qui récupère l'url inclus dans le "this"
+                const icone = this.querySelector('i');                          // variable qui sélectionne l'élément balise <i></i>
+                axios
+                    .post(url)
+                    .then(function(response) {
+                        if(icone.classList.contains('far')) {
+                            icone.classList.replace('far', 'fas');
+                            icone.classList.replace('text-danger', 'text-success');
+                        }
+                        else {
+                            icone.classList.replace('fas', 'far');
+                            icone.classList.replace('text-success', 'text-danger');
+                        }
+                    });
+            }
+
+            // --------------------------------------------------------------------------
+            // Bloc de suppression d'une section
+            // --------------------------------------------------------------------------
+            // Ouverture de la modale de suppression
+            var Suppr = document.getElementById('Suppr')
+            Suppr.addEventListener('show.bs.modal', function (event) {
+                // Button that triggered the modal
+                var a = event.relatedTarget
+                // Extract info from data-bs-* attributes
+                var recipient = a.getAttribute('data-bs-whatever')
+                // If necessary, you could initiate an AJAX request here
+                // and then do the updating in a callback.
+                //
+                // Update the modal's content.
+                var modalTitle = Suppr.querySelector('.modal-title')
+                var modalText = Suppr.querySelector('.modal-text')
+                var modalBodyInput = Suppr.querySelector('.modal-body input')
+
+                modalTitle.textContent = "Suppression d'un évènement"
+                modalBodyInput.value = recipient
+                modalText.innerHTML = "Vous êtes sur le point de supprimer la section sélectionnée.<br><b>Etes-vous sur de continuer ?</b>"
+            })
+            // Action de Suppression de la ligne en cours
+            function onClickDelEvent(event){
+                event.preventDefault()
+                const id = document.getElementById('recipient-name').value
+                axios
+                    .post('/webapp/section/del/'+ id)
+                    .then(function(response)
+                    {
+                        // préparation de la liste à rafraichir
+                        const liste = document.getElementById('liste').innerHTML = response.data.liste;
+                        // on réinitie l'appel de l'évènement sur jsPosition
+                        document.querySelectorAll('a.jsPosition').forEach(function (link){
+                            link.addEventListener('click', onClickBtnPosition);
+                        })
+                        //On appelle le toast
+                        var option = {
+                            animation : true,
+                            autohide: true,
+                            delay : 3000,
+                        };
+                        var toastHTMLElement = document.getElementById("toaster");
+                        var message = response.data.message;
+                        var toastBody = toastHTMLElement.querySelector('.toast-body') // selection de l'élément possédant le message
+                        toastBody.textContent = message;
+                        var toastElement = new bootstrap.Toast(toastHTMLElement, option);
+                        toastElement.show();
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    })
+            }
+
+
+
+            // --------------------------------------------------------------------------
+            // Bloc de création d'une nouvelle section à la page
+            // --------------------------------------------------------------------------
+            // Ajouter un évènement sur le bouton AddSection
+            document.getElementById('btnAddSection').addEventListener("click", function(event){
+                event.preventDefault();
+                let element = document.getElementById('btnAddSection').name;
+                const data = element.split('-');
+                const page = data[0];
+                let row = data[1];
+                //console.log(page, row);
+                const url = '/webapp/section/addsection/' + page +'/'+ row
+                axios
+                .get(url)
+                .then(function(response)
+                {
+                    const liste = document.getElementById('liste').innerHTML = response.data.liste;
+                    // on réinitie l'appel de l'évènement sur jsPosition
+                    document.querySelectorAll('a.jsPosition').forEach(function (link){
+                        link.addEventListener('click', onClickBtnPosition);
+                    })
+                    // initialisation du toaster
+                    var toastHTMLElement = document.getElementById("toaster")
+                    var message = response.data.message
+                    var toastBody = toastHTMLElement.querySelector('.toast-body') // selection de l'élément possédant le message
+                    toastBody.textContent = message
+                    var toastElement = new bootstrap.Toast(toastHTMLElement, {animation : true,autohide: true,delay : 3000})
+                    toastElement.show()
+                    // génération d'un identifiant sur le bouton AddSection dans son attribut Name.
+                    let nextrow = ++row
+                    let name = page.concat('-',nextrow)
+                    //console.log(name)
+                    document.getElementById('btnAddSection').setAttribute("name", name)
+
+                })
+            })
+
+            // --------------------------------------------------------------------------
+            // Bloc de déplacement UP or DOWN d'une section
+            // --------------------------------------------------------------------------
+            function onClickBtnPosition(event)
+            {
+                event.preventDefault();
+                const id = this.id;                                                             // correspond au futur placement de la section
+                const icone = this.querySelector('i');
+                let level;
+                if(icone.classList.contains('fa-long-arrow-alt-up')) {
+                    level = 'up';
+                }else{
+                    level = 'down';
+                }
+                const url = '/webapp/section/position/' + id + '/' + level;
+                axios
+                    .get(url)
+                    .then(function(response){
+                        const liste = document.getElementById('liste').innerHTML = response.data.liste;
+                        // on réinitie l'appel de l'évènement sur jsPosition
+                        document.querySelectorAll('a.jsPosition').forEach(function (link){
+                            link.addEventListener('click', onClickBtnPosition);
+                        })
+                        // préparation du toaster
+                        var option = {
+                            animation : true,
+                            autohide: true,
+                            delay : 3000,
+                        };
+                        // initialisation du toaster
+                        var toastHTMLElement = document.getElementById("toaster");
+                        var message = response.data.message;
+                        var toastBody = toastHTMLElement.querySelector('.toast-body') // selection de l'élément possédant le message
+                        toastBody.textContent = message;
+                        var toastElement = new bootstrap.Toast(toastHTMLElement, option);
+                        toastElement.show();
+                    })
+            }
+
+            // --------------------------------------------------------------------------
+            // Bloc de déclaration des évènements sur la page
+            // --------------------------------------------------------------------------
+            // Ajouter un évènement sur le bouton de mise en vedette d'une section lors d'un clic
+            document.querySelectorAll('a.js-star').forEach(function (link){
+                link.addEventListener('click', onClickBtnStar);
+            })
+            // Ajouter un évènement sur le bouton de mise en vedette d'une section lors d'un clic
+            document.querySelectorAll('a.js-del-section').forEach(function (link){
+                link.addEventListener('click', onClickBtnDelSection);
+            })
+            // Ajouter un évènement sur le bouton de suppression de la ligne en cours
+            document.querySelectorAll('a.js-data-suppr').forEach(function(link){
+                link.addEventListener('click', onClickDelEvent)
+            })
+            // Appel de la fonction lors du clic sur la flèche DOWN
+            document.querySelectorAll('a.jsPosition').forEach(function (link){
+                link.addEventListener('click', onClickBtnPosition);
+            })
+        }
+    </script>
+{% endblock %}
+
+{% block header %}
+    {{ include('admin/dashboard/include/header.html.twig', {
+        'title' : 'Gestions des pages',
+        'btns' : {
+            'new': {
+                'id' : null,
+                'href' : path('op_webapp_page_new'),
+                'icon' : '<i class="fa-duotone fa-solid fa-square-plus"></i>',
+                'text' : 'Créer une nouvelle page',
+                'array':null
+            },
+            'return': {
+                'id' : null,
+                'href' : path('op_webapp_page_index'),
+                'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
+                'text' : 'Retour',
+                'array':null
+            }
+        }
+    }) }}
+{% endblock %}
+
+{% block main %}
+
+    <section id="op_admin_content_body">
+        <h5 class="font-normal uppercase text-xl text-sky-700">Contenu de la page : "{{ page.title }}"</h5>
+        <div class="grid grid-cols-5 gap-8 mt-4">
+            <div class="col-span-2">
+                <h3 class="font-medium border-b border-b-slate-900 mb-3">Détails de la page</h3>
+                <div class="">
+                    <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15 border border-b-slate-700">
+                        <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+                            <tr>
+                                <th class="w-1/3 text-start px-4 py-2 bg-slate-200">Id</th>
+                                <td class="w-2/3 text-start px-4">{{ page.id }}<input id="page" type="hidden" value="{{ page.id }}"></td>
+                            </tr>
+                            <tr>
+                                <th class="w-1/3 text-start px-4 py-2 bg-slate-200">Titre</th>
+                                <td class="w-2/3 text-start px-4">{{ page.title }} - {{ page.slug }}</td>
+                            </tr>
+                            <tr>
+                                <th class="w-1/3 text-start px-4 py-2 bg-slate-200">Etat</th>
+                                <td class="w-2/3 text-start px-4">{{ page.state }}</td>
+                            </tr>
+                            <tr>
+                                <th class="w-1/3 text-start px-4 py-2 bg-slate-200">menu ?</th>
+                                <td class="w-2/3 text-start px-4">{{ page.isMenu ? '<p class="text-success"><i class="far fa-check-circle"></i></p>' : '<p class="text-danger"><i class="far fa-times-circle"></i></p>' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="w-1/3 text-start px-4 py-2 bg-slate-200">Mots clefs</th>
+                                <td class="w-2/3 text-start px-4">{{ page.metaKeywords ? page.metaKeywords|join(', ') : '' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="w-1/3 text-start px-4 py-2 bg-slate-200">Description</th>
+                                <td class="w-2/3 text-start px-4">{{ page.metaDescription }}</td>
+                            </tr>
+                            <tr>
+                                <th class="w-1/3 text-start px-4 py-2 bg-slate-200">Tags</th>
+                                <td class="w-2/3 text-start px-4">{{ page.tags ? page.tags|join(', ') : '' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="w-1/3 text-start px-4 py-2 bg-slate-200">Créée le :</th>
+                                <td class="w-2/3 text-start px-4">{{ page.createdAt ? page.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="w-1/3 text-start px-4 py-2 bg-slate-200">Mise à jour le :</th>
+                                <td class="w-2/3 text-start px-4">{{ page.updatedAt ? page.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="col-span-3">
+                {{ render(controller('App\\Controller\\Webapp\\SectionController::byPage', {'page': page.id})) }}
+            </div>
+        </div>
+
+        <div class="row g-2">
+
+            <div class="col-10">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4">
+
+                            </div>
+                            <div class="col-8">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

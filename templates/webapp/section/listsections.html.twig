@@ -1,0 +1,30 @@
+{% if sections %}
+    {% for section in sections %}
+        <section class="{% if section.fluid == 1 %}{% else %}mx-auto max-w-7xl px-2 sm:px-6 lg:px-8{% endif %}" id="page_content">
+            {% if section.content == 'ONE_ARTICLE' %}
+                {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesBySection', {'idsection': section.id})) }}
+            {% elseif section.content == 'ONE_CATEGORY' %}
+            {% elseif section.content == 'FIVE_ARTICLES' %}
+                {{ render(controller('App\\Controller\\Webapp\\ArticleController::listFiveArticles', {'category': section.category})) }}
+            {% elseif section.content == 'ONE_COLLEGE' %}
+                {{ render(controller('App\\Controller\\Admin\\CollegeController::show', {'id': section.singleCollege})) }}
+            {% elseif section.content == 'ALL_COLLEGES' %}
+                {{ render(controller('App\\Controller\\Admin\\CollegeController::listCollegesBySection', {'idsection': section.id})) }}
+            {% elseif section.content == 'OTHER_CONTENT' %}
+                {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesBySectionOther', {'idsection': section.id})) }}
+            {% elseif section.content == 'ALL_RESSOURCES' %}
+                {{ render(controller('App\\Controller\\App\\RessourcesController::sectionListAll')) }}
+            {% elseif section.content == 'ALL_RESSOURCES' %}
+                {{ render(controller('App\\Controller\\App\\RessourcesController::sectionlistOneCategory', {'category': section.ressourcescat})) }}
+            {% endif %}
+        </section>
+    {%  endfor %}
+{% else %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h3 class="alert alert-warning">Pas de contenu</h3>
+            </div>
+        </div>
+    </div>
+{% endif %}

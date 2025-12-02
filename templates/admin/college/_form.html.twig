@@ -1,0 +1,143 @@
+<div>
+    {{ form_start(form) }}
+    <div class="my-2">
+        <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mb-1">Le COLLEGE</h3>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Nom de l\'établissement',
+                form : form.name,
+                'placeholder': 'Nom ?',
+                'input_width' : 'w-40',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/blocs/bloc_city_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label': 'Adresse',
+                address : form.address,
+                bisAddress : form.complement,
+                zipcode : form.zipcode,
+                city : form.city,
+                'address_width' :'w-80',
+                'bisAddress_width' :'w-80',
+                'zipcode_width' : 'w-20',
+                'city_width' :'w-60',
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/inputs/input_double_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Contacts',
+                form : form.collegePhone,
+                'placeholder': 'Téléphone',
+                'input_width' : 'w-40',
+                'oninput': '',
+                form2 : form.collegeEmail,
+                'placeholder2': 'Email',
+                'input_width2' : 'w-80',
+                'oninput2': ''
+            } %}
+        </div>
+
+    </div>
+
+    <div class="my-2">
+        <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mb-1">Le GROUPE</h3>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'L\'animateur du groupe',
+                form : form.animateur,
+                'placeholder': 'Nom ?',
+                'input_width' : 'w-40',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/inputs/input_double_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Contacts du groupe',
+                form : form.groupPhone,
+                'placeholder': 'Téléphone',
+                'input_width' : 'w-40',
+                'oninput': '',
+                form2 : form.groupEmail,
+                'placeholder2': 'Email',
+                'input_width2' : 'w-40',
+                'oninput2': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_textarea.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Description du groupe',
+                form : form.GroupDescription,
+                'placeholder': 'Nom ?',
+                'input_width' : 'w-full',
+                'rows': 10,
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Nos réunions',
+                form : form.workMeeting,
+                'placeholder': 'Nous nous retrouvons',
+                'input_width' : 'w-full',
+                'oninput': ''
+            } %}
+        </div>
+    </div>
+    <div class="my-2">
+        <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mb-1">AVATAR & BANDEAU</h3>
+        <div class="mb-1">
+            {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Bandeau',
+                'entity_id': college.id,
+                'entity_name': college.headerName,
+                'url_file': 'uploads/images/colleges/',
+                form : form.headerFile,
+                'input_width' : 'w-full',
+                'routename' : 'op_webapp_message_new',
+            } %}
+        </div>
+
+        <div class="mb-1">
+            {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label': 'Avatar',
+                'entity_id': college.id,
+                'entity_name': college.logoName,
+                'url_file': 'uploads/images/colleges/',
+                form : form.logoFile,
+                'input_width' : 'w-full',
+                'routename' : 'op_webapp_message_new',
+            } %}
+        </div>
+    </div>
+
+    <div id="bouton_form">
+        {% include 'composants/buttons/button_submit.html.twig' with {
+            'id': null,
+            'button_width': null,
+            'icon': null,
+            'text': button_label|default('Enregistrer')
+        } %}
+    </div>
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
+</div>
+

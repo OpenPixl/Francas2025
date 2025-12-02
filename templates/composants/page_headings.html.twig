@@ -1,0 +1,56 @@
+<div class="flex flex-row items-center justify-between rounded bg-white shadow px-2 py-2">
+    <div>
+        <nav class="sm:hidden" aria-label="Back">
+            <a href="#" class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700">
+                <svg class="mr-1 -ml-1 size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                    <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                </svg>
+                Back
+            </a>
+        </nav>
+        <nav class="hidden sm:flex" aria-label="Breadcrumb">
+            <ol role="list" class="flex items-center space-x-4">
+                <li>
+                    <div class="flex">
+                        <a href="{{ path('mac_admin_dashboard_index') }}" class="text-sm font-medium text-gray-500 hover:text-gray-700"><i class="fa-duotone fa-light fa-gauge"></i> Dashboard</a>
+                    </div>
+                </li>
+                {% if firstLabel is not null %}
+                <li>
+                    <div class="flex items-center">
+                        <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                            <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                        </svg>
+                        <a href="{% if firstLabel_route is not null %}{{ path(firstLabel_route) }}{% else %}#{% endif %}" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">{{ firstLabel }}</a>
+                    </div>
+                </li>
+                {% endif %}
+                {% if secondLabel is not null %}
+                <li>
+                    <div class="flex items-center">
+                        <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                            <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                        </svg>
+                        <a href="{% if secondLabel_route is not null %}{{ path(secondLabel_route) }}{% else %}#{% endif %}" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">{{ secondLabel }}</a>
+                    </div>
+                </li>
+                {% endif %}
+                {% if thirdLabel is not null %}
+                <li>
+                    <div class="flex items-center">
+                        <svg class="size-5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" data-slot="icon">
+                            <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                        </svg>
+                        <a href="{% if thirdLabel_route is not null %}{{ path(thirdLabel_route) }}{% else %}#{% endif %}" aria-current="page" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">{{ thirdLabel }}</a>
+                    </div>
+                </li>
+                {% endif %}
+            </ol>
+        </nav>
+    </div>
+    <div class="mt-0 md:flex md:items-center md:justify-between">
+        <div class="min-w-0 flex-1">
+            <h2 class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-2xl sm:tracking-tight">{{ label }}</h2>
+        </div>
+    </div>
+</div>

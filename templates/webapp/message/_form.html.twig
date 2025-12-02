@@ -1,0 +1,135 @@
+<div class="flex flex-col">
+    {% if app.request.attributes.get('_route') == 'op_webapp_message_reply_mail' %}
+        {{ form_start(replyform) }}
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Sujet',
+                form : replyform.subject,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_textarea.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Contenu du message',
+                form : replyform.content,
+                'placeholder': 'Nom ?',
+                'input_width' : 'w-full',
+                'rows': 10,
+                'oninput': ''
+            } %}
+        </div>
+
+        <div id="bouton_form">
+            {% include 'composants/buttons/button_submit.html.twig' with {
+                'id': null,
+                'button_width': null,
+                'icon': null,
+                'text': button_label|default('Enregistrer')
+            } %}
+        </div>
+
+        {{ form_end(replyform) }}
+    {% elseif app.request.attributes.get('_route') == 'op_webapp_message_trans_mail' %}
+        {{ form_start(transform) }}
+
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Sujet',
+                form : transform.subject,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/inputs/input_tomselectmulti.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'A :',
+                form : transform.recipient,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_textarea.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Contenu du message',
+                form : transform.content,
+                'placeholder': 'Nom ?',
+                'input_width' : 'w-full',
+                'rows': 10,
+                'oninput': ''
+            } %}
+        </div>
+
+        <div id="bouton_form">
+            {% include 'composants/buttons/button_submit.html.twig' with {
+                'id': null,
+                'button_width': null,
+                'icon': null,
+                'text': button_label|default('Envoyer le message')
+            } %}
+        </div>
+        {{ form_end(transform) }}
+    {% else %}
+        {{ form_start(form) }}
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Sujet',
+                form : form.subject,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/inputs/input_tomselectmulti.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'A :',
+                form : form.recipient,
+                'placeholder': 'inscrire le titre',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_textarea.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Contenu du message',
+                form : form.content,
+                'placeholder': 'Nom ?',
+                'input_width' : 'w-full',
+                'rows': 10,
+                'oninput': ''
+            } %}
+        </div>
+
+        <div id="bouton_form">
+            {% include 'composants/buttons/button_submit.html.twig' with {
+                'id': null,
+                'button_width': null,
+                'icon': null,
+                'text': button_label|default('Envoyer le message')
+            } %}
+        </div>
+
+        {{ form_end(form) }}
+    {% endif %}
+</div>
+
+

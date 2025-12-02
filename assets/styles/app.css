@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@import "tom-select/dist/css/tom-select.css";
+@source not "../../public";
+
+body {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}
+
+main a{
+    color: #d84519;
+}
+main a:hover{
+    color: #d84519;
+}
+
+main #bloc_admin a{
+    color: #d84519;
+}
+main #bloc_admin a:hover{
+    color: #d84519;
+    font-weight: bold;
+}
+
+main .ck-editor{
+    width: 100% !important;
+}

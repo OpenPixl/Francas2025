@@ -1,0 +1,19 @@
+<div class="w-full inline-flex bg-white items-center">
+    <div class="{{ legend_width }}">
+        <label class="text-sm text-slate-700 font-normal" for="{{ form.vars.id }}">
+            {{ label }}
+        </label>
+    </div>
+    <div class="{{ col_width }}">
+        {{ form_widget(form, { attr: { class: input_width ~' multiChoice block w-full rounded cursor-pointer focus:outline-none', 'placholder': placeholder, 'oninput': oninput } }) }}
+    </div>
+</div>
+{% if form.vars.help is not empty %}
+<div class="w-full inline-flex bg-white items-center">
+    <div class="inline-flex justify-start text-justify overflow-hidden">
+            <small class="form-text text-xs text-slate-500">
+                {{ form_help(form) }}
+            </small>
+    </div>
+</div>
+{% endif %}

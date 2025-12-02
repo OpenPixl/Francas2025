@@ -1,0 +1,29 @@
+<div class="card">
+    <div class="card-body">
+        {% if app.request.get('_route') == 'op_webapp_page_index'%}
+            <h4><a href="{{ path('op_webapp_ressources_new') }}"><i class="far fa-plus-square"></i> Nouvelle ressource</a></h4>
+        {% elseif app.request.get('_route') == 'op_webapp_ressources_new' or app.request.get('_route') == 'op_webapp_ressources_new' %}
+            <h4 class="text-muted"><i class="far fa-plus-square text-muted"></i> Nouvelle ressource</h4>
+        {% else %}
+            <h4><a href="{{ path('op_webapp_ressources_new') }}"><i class="far fa-plus-square"></i> Nouvelle ressource</a></h4>
+        {% endif %}
+    </div>
+</div>
+{% if app.request.get('_route') == 'op_webapp_section_homepagefavourites'%}
+<div class="card">
+    <div class="card-body">
+        <h3>
+            <a href="{{ path('op_webapp_section_homepagefavourites') }}"><i class="fas fa-home"></i> Page d'accueil</a>
+        </h3>
+    </div>
+</div>
+{% endif %}
+<div class="card">
+    <div class="card-body">
+        <h3>{% if app.request.get('_route') == 'op_webapp_page_index'%}
+                <a href="{{ path('op_admin_dashboard_index') }}"><i class="fas fa-chevron-circle-left"></i> Retour</a>
+            {% else %}
+                <a href="{{ path('op_webapp_page_index') }}"><i class="fas fa-chevron-circle-left"></i> Retour</a>
+            {% endif %}</h3>
+    </div>
+</div>

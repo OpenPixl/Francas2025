@@ -1,0 +1,36 @@
+{% if pageCount > 1 %}
+    <nav class="flex items-center justify-end text-sm">
+        {# Lien vers la première page #}
+        {% if first is defined and current != first %}
+            <a href="{{ path(route, query|merge({(pageParameterName): first})) }}" class="px-3 py-1 rounded-l-md border border-gray-300 bg-white hover:bg-gray-100 text-gray-600">
+                <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="size-5">
+                    <path d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                </svg>
+            </a>
+        {% endif %}
+
+        {# Liens vers les pages #}
+        {% for page in pagesInRange %}
+            {% if page == current %}
+                <span class="px-3 py-1 bg-blue-600 text-white border border-blue-600">
+                    {{ page }}
+                </span>
+            {% else %}
+                <a href="{{ path(route, query|merge({(pageParameterName): page})) }}"
+                   class="px-3 py-1 border border-gray-300 bg-white hover:bg-gray-100 text-gray-600">
+                    {{ page }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {# Lien vers la dernière page #}
+        {% if last is defined and current != last %}
+            <a href="{{ path(route, query|merge({(pageParameterName): last})) }}"
+               class="px-3 py-1 rounded-r-md border border-gray-300 bg-white hover:bg-gray-100 text-gray-600">
+                <svg viewBox="0 0 20 20" fill="currentColor" data-slot="icon" aria-hidden="true" class="size-5">
+                    <path d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                </svg>
+            </a>
+        {% endif %}
+    </nav>
+{% endif %}

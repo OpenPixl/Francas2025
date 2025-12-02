@@ -1,0 +1,26 @@
+<div class="w-full flex items-start bg-white">
+
+    <label class="{{ legend_width }} shrink-0 text-sm text-slate-700 mt-2" for="{{ firstname.vars.id }}">
+        {{ label }}
+    </label>
+
+    <div class="flex w-full justify-start overflow-hidden">
+        {% if civility is defined %}
+        <div class="flex">
+            {% for child in civility %}
+                <label for="{{ child.vars.id }}" class="flex items-center cursor-pointer">
+
+                    {{ form_widget(child, { attr: { class: 'hidden peer' } }) }}
+                    <span class="px-3 py-1 text-sm border-gray-300 {% if loop.first %}border-l border-t border-b rounded-l-lg {% else %}border {% endif%}transition peer-checked:border-sky-700 peer-checked:border-t peer-checked:border-r peer-checked:text-sky-700 font-medium uppercase">{{ child.vars.label }}</span>
+                </label>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if civility is defined %}
+            {{ form_widget(firstname, { attr: { class: firstname_width ~ ' border-t border-b border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 focus:outline-none focus:bg-white' } }) }}
+        {% else %}
+            {{ form_widget(firstname, { attr: { class: firstname_width ~ ' border-s border-t border-b border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 rounded-l-lg focus:outline-none focus:bg-white' } }) }}
+        {% endif %}
+        {{ form_widget(lastname, { attr: { class: lastname_width ~ ' border border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 rounded-r-lg focus:outline-none focus:bg-white' } }) }}
+    </div>
+</div>

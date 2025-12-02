@@ -1,0 +1,43 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>Etablissement</th>
+        <th>Commune</th>
+        <th>Animateur</th>
+        <th>publié</th>
+        <th>actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for college in colleges %}
+        <tr>
+            <td></td>
+            <td>{{ college.name }}</td>
+            <td>{{ college.city }}</td>
+            <td>{{ college.animateur }}</td>
+            <td>
+                {% if college.isActive == 0 %}
+                    <a class="js-verified" href="{{ path('op_admin_college_verified', {'id': college.id}) }}"><i class="far fa-times-circle text-danger"></i></a>
+                {% elseif college.isActive == 1 %}
+                    <a class="js-verified" href="{{ path('op_admin_college_verified', {'id': college.id}) }}"><i class="far fa-check-circle text-success"></i></a>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{{ path('op_admin_college_show', {'id': college.id}) }}"><i class="far fa-eye"></i></a>&nbsp;
+                <a href="{{ path('op_admin_college_edit', {'id': college.id}) }}"><i class="far fa-edit"></i></a>
+                {#
+                &nbsp;|&nbsp;
+            <a href="#" class="js-modalSuppr text-danger" type="button" data-bs-toggle="modal" data-bs-target="#Suppr" data-bs-whatever="{{ college.id }}">
+                <i class="fas fa-eraser"></i>
+            </a>
+                #}
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="15">no records found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

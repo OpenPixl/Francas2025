@@ -1,0 +1,60 @@
+<div class="table-responsive">
+
+    <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+        <thead class="">
+            <tr>
+                <th></th>
+                <th>Titre</th>
+                <th>Thème</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+        {% for a in articles %}
+            <tr class="hover:bg-gray-100">
+                <td><input type="checkbox"></td>
+
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    {{ a.title }}<br><small class="text-gray-500">{{ a.author }}</small>
+                </td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    {{ a.theme }}
+                </td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ a.createdAt|date('d-m-y') }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ a.updatedAt|date('d-m-y')}}</td>
+
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    <a href="{{ path('op_webapp_articles_show', {'id':a.id}) }}" class="text-blue-600 hover:underline">Voir</a>
+                    <a href="{{ path('op_webapp_articles_edit_admin', {'id':a.id}) }}" class="text-yellow-600 hover:underline">Modifier</a>
+                    <a href="{{ path('op_webapp_articles_delete', {'id':a.id}) }}" class="text-red-600 hover:underline">Supprimer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8" class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                    Aucun résultat trouvé.
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tbody>
+        <tr>
+            <td colspan="8" class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+
+                <div class="relative flex flex-row w-full">
+                    <div class="flex-1">
+                        <p class="text-sm">Nombre de résultats : {{ articles.getTotalItemCount }}</p>
+                    </div>
+                    <div class="flex-1">
+                        {{ knp_pagination_render(articles, 'include/pagination.html.twig') }}
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+
+</div>

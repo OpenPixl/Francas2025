@@ -1,0 +1,52 @@
+<header class="relative flex flex-row w-full justify-around bg-white shadow-sm dark:bg-gray-800 dark:shadow-none dark:after:pointer-events-none dark:after:absolute dark:after:inset-x-0 dark:after:inset-y-0 dark:after:bottom-0 dark:after:border-y dark:after:border-white/10">
+    <div class="flex-1 px-4 py-4 sm:px-6 lg:px-8">
+        <div class="w-full h-full flex items-center justify-start">
+            <h1 class="text-lg/6 font-semibold text-gray-900 dark:text-white">{{ title }}</h1>
+        </div>
+    </div>
+    {% if btns is defined %}
+
+        <div class="flex-1 px-4 py-4 sm:px-6 lg:px-8">
+        <div class="w-full flex justify-end">
+
+            {% if btns.return is defined and btns.return is not null %}
+                {{ include('composants/buttons/button_utils.html.twig', {
+                    'id': btns.return.id,
+                    'icon': btns.return.icon,
+                    'href': btns.return.href,
+                    'text': btns.return.text,
+                    'array': btns.return.array
+                }) }}
+            {% endif %}
+            {% if btns.new is defined and btns.new is not null %}
+                {{ include('composants/buttons/button_utils.html.twig', {
+                    'id': btns.new.id,
+                    'icon': btns.new.icon,
+                    'href': btns.new.href,
+                    'text': btns.new.text,
+                    'array':btns.new.array
+                }) }}
+            {% endif %}
+            {% if btns.edit is defined and btns.edit is not null %}
+            {{ include('composants/buttons/button_utils.html.twig', {
+                'id': btns.edit.id,
+                'icon': btns.edit.icon,
+                'href': btns.edit.href,
+                'text': btns.edit.text,
+                'array':btns.edit.array
+            }) }}
+            {% endif %}
+            {% if btns.del is defined and btns.del is not null %}
+            {{ include('composants/buttons/button_utils.html.twig', {
+                'id': btns.del.id,
+                'icon': btns.del.icon,
+                'href': btns.del.href,
+                'text': btns.del.text,
+                'array':btns.del.array
+            }) }}
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    {% endif %}
+</header>

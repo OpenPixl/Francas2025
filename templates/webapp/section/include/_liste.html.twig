@@ -1,0 +1,59 @@
+<table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+    <thead>
+    <tr>
+        <th></th>
+        <th class="text-start">Section</th>
+        <th class="text-start">Mise en avant</th>
+        <th class="text-start">Contenu</th>
+        <th class="text-start">actions</th>
+    </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+    {% for section in sections %}
+        <tr class="hover:bg-gray-100">
+            <td>
+                <i class="fa-duotone fa-light fa-grip-dots-vertical"></i>
+            </td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><a href="{{ path('op_webapp_section_edit', {'id': section.id}) }}">{{ section.name }}</a></td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                {% if section.favorites == 0 %}
+                    <p class="card-text"><a class="js-star" href="{{ path('op_webapp_section_star', {'id': section.id}) }}"><i class="far fa-star text-warning"></i></a></p>
+                {% else %}
+                    <p class="card-text"><a class="js-star" href="{{ path('op_webapp_section_star', {'id': section.id}) }}"><i class="fas fa-star text-warning"></i></a></p>
+                {% endif %}
+            </td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                {% if section.content == 'ONE_ARTICLE' %}
+                    Un article
+                {% elseif section.content == 'ONE_ARTICLE_COMPLETE' %}
+                    Un article complet
+                {% elseif section.content == 'FIVE_ARTICLES' %}
+                    Les 5 deniers articles collègiens
+                {% elseif section.content == 'Category' %}
+                    Une catégorie
+                {% elseif section.content == 'One_event' %}
+                    Un Evènement
+                {% elseif section.content == 'Events' %}
+                    les évènement à venir
+                {% elseif section.content == 'HistoryOfEvent' %}
+                    Historique des évènements
+                {% elseif section.content == 'OTHER_CONTENT' %}
+                    Autres contenu
+                {% else %}
+                {{ section.content }}
+                {% endif %}
+            </td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                <a href="{{ path('op_webapp_section_edit', {'id': section.id}) }}"><i class="far fa-edit"></i></a>&nbsp;&nbsp;
+                <a href="#" class="js-modalSuppr text-danger" type="button" data-bs-toggle="modal" data-bs-target="#Suppr" data-bs-whatever="{{ section.id }}">
+                    <i class="bi bi-eraser text-danger"></i>
+                </a>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="9">no records found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

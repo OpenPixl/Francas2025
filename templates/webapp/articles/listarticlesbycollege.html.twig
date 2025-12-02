@@ -1,0 +1,24 @@
+{% if not articles %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Titre</th>
+                <th>Thème</th>
+                <th>Etat</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="4">
+                <p>Pour le moment, aucun article n'a été produit par le groupe de collégiens</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+{% else %}
+    <div id="listeArticles">
+        {{include('webapp/articles/include/_listebycollege.html.twig')}}
+    </div>
+{% endif %}
+

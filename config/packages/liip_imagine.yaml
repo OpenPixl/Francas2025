@@ -1,0 +1,69 @@
+# Documentation on how to configure the bundle can be found at: https://symfony.com/doc/current/bundles/LiipImagineBundle/basic-usage.html
+liip_imagine:
+    # valid drivers options include "gd" or "gmagick" or "imagick"
+    driver: "gd"
+    twig:
+        mode: lazy
+    filter_sets:
+        thumb_bandeau_college:
+            quality: 75
+            filters:
+                thumbnail:
+                    size: [ 1132, 250 ]
+                    mode: outbond
+                background:
+                    # set the background color to #00ffff
+                    color: '#ffffff'
+                    # set a size different from the input image
+                    size: [ 1132, 250 ]
+                    # center input image on the newly created background
+                    position: center
+
+        thumb_logo_college:
+            quality: 75
+            filters:
+                thumbnail:
+                    size: [ 200, 152 ]
+                    mode: outbond
+                background:
+                    # set the background color to #00ffff
+                    color: '#ffffff'
+                    # set a size different from the input image
+                    size: [ 200, 152 ]
+                    # center input image on the newly created background
+                    position: center
+
+        thumb_card_college:
+            quality: 75
+            filters:
+                thumbnail:
+                    size: [ 314, 240 ]
+                    mode: outbond
+
+        thumb_img_article:
+            quality: 75
+            filters:
+                thumbnail:
+                    size: [ 280, 210 ]
+                    mode: outbond
+                background:
+                    # set the background color to #00ffff
+                    color: '#ffffff'
+                    # set a size different from the input image
+                    size: [ 280, 210 ]
+                    # center input image on the newly created background
+                    position: center
+
+        thumb_five_articles:
+            quality: 75
+            filters:
+                thumbnail:
+                    size: [ 280, 210 ]
+                    mode: outbond
+                background:
+                    # set the background color to #00ffff
+                    color: '#ffffff'
+                    # set a size different from the input image
+                    size: [ 280, 210 ]
+                    # center input image on the newly created background
+                    position: center

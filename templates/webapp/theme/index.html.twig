@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Theme index{% endblock %}
+
+{% block main %}
+    <h1>Theme index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>ImageName</th>
+                <th>ImageSize</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for theme in themes %}
+            <tr>
+                <td>{{ theme.id }}</td>
+                <td>{{ theme.name }}</td>
+                <td>{{ theme.imageName }}</td>
+                <td>{{ theme.imageSize }}</td>
+                <td>{{ theme.updatedAt ? theme.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('webapp_theme_show', {'id': theme.id}) }}">show</a>
+                    <a href="{{ path('webapp_theme_edit', {'id': theme.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('webapp_theme_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un message{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        window.onload = function(){
+            ClassicEditor
+                .create(document.querySelector('#message_content'), {
+                    toolbar: [ 'heading','bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment' ],
+                    height: 50
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+    </script>
+{% endblock %}
+
+{% block main %}
+    <section class="container" id="espace_college_header">
+        <div class="row" id="content">
+            {{ include('espacecollege/dashboard/_header_college.html.twig') }}
+        </div>
+    </section>
+    <section class="container"  id="espace_college_content">
+        <div class="row">
+            <div class="col-9" id="content">
+                <div class="row" id="content_title">
+                    <div class="col-12">
+                        <h5>Modifier un message</h5>
+                        <p>Vous pouvez envoyer un message à un collège ou plusieurs inscrit dans le dispositif.</p>
+                        <hr>
+                    </div>
+                </div>
+                {{ include('webapp/message/_form.html.twig') }}
+            </div>
+            {{ render(controller('App\\Controller\\Admin\\CollegeController:blocAdminCollege', {'id':college.id})) }}
+        </div>
+    </section>
+{% endblock %}

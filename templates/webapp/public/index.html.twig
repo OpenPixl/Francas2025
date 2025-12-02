@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+{#
+{% block meta %}
+    {{ parent() }}
+    <link rel="icon" href="{{ vich_uploader_asset(parameter, 'faviconFile') }}" />
+
+{% endblock %}
+#}
+{% block title %}{{ config.name }}{% endblock %}
+
+{% block main %}
+    {% if not sections %}
+        <header id="page-title">
+            <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+                <div class="row">
+                    <div class="col">
+                        {% if config.IsShowTitleSiteHome == 1 %}
+                            <h1 class="text-center title">{{ config.name }}</h1>
+                        {% else %}
+                        {% endif %}
+                        <p class="text-center text-h1">Bienvenue sur votre site.<br></p>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <div class="row align-items-center">
+                <div class="col-xs-12 col-sm-12 col-lg-6 col-xl-6 mb-4">
+                </div>
+                <div class="col-xs-12 col-sm-12 col-lg-6 col-xl-6">
+                </div>
+            </div>
+        </section>
+    {% else %}
+        {% if app.request.get('_route') == 'op_webapp_public_homepage' %}
+            {% for section in sections %}
+                {% include('webapp/section/include/_onesection.html.twig') %}
+            {% endfor %}
+        {% else %}
+            {% for section in sections %}
+                {% include('webapp/section/include/_onesection.html.twig') %}
+            {% endfor %}
+        {% endif%}
+    {% endif %}
+{% endblock %}

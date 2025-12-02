@@ -1,0 +1,51 @@
+{% if ressource.imageName is not null %}
+    <div class="col-3 g-0" id="img_ressource">
+        <img class="img-fluid" src="{{ vich_uploader_asset(ressource, 'imageFile', 'App\\Entity\\Webapp\\ressources' ) }}" alt="{{ ressource.imageName }}">
+        <div id="logo_ressource">
+            <div id="logo_ressource_support">
+                {% if ressource.support is not null %}
+                    {{ render(controller('App\\Controller\\Webapp\\SupportController::Show', {'id': ressource.idsupport})) }}
+                {% else %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-9 g-0" id="content_text">
+        <div class="row">
+            <div class="col-12" id="content_title">
+                <h3>{{ ressource.name }}</a>
+            </div>
+            <div class="col-12">
+                {{ ressource.content|u.truncate(280, ' ...')|raw }}
+                {% if app.request.attributes.get('_route') == 'op_webapp_ressources_ressourceSlug' %}
+                {% else %}
+                <p>Lire la suite</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="col-3 g-0" id="img_ressource">
+        <img class="img-fluid" src="/uploads/images/fixes/img_ressource_none.png" alt="img_ressource_none">
+        <div id="logo_ressource">
+            <div id="logo_ressource_support">
+                {% if ressource.support is not null %}
+                    {{ render(controller('App\\Controller\\Webapp\\SupportController::Show', {'id': ressource.idsupport})) }}
+                {% else %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-9 g-0" id="content_text">
+        <div class="row">
+            <div class="col-12" id="content_title">
+                <h3>{{ ressource.name }}</h3>
+                {{ ressource.content|u.truncate(280, ' ...')|raw }}
+                {% if app.request.attributes.get('_route') == 'op_webapp_ressources_ressourceSlug' %}
+                {% else %}
+                    <p>Lire la suite</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}

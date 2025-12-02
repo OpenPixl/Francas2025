@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Collège {{ college.name }}{% endblock %}
+
+{% block main %}
+    <section class="bg-[#ffd100]/20 py-4" id="college_page_header">
+        <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            {% include 'admin/college/include/banner_college.html.twig' %}
+        </div>
+
+        <div class="row" id="content">
+            <div class="col-12" id="college_intro">
+                <div id="content_text">
+                    {{ college.GroupDescription|raw }}
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="mx-auto max-w-7xl px-2 py-2 sm:px-6 lg:px-8" id="college_page_content">
+        <h1 class="font-semibold text-2xl text-gray-700 border-b border-b-gray-700">Les articles de notre collège</h1>
+        {{ include('webapp/articles/listarticlesbypagecollege.html.twig') }}
+    </section>
+
+
+{% endblock %}

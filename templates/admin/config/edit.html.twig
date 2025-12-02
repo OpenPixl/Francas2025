@@ -1,0 +1,33 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}Collégiens-Citoyens{% endblock %}
+
+{% block header %}
+    {{ include('admin/dashboard/include/header.html.twig', {
+        'title' : 'PARAMETRES',
+        'btns' : {
+            'return': {
+                'id' : null,
+                'href' : path('op_webapp_page_index'),
+                'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
+                'text' : 'Retour',
+                'array':null
+            }
+        }
+    }) }}
+{% endblock %}
+
+{% block main %}
+
+    <section id="op_admin_content_body">
+
+        <h2 class="font-normal uppercase text-xl text-sky-700">Modifier les information du dite</h2>
+
+        <div class="mt-3">
+            {{ include('admin/config/_form.html.twig') }}
+        </div>
+
+
+    </section>
+
+{% endblock %}

@@ -1,0 +1,96 @@
+{{ form_start(form) }}
+<div class="my-2">
+    <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mb-1">Information du membre</h3>
+    <div class="mb-1">
+        {% include 'composants/forms/blocs/bloc_identity_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Nom & prénom',
+            firstname : form.firstName,
+            lastname : form.lastName,
+            'placeholder': 'Nom ?',
+            'firstname_width' : 'w-40',
+            'lastname_width' : 'w-40',
+            'oninput': ''
+        } %}
+    </div>
+    <div class="mb-1">
+        {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Email',
+            form : form.email,
+            'placeholder': 'Nom ?',
+            'input_width' : 'w-100',
+            'oninput': ''
+        } %}
+    </div>
+
+    <div class="mt-3 mb-1">
+        {% include 'composants/forms/blocs/bloc_city_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label': 'Adresse',
+            address : form.adress1,
+            bisAddress : form.adress2,
+            zipcode : form.zipcode,
+            city : form.city,
+            'address_width' :'w-80',
+            'bisAddress_width' :'w-80',
+            'zipcode_width' : 'w-20',
+            'city_width' :'w-60',
+        } %}
+    </div>
+
+    <div class="mt-3 mb-1">
+        {% include 'composants/forms/blocs/bloc_identity_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Contacts téléphonique',
+            firstname : form.phoneDesk,
+            lastname : form.phoneGsm,
+            'placeholder': 'Nom ?',
+            'firstname_width' : 'w-40',
+            'lastname_width' : 'w-40',
+            'oninput': ''
+        } %}
+    </div>
+
+
+    <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mt-3 mb-1">Rôles du membre</h3>
+    <div class="mt-3 mb-1">
+        {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Type de membre',
+            form : form.typeuser,
+            'placeholder': 'Nom ?',
+            'input_width' : 'w-40',
+            'oninput': ''
+        } %}
+    </div>
+
+    <div class="mt-3 mb-1">
+        {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+            'legend_width' : 'w-3/12',
+            'col_width' : 'w-9/12',
+            'label' : 'Avatar',
+            'entity_id': user.id,
+            'entity_name': user.avatarName,
+            'url_file': 'uploads/images/colleges/',
+            form : form.avatarFile,
+            'input_width' : 'w-200',
+            'routename' : 'op_webapp_message_new',
+        } %}
+    </div>
+
+    <div id="bouton_form">
+        {% include 'composants/buttons/button_submit.html.twig' with {
+            'id': null,
+            'button_width': null,
+            'icon': null,
+            'text': button_label|default('Enregistrer')
+        } %}
+    </div>
+</div>
+{{ form_end(form) }}

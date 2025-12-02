@@ -1,0 +1,41 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}OpenGaia | Administration{% endblock %}
+
+{% block header %}
+    {{ include('admin/dashboard/include/header.html.twig', {
+        'title' : 'Gestions des pages',
+        'btns' : {
+            'new': {
+                'id' : null,
+                'href' : path('op_webapp_page_new'),
+                'icon' : '<i class="fa-duotone fa-solid fa-square-plus"></i>',
+                'text' : 'Créer une nouvelle page',
+                'array':null
+            },
+            'return': {
+                'id' : null,
+                'href' : path('op_webapp_page_index'),
+                'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
+                'text' : 'Retour',
+                'array':null
+            }
+        }
+    }) }}
+{% endblock %}
+
+{% block main %}
+
+    <section id="op_admin_content_body">
+
+        <h2 class="font-normal uppercase text-xl text-sky-700">Modifier une page</h2>
+
+
+        <div class="mt-3">
+            {{ include('webapp/page/_form.html.twig') }}
+        </div>
+
+
+    </section>
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Support{% endblock %}
+
+{% block main %}
+    <h1>Create new Support</h1>
+
+    {{ include('webapp_support/_form.html.twig') }}
+
+    <a href="{{ path('webapp_support_index') }}">back to list</a>
+{% endblock %}

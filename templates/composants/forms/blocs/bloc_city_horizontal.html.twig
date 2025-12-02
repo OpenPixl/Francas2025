@@ -1,0 +1,20 @@
+<div class="w-full inline-flex bg-white">
+    <div class="{{ legend_width }}">
+        <label class="text-sm text-slate-700" for="{{ zipcode.vars.id }}">
+            {{ label }}
+        </label>
+    </div>
+    <div class="{{ col_width }} flex flex-col justify-start overflow-hidden">
+        {{ form_widget(address, { attr: { class: address_width ~ ' border border-gray-300 bg-gray-100/70 rounded-t-lg text-gray-900 text-sm px-2 py-1 focus:outline-none focus:bg-white' } }) }}
+        {{ form_widget(bisAddress, { attr: { class: bisAddress_width ~ ' border-l border-r border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 focus:outline-none focus:bg-white' } }) }}
+        <div class="inline-flex">
+            {{ form_widget(zipcode, { attr: { class: zipcode_width ~ ' text-sm px-2 py-1 border-y border-l border-gray-300 bg-gray-100/70 rounded-bl-lg text-gray-900 focus:outline-none focus:bg-white', 'maxlength':"5" } }) }}
+            {{ form_widget(city, { attr: { class: 'hidden'} }) }}
+            <select id="selectcity" class="{{ city_width }} text-sm px-2 py-1 border-x border-y border-gray-300  bg-gray-100/70 rounded-br-lg text-gray-700 focus:outline-none focus:bg-white">
+                <option>{{ city.vars.data }}</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+

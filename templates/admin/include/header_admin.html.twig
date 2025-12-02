@@ -1,0 +1,55 @@
+<div id="header_admin" class="navbar navbar-expand-lg navbar-light bg-light" style="background: linear-gradient(90deg, rgba(28,113,216,1) 0%, rgba(48,200,119,1) 100%); padding:4px 5px; font-size:110%;">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ path('op_admin_dashboard_index') }}">OpenGaia</a>
+        <div class="collapse navbar-collapse" id="block_title">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Accueil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://wiki.collegiens-citoyens.openpixl.fr/">aide</a>
+                </li>
+            </ul>
+        </div>
+        {% if app.request.attributes.get('_route') == 'op_admin_first_install' %}
+        {% else %}
+        <div class="collapse navbar-collapse" id="block_user">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-bullhorn"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-envelope"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('op_webapp_public_homepage')}}" onclick="window.open(this.href); return false;"><i class="bi bi-eye">  Voir le site</i>
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userpanel" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if app.user is null %}
+                            {% do path('op_admin_security_login') %}
+                        {% else %}
+                        {{ app.user.firstName }}  {{ app.user.lastName }}
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userpanel">
+                        <li><a class="dropdown-item" href="#"><i class="far fa-id-badge"></i> Mon profil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-key"></i> Changer le mot de passe</a></li>
+                        <li><a class="dropdown-item" href="{{ path('op_admin_security_logout') }}"><i class="fas fa-lock-open"></i> Déconnexion</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+

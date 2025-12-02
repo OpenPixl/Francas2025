@@ -1,0 +1,55 @@
+{# templates/components/_table.html.twig #}
+<table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+    <thead class="">
+        <tr>
+            <th></th>
+            {% for header in headers %}
+                <th scope="col" class="py-1.5 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                    {{ header }}
+                </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+    {% for row in rows %}
+        <tr class="hover:bg-gray-100">
+            <td><input type="checkbox"></td>
+            {% for row in rows %}
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ titre }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ row.author }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ row.theme }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ row.support }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ row.createdAt }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ row.updatedAt }}</td>
+
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                    <a href="{{ row.actions.view }}" class="text-blue-600 hover:underline">Voir</a>
+                    <a href="{{ row.actions.edit }}" class="text-yellow-600 hover:underline">Modifier</a>
+                    <a href="{{ row.actions.delete }}" class="text-red-600 hover:underline">Supprimer</a>
+                </td>
+            {% endfor %}
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="{{ headers|length + 1 }}" class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                Aucun résultat trouvé.
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    <tbody>
+        <tr>
+            <td colspan="{{ headers|length + 1 }}" class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+
+                <div class="relative flex flex-row w-full">
+                    <div class="flex-1">
+                        <p class="text-sm">Nombre de résultats : {{ articles.getTotalItemCount }}</p>
+                    </div>
+                    <div class="flex-1">
+                        {{ knp_pagination_render(articles, 'include/pagination.html.twig') }}
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>

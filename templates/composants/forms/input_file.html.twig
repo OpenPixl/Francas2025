@@ -1,0 +1,20 @@
+<label class="font-normal text-sm text-slate-700" for="{{ id }}">
+    {{ label }}
+</label>
+<div class="flex flex-row gap-1 bg-white items-center">
+    <div class="flex-1 ">
+        <input id="{{ id }}" class="w-full text-sm bg-gray-100 text-slate-900 border border-gray-300 rounded file:py-1 file:px-2 file:mr-4 file:rounded-s file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-800 hover:file:bg-gray-100 active:file:bg-gray-100" required="{{ required }}" name="{{ name }}" type="file" value="{{ value }}">
+        {% block form_help %}
+            {% if form.logoFile.vars.help is not empty %}
+                <p class="text-sm text-gray-500">{{ form.logoFile.vars.help|raw }}</p>
+            {% endif %}
+        {% endblock %}
+    </div>
+    <div class="flex-1">
+        {% if association.logoName is not null or association.logoName is not empty %}
+            <div class="border border-gray-300 rounded">
+                <img class src="{{ asset('associations/'~association.slug~'/logo/'~association.logoName) }}" alt="{{ association.logoName }}">
+            </div>
+        {% endif %}
+    </div>
+</div>

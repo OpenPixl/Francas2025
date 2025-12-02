@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Collégiens-citoyens{% endblock %}
+
+{% block main %}
+	<section class="container">
+		<div id="bloc_login">
+			{{form_start(form)}}
+			<div class="row">
+				<div class="col-12">
+					<h3>Renouvellement du mot de passe</h3>
+					<hr>
+					<p>
+						Cet espace est dédié à la modification du mot de passe du compte de {{ user.firstname }} {{ user.lastname }}.<br>
+						Seul le référent de l'établissement possède l'accès à cette page.
+					</p>
+
+				</div>
+			</div>
+			<div class="row" id="login_form">
+				<div class="col-12">
+					<div class="form-group row">
+						{{ form_label(form.Password.first, "Nouveau mot de passe", {'label_attr': {'class': 'col-sm-5 col-form-label'}}) }}
+						<div class="col-sm-7">
+							{{ form_widget(form.Password.first) }}
+							<small>{{ form_help(form.Password.first) }}</small>
+							<div class="form-error">
+								{{ form_errors(form.Password.first) }}
+							</div>
+						</div>
+					</div>
+					<div class="form-group row">
+						{{ form_label(form.Password.second, "Confirmer mot de passe", {'label_attr': {'class': 'col-sm-5 col-form-label'}}) }}
+						<div class="col-sm-7">
+							{{ form_widget(form.Password.second) }}
+							<small>{{ form_help(form.Password.second) }}</small>
+							<div class="form-error">
+								{{ form_errors(form.Password.second) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<button class="btn btn-outline-danger"  type="submit">Envoyer</button>
+			{{form_end(form)}}
+		</div>
+	</section>
+
+{% endblock %}

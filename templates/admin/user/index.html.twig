@@ -1,0 +1,113 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}user index{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        window.onload = function(){
+            // active ou désactive l'utilisateur sélectionné de la plateforme
+            function onClickBtnVerified(event){
+                event.preventDefault();
+                const url = this.href;                                          // variable qui récupère l'url inclus dans le "this"
+                const icone = this.querySelector('i');
+                axios
+                    .get(url)
+                    .then(function(response) {
+                        if(icone.classList.contains('fa-check-circle')) {
+                            icone.classList.replace('fa-check-circle', 'fa-times-circle');
+                            icone.classList.replace('text-success', 'text-danger');
+                        }
+                        else {
+                            icone.classList.replace('fa-times-circle', 'fa-check-circle');
+                            icone.classList.replace('text-danger', 'text-success');
+                        }
+                    });
+            }
+
+            // Evènement sur le bouton js-verified
+            document.querySelectorAll('a.js-verified').forEach(function (link){
+                link.addEventListener('click', onClickBtnVerified);
+            })
+
+            // Modal suppr une ligne
+            var Suppr = document.getElementById('Suppr')
+            Suppr.addEventListener('show.bs.modal', function (event) {
+                // Button that triggered the modal
+                var a = event.relatedTarget
+                // Extract info from data-bs-* attributes
+                var recipient = a.getAttribute('data-bs-whatever')
+                // If necessary, you could initiate an AJAX request here
+                // and then do the updating in a callback.
+                //
+                // Update the modal's content.
+                var modalTitle = Suppr.querySelector('.modal-title')
+                var modalText = Suppr.querySelector('.modal-text')
+                var modalBodyInput = Suppr.querySelector('.modal-body input')
+
+                modalTitle.textContent = "Suppression d'un membre"
+                modalBodyInput.value = recipient
+                modalText.innerHTML = "Vous êtes sur le point de supprimer le membre sélectionné.<br><b>Etes-vous bien sur de vouloir continuer ?</b>"
+            })
+
+            // function Suppression de la ligne en cours
+            function onClickDelEvent(event){
+                //event.preventDefault()
+                const id = document.getElementById('recipient-name').value
+                axios
+                    .post('/admin/user/del/'+ id)
+                    .then(function(response)
+                    {
+                        const liste = document.getElementById('liste').innerHTML;
+                        console.log(liste);
+
+                        // Bouton de suppression de la ligne en cours
+                        document.querySelectorAll('a.js-data-suppr').forEach(function(link){
+                            link.addEventListener('click', onClickDelEvent)
+                        })
+
+                        var option = {
+                            animation : true,
+                            autohide: true,
+                            delay : 3000,
+                        };
+
+                        var toastHTMLElement = document.getElementById("toaster");
+                        var message = response.data.message;
+                        var toastBody = toastHTMLElement.querySelector('.toast-body') // selection de l'élément possédant le message
+                        toastBody.textContent = message;
+                        var toastElement = new bootstrap.Toast(toastHTMLElement, option);
+                        toastElement.show();
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    })
+            }
+
+            // Bouton de suppression de la ligne en cours
+            document.querySelectorAll('a.js-data-suppr').forEach(function(link){
+                link.addEventListener('click', onClickDelEvent)
+            })
+        }
+    </script>
+{% endblock %}
+
+{% block main %}
+
+    <section id="op_admin_content_body">
+
+        <h2 class="font-normal uppercase text-xl text-sky-700">Liste des membres du site</h2>
+        <p class="text-sm font-light">Créer, Modifier ou supprimer des utilisateurs du site.</p>
+
+        <div class="mt-3">
+            <button class="btn btn-sm btn-outline-secondary">Supprimer</button>
+            {{ include('admin/user/include/_liste.html.twig') }}
+        </div>
+
+        <div class="mt-3">
+            {# Ajout du template personnalisé pour la pagination en fin du block #}
+            {{ knp_pagination_render(users, 'include/pagination.html.twig') }}
+        </div>
+
+    </section>
+{% endblock %}

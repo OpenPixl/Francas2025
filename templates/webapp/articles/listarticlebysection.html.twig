@@ -1,0 +1,49 @@
+<div id="content" class="row">
+    {% if article.imageName is null %}
+        <div class="col-12" id="content_text">
+            {% if article.isTitleShow == 1 %}
+            <div class="row">
+                <div class="col-12">
+                    <h3><a href="{{ path('op_webapp_articles_show', {'id': article.id}) }}">{{ article.title }}</a></h3>
+                </div>
+            </div>
+            {% endif %}
+            {% if article.isShowReadMore == 1 %}
+                <p>{{ article.content|u.truncate(600, ' ...')|raw }}</p>
+                <a class="content-readmore" href="{{ path('op_webapp_articles_show', {'id': article.id}) }}">Lire la suite</a>
+            {% else %}
+                <p>{{ article.content|raw }}</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="col-3">
+            <img id="img_article" class="img-fluid" src="{{ asset('uploads/images/articles/'~article.imageName ) | imagine_filter('thumb_img_article') }}" alt="{{ article.imageName }}">
+        </div>
+        <div class="col-9" id="content_text">
+            {% if article.isTitleShow == 1 %}
+                <div class="row">
+                    <div class="col-12">
+                        <h3><a href="{{ path('op_webapp_articles_show', {'id': article.id}) }}">{{ article.title }}</a></h3>
+                    </div>
+                </div>
+            {% endif %}
+            {% if article.isShowReadMore == 1 %}
+                <div class="row">
+                    <div class="col-12">
+                        <p>{{ article.content|u.truncate(600, ' ...')|raw }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <a class="content-readmore" href="{{ path('op_webapp_articles_show', {'id': article.id}) }}">Lire la suite</a>
+                    </div>
+                </div>
+
+            {% else %}
+                <p>{{ article.content|raw }}</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+

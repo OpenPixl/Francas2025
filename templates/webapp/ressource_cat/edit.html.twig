@@ -1,0 +1,25 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}Edit Ressources{% endblock %}
+
+{% block main %}
+    <div class="container-fluid">
+        {{ include('webapp/ressources/include/_section_content_header.html.twig') }}
+        <section id="op_admin_content_body">
+            <div class="row g-2">
+                <div class="col-2">
+                    {{ include('webapp/ressources/include/_section_content_aside.html.twig') }}
+                </div>
+                <div class="col-10">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Modifier la ressource</h3>
+                        </div>
+                        {{ include('webapp/ressource_cat/_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}

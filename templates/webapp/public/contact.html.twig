@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+{#
+{% block meta %}
+    {{ parent() }}
+    <link rel="icon" href="{{ vich_uploader_asset(parameter, 'faviconFile') }}" />
+
+{% endblock %}
+#}
+{% block title %}{{ config.name }}{% endblock %}
+
+{% block main %}
+
+    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="bg-white py-24 sm:py-32 dark:bg-gray-900">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <div class="mx-auto max-w-2xl lg:mx-0">
+                    <h2 class="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl dark:text-white">Nous contacter</h2>
+                    <p class="mt-6 text-lg/8 text-gray-600 dark:text-gray-400">Vous souhaitez faire participer un groupe d'élèves de votre établissement au dispositif "Collégiens-Citoyens" ?</p>
+                    <p class="mt-6 text-lg/8 text-gray-600 dark:text-gray-400">Le dispositif Collégiens Citoyens des Landes accompagne les établissements dans l’éducation à la citoyenneté active, au vivre-ensemble et à l’engagement.
+                        Vous souhaitez en savoir plus, proposer un projet ou rejoindre le programme ? L’équipe des Francas des Landes est à votre écoute pour vous accompagner.</p>
+
+                 </div>
+                <div class="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 text-base/7 sm:grid-cols-2 sm:gap-y-16 lg:mx-0 lg:max-w-none lg:grid-cols-4">
+                    <div>
+                        <h3 class="border-l border-[#d84519] pl-6 font-semibold text-gray-900 dark:border-indigo-500 dark:text-white"><i class="fa-sharp-duotone fa-light fa-location-dot"></i> Francas des Landes</h3>
+                        <address class="border-l border-gray-200 pt-2 pl-6 text-gray-600 not-italic dark:border-white/10 dark:text-gray-400">
+                            <p>3 allée de la Solidarité</p>
+                            <p>40000 Mont de Marsan</p>
+                        </address>
+                    </div>
+                    <div>
+                        <h3 class="border-l border-[#d84519] pl-6 font-semibold text-gray-900 dark:border-indigo-500 dark:text-white">Contact</h3>
+                        <address class="border-l border-gray-200 pt-2 pl-6 text-gray-600 not-italic dark:border-white/10 dark:text-gray-400">
+                            <p><i class="fa-duotone fa-light fa-phone"></i> +33(0)5 58 46 33 54</p>
+                            <p></p>
+                        </address>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+{% endblock %}

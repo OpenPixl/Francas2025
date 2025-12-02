@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace Collège{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        window.onload = function(){
+
+            // Archivage d'un article depuis le compte college
+            function updateArticleArchived(event){
+                event.preventDefault()
+                const urlArchived = this.href
+                // Déclaration de la modal
+                let warningArchived = document.getElementById('ModalWarning')
+                // Personnalisation de la modal
+                let modalTitle = warningArchived.querySelector('.modal-title')
+                modalTitle.textContent = "Attention : Archivage de l'article"
+                let modalBody = warningArchived.querySelector('.modal-body')
+                modalBody.innerHTML = "<p>Vous êtes sur le point de mettre votre article en archive. Seul, le coordinnateur du dispositif aura accès à l'article</p><p>Etes-vous sur de vouloir continuer ?"
+                // Ouverture de la modal
+                let Warning = new bootstrap.Modal(warningArchived, {
+                    backdrop:true,
+                    focus:true,
+                    keyboard:true
+                })
+                Warning.show()
+                // sélection du bouton push
+                const btnPushReq = document.getElementById('btnPushReq')
+                // comportement
+                btnPushReq.addEventListener('click', function (event){
+                    axios
+                        .post(urlArchived)
+                        .then(function (response){
+                            const listeArticles = document.getElementById('listeArticles').innerHTML = response.data.listeArticles
+                            Warning.hide()
+                            // initialisation du toaster bootstrap
+                            let toastHTMLElement = document.getElementById("toaster")
+                            let message = response.data.message
+                            let toastBody = toastHTMLElement.querySelector('.toast-body') // selection de l'élément possédant le message
+                            toastBody.innerHTML = "<p>" + message + "</p>";
+                            let toastElement = new bootstrap.Toast(toastHTMLElement, {
+                                animation: true,
+                                autohide: true,
+                                delay: 3000,
+                            });
+                            toastElement.show();
+                            // Redéclaration des écouteurs d'évènement
+                            // Archivage
+                            document.querySelectorAll('a.btnArchived').forEach(function (link) {
+                                link.addEventListener('click', updateArticleArchived);
+                            })
+                        })
+                        .catch(function (error){
+                            console.log(error)
+                        })
+
+                })
+
+            }
+            // Mise en place de l'écouteur d'évènement sur le lien Archivage
+            document.querySelectorAll('a.btnArchived').forEach(function (link) {
+                link.addEventListener('click', updateArticleArchived);
+            })
+
+        }
+    </script>
+{% endblock %}
+
+{% block main %}
+    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="row" id="content">
+            {{ include('espacecollege/dashboard/_header_college.html.twig') }}
+        </div>
+    </section>
+    <section class="mb-4 mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 border-b border-b-gray-700 text-gray-700 flex justify-between">
+        <h5 class="font-semibold text-2xl">Tableau de bord</h5>
+        <a href="{{ path('op_admin_security_logout') }}"><i class="fa-duotone fa-solid fa-right-from-bracket"></i> Se déconnecter</a>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-4 gap-3">
+            <div class="col-span-3">
+                <h5>LISTE DES ARTICLES PRODUIT PAR LE GROUPE</h5>
+                <p>Tous vos articles publiés sur votre page personelle sont listées ci-dessous.</p>
+                {{ include('webapp/articles/include/_listebycollege.html.twig') }}
+            </div>
+            <div>
+                {{ render(controller('App\\Controller\\Admin\\CollegeController::blocAdminCollege', {'id':college.id})) }}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block Modals %}
+    {{ parent() }}
+{% endblock %}

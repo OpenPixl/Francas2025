@@ -1,0 +1,145 @@
+{{ form_start(form) }}
+
+<div class="grid grid-cols-5 gap-8">
+    <div class="col-span-3">
+        <h2 class="font-normal border-b border-slate-900 mb-2">Contenu</h2>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Titre',
+                form : form.name,
+                'placeholder': 'inscrire le nom de la section',
+                'input_width' : 'w-100',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Choix de la page ou afficher la section',
+                form : form.page,
+                'placeholder': 'inscrire le nom de la section',
+                'input_width' : 'w-60',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_textarea.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Text d\'intro',
+                form : form.descriptif,
+                'placeholder': 'Nom ?',
+                'input_width' : 'w-full',
+                'rows': 6,
+                'oninput': ''
+            } %}
+        </div>
+
+        <div class="mt-3 mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Type de contenu',
+                form : form.content,
+                'placeholder': 'inscrire le nom de la section',
+                'input_width' : 'w-100',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mt-3 mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Choix de la catégorie',
+                form : form.category,
+                'placeholder': 'inscrire le nom de la section',
+                'input_width' : 'w-100',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mt-3 mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Choix de l\'article',
+                form : form.oneArticle,
+                'placeholder': 'inscrire le nom de la section',
+                'input_width' : 'w-100',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mt-3 mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Choix de la ressource',
+                form : form.ressourcesCat,
+                'placeholder': 'inscrire le nom de la section',
+                'input_width' : 'w-100',
+                'oninput': ''
+            } %}
+        </div>
+
+    </div>
+    <div class="col-span-2">
+        <h2 class="font-normal border-b border-slate-900 mb-2">Options</h2>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Position de la section',
+                form : form.position,
+                'placeholder': 'inscrire le nom de la section',
+                'input_width' : 'w-40',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mt-3 mb-1">
+            {% include 'composants/forms/input_switch.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                form : form.isShowTitle,
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_switch.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                form : form.isShowdescription,
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mt-3 mb-1">
+            {% include 'composants/forms/input_switch.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                form : form.fluid,
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mt-3 mb-1">
+            {% include 'composants/forms/input_switch.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                form : form.favorites,
+                'oninput': ''
+            } %}
+        </div>
+    </div>
+
+    <div id="bouton_form">
+        {% include 'composants/buttons/button_submit.html.twig' with {
+            'id': null,
+            'button_width': null,
+            'icon': null,
+            'text': button_label|default('Enregistrer')
+        } %}
+    </div>
+
+
+{{ form_end(form) }}
+

@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}collégiens-Citoyens{% endblock %}
+
+{% block main %}
+    {% if article.headerName is null %}
+    {% else %}
+        <section class="bg-[#ffd100]/20 py-4" id="college_page_header">
+            <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+                {% include 'admin/college/include/banner_college.html.twig' %}
+            </div>
+        </section>
+    {% endif %}
+    <section class="mx-auto max-w-7xl px-2 py-2 sm:px-6 lg:px-8" id="college_page_content">
+        {% include 'composants/modules/breadcrumb.html.twig' with {
+            'level_1' : {
+                'title' : 'Colleges',
+                'href' : path('op_webapp_page', {'slug': 'les_medias_collegiens'})
+            },
+            'level_2' : {
+                'title' : article.slug,
+                'href' : '#'
+            }
+        } %}
+        <h1 class="mt-4 font-normal text-2xl text-gray-700 border-b border-gray-700">{{ article.title }}</h1>
+        <div class="row" id="content">
+
+            {% if article.imageName is null %}
+                <article class="prose max-w-none py-2">
+                    {{ article.content|raw }}
+                </article>
+            {% else %}
+                <article class="prose max-w-none py-2">
+                    <img
+                        src="{{ asset('/uploads/images/articles/'~ article.imageName) }}"
+                        alt="{{ article.imageName }}"
+                        class="float-left mr-2 mb-2 w-120 h-auto rounded-lg"
+                    >
+                    {{ article.content|raw }}
+                </article>
+            {% endif %}
+
+            <div class="clear-both"></div>
+
+            {% if article.idsupport == 0 %}
+            {% elseif article.idsupport == 1 %}
+                <h4 class="font-normal text-xl text-gray-700">Ecouter l'émission radio</h4>
+                <div class="flex items-center gap-4 bg-white/90 border border-slate-200 rounded-3xl shadow-sm p-4 max-w-xl">
+
+                    <!-- Bouton Play -->
+                    <button id="playBtn" class="size-12 rounded-full bg-[#d84519] text-white grid place-content-center text-xl shadow-md hover:bg-[#F26438] transition">
+                        ►
+                    </button>
+
+                    <!-- Bloc central -->
+                    <div class="flex-1 min-w-0">
+
+                        <!-- TITRE -->
+                        <div class="mb-2">
+                            <div id="mp3Title" class="text-slate-900 font-semibold truncate">
+                                {{ article.doc }}
+                            </div>
+                            <!-- Sous-titre optionnel -->
+                            <div id="mp3Artist" class="text-slate-500 text-xs truncate hidden">
+                                Source / Auteur
+                            </div>
+                        </div>
+
+                        <!-- Infos temps -->
+                        <div class="flex justify-between text-sm text-slate-600 mb-1">
+                            <span id="currentTime">0:00</span>
+                            <span id="duration">0:00</span>
+                        </div>
+
+                        <!-- Barre de progression -->
+                        <div id="rail" class="relative h-2 bg-slate-200 rounded-full cursor-pointer">
+                            <div id="played" class="absolute h-2 bg-[#d84519] rounded-full left-0 top-0 w-[0%]"></div>
+                            <div id="thumb"
+                                 class="absolute -top-1.5 size-4 bg-white border border-[#d84519] rounded-full shadow -translate-x-1/2 cursor-pointer"
+                                 style="left: 0%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Volume -->
+                    <input id="volume" type="range" min="0" max="1" step="0.01"
+                           class="w-24 accent-[#d84519]" value="1">
+                </div>
+
+                <audio id="audio" src="{{ asset('/uploads/images/articles/'~article.doc) }}" preload="metadata"></audio>
+
+            {% elseif article.idsupport == 2 %}
+
+                <div class="max-w-3xl mx-auto bg-gray-900 text-white rounded-xl overflow-hidden shadow-lg">
+
+                    <!-- Titre -->
+                    <div class="p-4 border-b border-gray-700">
+                        <h2 id="videoTitle" class="text-lg font-semibold">Titre de la vidéo</h2>
+                    </div>
+
+                    <!-- Vidéo -->
+                    <div class="relative bg-black">
+                        <video id="video" class="w-full max-h-[450px]">
+                            <source src="{{ asset('/uploads/images/articles/'~article.doc) }}" type="video/mp4">
+                        </video>
+                    </div>
+
+                    <!-- Contrôles -->
+                    <div class="p-4 space-y-4">
+
+                        <!-- Boutons principaux -->
+                        <div class="flex items-center space-x-4">
+                            <button id="videoPlay" class="text-2xl">►</button>
+                            <span id="videoCurrent" class="text-sm">0:00</span>
+                            <span class="text-sm opacity-60">/</span>
+                            <span id="videoDuration" class="text-sm opacity-60">0:00</span>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="w-full">
+                            <div id="videoRail" class="relative h-3 bg-gray-700 rounded-full cursor-pointer">
+                                <div id="videoPlayed" class="absolute top-0 left-0 h-3 bg-blue-500 rounded-full"></div>
+                                <div id="videoThumb" class="absolute top-1/2 -translate-y-1/2 h-4 w-4 bg-white rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Volume & Fullscreen -->
+                        <div class="flex items-center justify-between">
+                            <input id="videoVolume" type="range" min="0" max="1" step="0.01" value="1"
+                                   class="w-32 accent-blue-500">
+                            <button id="videoFullscreen" class="text-xl">⛶</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-12" id="content_support">
+                    <video controls width="500">
+
+                        <source src="{{ asset('/uploads/images/articles/'~article.doc) }}" type="video/mp4">
+
+                        <p>Votre navigateur ne prend pas en charge les vidéos HTML5.
+                            Voici <a href="{{ asset('/uploads/images/articles/'~article.doc) }}">un lien pour télécharger la vidéo sur votre ordinateur</a>.</p>
+                    </video>
+                </div>
+            {% elseif article.idsupport == 3 %}
+                <div class="col-12" id="content_support">
+                    <p>
+                        En cliquant sur le lien suivant, vous pourrez télécharger notre document au format "Pdf" au "Doc" : <a href="{{ asset('/uploads/images/articles/'~article.doc) }}"><i class="fa-duotone fa-file-pdf fa-2x"></i> Télécharger le fichier</a>
+                    </p>
+
+                </div>
+            {% else %}
+                <div class="col-12" id="content_support">
+
+                </div>
+            {% endif %}
+        </div>
+        {% if is_granted('ROLE_USER') %}
+        {{ render(controller('App\\Controller\\Webapp\\CommentController::new')) }}
+        {% endif %}
+    </section>
+{% endblock %}

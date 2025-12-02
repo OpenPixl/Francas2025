@@ -1,0 +1,41 @@
+{% extends 'admin.html.twig' %}
+
+{% block title %}Edit Section{% endblock %}
+
+{% block header %}
+    {{ include('admin/dashboard/include/header.html.twig', {
+        'title' : 'Gestions des pages',
+        'btns' : {
+            'new': {
+                'id' : null,
+                'href' : path('op_webapp_page_new'),
+                'icon' : '<i class="fa-duotone fa-solid fa-square-plus"></i>',
+                'text' : 'Créer une nouvelle page',
+                'array':null
+            },
+            'return': {
+                'id' : null,
+                'href' : path('op_webapp_page_show', {'id': section.page.id }),
+                'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
+                'text' : 'Retour',
+                'array':null
+            }
+        }
+    }) }}
+{% endblock %}
+
+{% block main %}
+
+    <section id="op_admin_content_body">
+
+        <h2 class="font-normal uppercase text-xl text-sky-700">Modifier la section : "{{ section.name }}" située sur la page "{{ section.page.title }}".</h2>
+
+
+        <div class="mt-3">
+            {{ include('webapp/section/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+        </div>
+
+
+    </section>
+
+{% endblock %}

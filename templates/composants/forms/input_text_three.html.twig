@@ -1,0 +1,12 @@
+<div class="w-full inline-flex bg-white items-center">
+    <div class="{{ legend_width }}">
+        <label class="text-sm text-slate-700 font-normal" for="{{ first.vars.id }}">
+            {{ first.vars.label }}
+        </label>
+    </div>
+    <div class="{{ col_width }} inline-flex justify-start overflow-hidden">
+        {{ form_widget(first, { attr: { class: first_width ~ ' border rounded-l-lg text-gray-900 text-sm px-2 py-1 focus:outline-none focus:bg-white ' ~ (form_errors(first) ? 'border-orange-300 bg-white' : 'border-gray-300 bg-gray-100/70'), 'oninput': oninput1 } }) }}
+        {{ form_widget(second, { attr: { class: second_width ~ ' border-y text-gray-900 text-sm px-2 py-1 focus:outline-none focus:bg-whiteborder-b ' ~ (form_errors(second) ? 'border-orange-300 bg-white' : 'border-gray-300 bg-gray-100/70'), 'oninput': oninput2 } }) }}
+        {{ form_widget(third, { attr: { class: third_width ~ ' border text-gray-900 text-sm px-2 py-1 rounded-r-lg focus:outline-none focus:bg-white ' ~ (form_errors(third) ? 'border-orange-300 bg-white' : 'border-gray-300 bg-gray-100/70'), 'oninput': oninput3 } }) }}
+    </div>
+</div>

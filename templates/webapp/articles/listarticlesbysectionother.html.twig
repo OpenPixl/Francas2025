@@ -1,0 +1,54 @@
+<div id="content" class="row">
+    {% if article.imageName is null %}
+        <div class="col-12 g-0 mb-0" id="content_text">
+            {% if article.isTitleShow == 1 %}
+                <div class="row">
+                    <div class="col-12 m-3">
+                        <h3><a href="{{ path('op_webapp_articles_show', {'id': article.id}) }}">{{ article.title }}</a></h3>
+                    </div>
+                </div>
+            {% endif %}
+            {% if article.isShowReadMore == 1 %}
+                <div class="row">
+                    <div class="col-12">
+                        <p>{{ article.content|u.truncate(600, ' ...')|raw }}</p>
+                        <a class="content-readmore" href="{{ path('op_webapp_articles_show', {'id': article.id}) }}">Lire la suite</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-12">
+                        <p>{{ article.content|raw }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="col-3 g-0">
+            <img id="img_article" class="img-fluid" src="{{ vich_uploader_asset(article, 'imageFile', 'App\\Entity\\Webapp\\Article' ) | imagine_filter('thumb_img_article') }}" alt="{{ article.imageName }}">
+        </div>
+        <div class="col-9 g-0" id="content_text">
+            {% if article.isTitleShow == 1 %}
+                <div class="row">
+                    <div class="col-12">
+                        <h3><a href="{{ path('op_webapp_articles_show', {'id': article.id}) }}">{{ article.title }}</a></h3>
+                    </div>
+                </div>
+            {% endif %}
+            {% if article.isShowReadMore == 1 %}
+                <div class="row">
+                    <div class="col-12">
+                        <p>{{ article.content|u.truncate(600, ' ...')|raw }}</p>
+                        <a class="content-readmore" href="{{ path('op_webapp_articles_show', {'id': article.id}) }}">Lire la suite</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-12">
+                        <p>{{ article.content|raw }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>

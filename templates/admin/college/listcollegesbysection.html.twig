@@ -1,0 +1,16 @@
+<div class="grid grid-cols-4 gap-4" id="row_college">
+{% for college in colleges %}
+    <a href="{{ path('op_webapp_college_show2', {'id': college.id}) }}" class="group">
+        {% if college.logoName %}
+            <img src="{{ asset('/uploads/images/colleges/'~college.logoName)}}" alt="Logo du groupe de collégiens de {{ college.city }}" class="aspect-square w-full rounded-lg bg-gray-200 object-contain group-hover:opacity-75 xl:aspect-square" />
+        {% else %}
+            <img src="{{ asset('/uploads/images/config/' ~ config.vignetteName)}}" alt="Tall slender porcelain bottle with natural clay textured body and cork stopper." class="aspect-square w-full rounded-lg bg-gray-200 object-contain group-hover:opacity-75 xl:aspect-square" />
+        {% endif %}
+        <h3 class="mt-3 text-sm text-[#d84519]">{{ college.name }}</h3>
+        <p class="font-semibold text-gray-900">{{ college.city }}</p>
+    </a>
+{% endfor %}
+</div>
+
+
+

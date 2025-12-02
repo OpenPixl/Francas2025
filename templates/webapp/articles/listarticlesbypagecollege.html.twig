@@ -1,0 +1,20 @@
+{% if not articles %}
+<div id="content" class="row">
+    <div class="col-12 noArticles" >
+     <div class="alert alert-warning" role="alert">
+      Le groupe n'a pas encore publié d'articles.
+     </div>
+    </div>
+
+</div>
+{% else %}
+    {% for article in articles %}
+    <div id="content" class="row">
+        {{ include('webapp/articles/include/_blocarticle.html.twig') }}
+    </div>
+    {% endfor %}
+{% endif %}
+
+
+
+

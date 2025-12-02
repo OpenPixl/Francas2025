@@ -1,0 +1,6 @@
+<div class="flex flex-col bg-white">
+    <label class="font-normal text-sm text-slate-700" for="{{ form.vars.id }}">
+        {{ label }}
+    </label>
+    {{ form_widget(form, { attr: { class: input_width ~ ' border border-gray-300 bg-gray-100/70 text-gray-900 text-sm  px-2 py-1 rounded focus:bg-white ' ~ (form_errors(form) ? 'border-orange-300 bg-white' : 'border-gray-300 bg-gray-100/70'), 'oninput': oninput } }) }}
+</div>

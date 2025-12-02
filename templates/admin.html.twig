@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="300">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{% block title %}OpenGaia | Administration{% endblock %}</title>
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('admin') }}
+    {% endblock %}
+    {% block javascripts %}
+        {{ encore_entry_script_tags('admin') }}
+        <script src="https://kit.fontawesome.com/1fb9149f4c.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.ckeditor.com/ckeditor5/22.0.0/classic/ckeditor.js"></script>
+    {% endblock %}
+</head>
+<body class="h-screen flex flex-col bg-gray-100  bg-cover bg-center" data-page="{{ app.current_route }}">
+    {% block navbar %}
+        {{ include('admin/include/navbar_admin.html.twig') }}
+    {% endblock %}
+    {% block header %}
+        {{ include('admin/dashboard/include/header.html.twig', {'title' : 'Dashboard'}) }}
+    {% endblock %}
+    <main id="content" class="flex flex-col p-2">
+        <div class="flex-1 rounded-sm bg-white shadow-sm p-2">
+            {% block content_title %}
+            {% endblock %}
+
+            {% block main %}
+            {% endblock %}
+        </div>
+
+        {% block modal %}
+        {% endblock %}
+    </main>
+    {{ include('admin/dashboard/include/footer.html.twig') }}
+    {{ include('composants/modules/notifications.html.twig') }}
+    {{ include('composants/modules/dialog.html.twig') }}
+</body>
+</html>

@@ -1,0 +1,39 @@
+<table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+    <thead>
+    <tr>
+        <th class="px-1 py-1.5 text-sm text-start">De</th>
+        <th class="px-1 py-1.5 text-sm text-start">Sujet</th>
+        <th class="px-1 py-1.5 text-sm text-start">Envoyé le</th>
+        <th class="px-1 py-1.5 text-sm text-start">actions</th>
+    </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+    {% for message in messages %}
+        {% if message.isRead == 1 %}
+            <tr class="bg-gray-100 hover:bg-white">
+                <td class="px-1 py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ message.author }}</td>
+                <td class="px-1 py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><a href="{{ path('op_webapp_message_show', {'id': message.id}) }}">{{ message.subject }}</a></td>
+                <td class="px-1 py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ message.createdAt ? message.createdAt|date('d-m-Y') : '' }}</td>
+                <td class="px-1 py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    <a href="{{ path('op_webapp_message_show', {'id': message.id}) }}"><i class="fas fa-eye"></i></a> |
+                    <a class="btnDeleted" href="{{ path('op_webapp_message_delete', {'id': message.id}) }}"><i class="fas fa-trash"></i></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr class="hover:bg-gray-100">
+                <td class="px-1 py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ message.author }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><a href="{{ path('op_webapp_message_show', {'id': message.id}) }}">{{ message.subject }}</a></td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ message.createdAt ? message.createdAt|date('d-m-Y') : '' }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    <a href="{{ path('op_webapp_message_show', {'id': message.id}) }}"><i class="fas fa-eye"></i></a> |
+                    <a class="btnDeleted" href="{{ path('op_webapp_message_delete', {'id': message.id}) }}"><i class="fas fa-trash"></i></a>
+                </td>
+            </tr>
+        {% endif %}
+    {% else %}
+        <tr>
+            <td colspan="6">Aucun message arrivé</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

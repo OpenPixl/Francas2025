@@ -1,0 +1,32 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Slug</th>
+        <th>Parent</th>
+        <th>actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for ressource_cat in ressource_cats %}
+        <tr>
+            <td>{{ ressource_cat.id }}</td>
+            <td>{{ ressource_cat.name }}</td>
+            <td>{{ ressource_cat.slug }}</td>
+            <td>{{ ressource_cat.parent }}</td>
+            <td>
+                <a href="{{ path('op_webapp_ressource_cat_show', {'id': ressource_cat.id}) }}"><i class="far fa-eye"></i></a>
+                <a href="{{ path('op_webapp_ressource_cat_edit', {'id': ressource_cat.id}) }}"><i class="far fa-edit"></i></a>
+                <a href="#" class="js-modalSuppr text-danger" type="button" data-bs-toggle="modal" data-bs-target="#Suppr" data-bs-whatever="{{ ressource_cat.id }}">
+                    <i class="bi bi-eraser text-danger"></i>
+                </a>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="4">no records found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

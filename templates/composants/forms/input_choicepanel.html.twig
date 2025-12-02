@@ -1,0 +1,19 @@
+<div class="w-full inline-flex items-center">
+    <div class="{{ legend_width }}">
+        <p class="text-sm font-normal">{{ form.vars.label }}</p>
+    </div>
+    <div class="{{ col_width }} inline-flex overflow-hidden">
+        {% for child in form %}
+            <label for="{{ child.vars.id }}"
+                   class="flex items-center cursor-pointer">
+
+                {{ form_widget(child, { attr: { class: 'hidden peer' } }) }}
+
+                <span class="px-3 py-1 text-sm border border-gray-300 {% if loop.first %}rounded-l-lg{% endif%}{% if loop.last %}rounded-r-lg{% endif%} transition peer-checked:border-sky-700 peer-checked:border-t peer-checked:border-r peer-checked:text-sky-700 font-medium uppercase">
+                {{ child.vars.label }}
+            </span>
+            </label>
+        {% endfor %}
+    </div>
+</div>
+

@@ -1,0 +1,12 @@
+{% if config.isHeaderShow == 1 %}
+    {% if config.headerName is empty %}
+        <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <img src="{{ asset('uploads/images/fixes/logo_v1.jpg') }}" alt="{{ config.headerName }}" class="img-fluid">
+        </section>
+    {% else %}
+        <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <img src="{{ asset('uploads/images/collections/'~config.headerName) }}" alt="{{ config.headerName }}" class="img-fluid">
+        </section>
+    {% endif%}
+{% else %}
+{% endif %}

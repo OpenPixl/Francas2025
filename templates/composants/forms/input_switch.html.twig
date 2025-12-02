@@ -1,0 +1,22 @@
+<div class="w-full inline-flex bg-white items-center">
+    <div class="{{ legend_width }}">
+        <label class="text-sm text-slate-700 font-normal" for="{{ form.vars.id }}">
+            {{ form.vars.label }}
+        </label>
+    </div>
+    <div class="{{ col_width }} inline-flex justify-start overflow-hidden">
+        <label class=" relative flex justify-between items-center text-sm" for="{{ form.vars.id }}">
+
+            <span class="sr-only"></span>
+            {{ form_widget(form, {
+                attr: {
+                    class: 'absolute left-0 top-0 w-full h-full peer appearance-none',
+                }
+            }) }}
+            <span class="bg-gray-300 w-8 h-4 rounded-full flex flex-shrink-0 items-center after:bg-white after:w-3 after:h-3 after:rounded-full p-1 peer-checked:bg-sky-700 peer-checked:after:translate-x-3 ease-in-out duration-150 after:duration-150"></span>
+        </label>
+    </div>
+</div>
+
+
+

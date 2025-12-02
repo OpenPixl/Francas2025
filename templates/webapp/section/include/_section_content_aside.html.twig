@@ -1,0 +1,9 @@
+<div class="card">
+    <div class="card-body">
+        {% if app.request.get('_route') == 'op_webapp_section_index'%}
+        <h4><a href="{{ path('op_webapp_page_index') }}"><i class="fas fa-chevron-circle-left"></i> Retour</a></h4>
+        {% else %}
+        <h4><a href="{{ path('op_webapp_page_index') }}"><i class="fas fa-chevron-circle-left"></i> Retour</a></h4>
+        {% endif %}
+    </div>
+</div>
