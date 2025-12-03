@@ -15,12 +15,20 @@ main a:hover{
     color: #d84519;
 }
 
+main p{
+    margin-bottom: 0.5rem;
+}
+
 main #bloc_admin a{
     color: #d84519;
 }
 main #bloc_admin a:hover{
     color: #d84519;
     font-weight: bold;
+}
+
+main #college_intro #content_text{
+    font-size: 0.9rem;
 }
 
 main .ck-editor{

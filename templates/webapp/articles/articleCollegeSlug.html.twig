@@ -11,7 +11,7 @@
             </div>
         </section>
     {% endif %}
-    <section class="mx-auto max-w-7xl px-2 py-2 sm:px-6 lg:px-8" id="college_page_content">
+    <section class="mx-auto max-w-7xl px-2 py-2 sm:px-6 lg:px-8 mb-6" id="college_page_content">
         {% include 'composants/modules/breadcrumb.html.twig' with {
             'level_1' : {
                 'title' : 'Colleges',
@@ -44,7 +44,7 @@
 
             {% if article.idsupport == 0 %}
             {% elseif article.idsupport == 1 %}
-                <h4 class="font-normal text-xl text-gray-700">Ecouter l'émission radio</h4>
+                <h4 class="font-normal text-xl text-gray-700 mt-6 mb-3">Ecouter l'émission radio</h4>
                 <div class="flex items-center gap-4 bg-white/90 border border-slate-200 rounded-3xl shadow-sm p-4 max-w-xl">
 
                     <!-- Bouton Play -->
@@ -156,8 +156,11 @@
                 </div>
             {% endif %}
         </div>
+
         {% if is_granted('ROLE_USER') %}
-        {{ render(controller('App\\Controller\\Webapp\\CommentController::new')) }}
+            <div class="hidden">
+                {{ render(controller('App\\Controller\\Webapp\\CommentController::new')) }}
+            </div>
         {% endif %}
     </section>
 {% endblock %}
