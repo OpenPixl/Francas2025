@@ -3,6 +3,7 @@
 namespace App\Controller\Webapp;
 
 use App\Entity\Admin\College;
+use App\Entity\Admin\Config;
 use App\Entity\Webapp\Article;
 use App\Entity\Webapp\Section;
 use App\Form\Webapp\ArticlesType;
@@ -277,10 +278,12 @@ class ArticleController extends AbstractController
         $college = $entityManager->getRepository(College::class)->find($idcollege);
         // Code pour afficher l'article depuis le slug'
         $article = $entityManager->getRepository(Article::class)->articleCollegeSlug($id);
+        $config = $entityManager->getRepository(Config::class)->find(1);
 
         return $this->render('webapp/articles/articleCollegeSlug.html.twig',[
             'article' => $article,
-            'college' => $college
+            'college' => $college,
+            'config' => $config,
         ]);
     }
 
