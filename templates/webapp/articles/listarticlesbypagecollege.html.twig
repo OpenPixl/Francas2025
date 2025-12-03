@@ -1,12 +1,7 @@
-{% if not articles %}
-<div id="content" class="row">
-    <div class="col-12 noArticles" >
-     <div class="alert alert-warning" role="alert">
-      Le groupe n'a pas encore publié d'articles.
-     </div>
+{% if articles is empty %}
+    <div id="content" class="mt-3">
+        <p>Le groupe de ce collège n'a pas encore produit d'articles.</p>
     </div>
-
-</div>
 {% else %}
     {% for article in articles %}
     <div id="content" class="row">

@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Admin\College;
+use App\Entity\Admin\Config;
 use App\Entity\Admin\User;
 use App\Entity\Webapp\Article;
 use App\Entity\Webapp\Message;
@@ -222,6 +223,7 @@ class CollegeController extends AbstractController
     public function show2(College $college,Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
     {
         $data = $entityManager->getRepository(Article::class)->listArticlesByCollege($college->getId());
+        $config = $entityManager->getRepository(Config::class)->find(1);
 
         $articles = $paginator->paginate(
             $data,
@@ -232,6 +234,7 @@ class CollegeController extends AbstractController
         return $this->render('admin/college/show2.html.twig', [
             'college' => $college,
             'articles' => $articles,
+            'config' => $config,
             'page' => $request->query->getInt('page', 1),
         ]);
     }
