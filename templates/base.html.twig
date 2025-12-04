@@ -104,7 +104,7 @@
                                 <div>
                                     <p class="text-sm text-end text-[#d84519]">
                                         <a href="{{ path('op_webapp_page', {'slug':'mentions'}) }}">Mentions légales</a> |
-                                        <a href="">contacts</a> |
+                                        <a href="{{ path('op_webapp_public_contactpage') }}">contacts</a> |
                                         {% if not app.user %}
                                             <a href="{{ path('op_admin_security_redirect_login') }}">se connecter</a>
                                         {% endif %}
