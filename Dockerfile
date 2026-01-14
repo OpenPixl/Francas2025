@@ -1,5 +1,9 @@
 FROM dunglas/frankenphp:1.10-php8.4
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    nodejs npm
+
 RUN install-php-extensions \
 	pdo_mysql \
 	gd \
