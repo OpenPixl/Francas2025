@@ -71,9 +71,9 @@
                         </h3>
                     </div>
                 {% elseif article.idsupport == 2 %}
-                    <div class="col-12" id="content_support">
+                    <div class="shadow shadow-slate-300 m-2" id="content_support">
                         <video controls width="100%">
-                            <source src="{{ asset('uploads/images/articles/'~article.docName) }}" type="video/mp4">
+                            <source src="{{ asset('uploads/images/articles/'~article.doc) }}" type="video/mp4">
                             <p>Votre navigateur ne prend pas en charge les vidéos HTML5.
                                 Voici <a href="{{ asset('uploads/images/articles/'~article.doc) }}">un lien pour télécharger la vidéo sur votre ordinateur</a>.</p>
                         </video>
