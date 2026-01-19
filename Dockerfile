@@ -11,6 +11,9 @@ RUN install-php-extensions \
 	zip \
 	opcache
 
+RUN mkdir -p /var/lib/php/sessions \
+ && chown -R www-data:www-data /var/lib/php/sessions
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
