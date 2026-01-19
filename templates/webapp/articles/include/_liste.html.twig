@@ -4,8 +4,8 @@
         <thead class="">
             <tr>
                 <th></th>
-                <th>Titre</th>
-                <th>Thème</th>
+                <th class="text-start">Titre</th>
+                <th class="text-start">Thème</th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -26,9 +26,9 @@
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ a.updatedAt|date('d-m-y')}}</td>
 
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
-                    <a href="{{ path('op_webapp_articles_show', {'id':a.id}) }}" class="text-blue-600 hover:underline">Voir</a>
-                    <a href="{{ path('op_webapp_articles_edit_admin', {'id':a.id}) }}" class="text-yellow-600 hover:underline">Modifier</a>
-                    <a href="{{ path('op_webapp_articles_delete', {'id':a.id}) }}" class="text-red-600 hover:underline">Supprimer</a>
+                    <a href="{{ path('op_webapp_articles_show', {'id':a.id}) }}" class="hover:underline"><i class="far fa-eye"></i></a>
+                    <a href="{{ path('op_webapp_articles_edit_admin', {'id':a.id}) }}" class=" hover:underline">Modifier</a>
+                    <a href="{{ path('op_webapp_articles_delete', {'id':a.id}) }}" class=" hover:underline">Supprimer</a>
                 </td>
             </tr>
         {% else %}
