@@ -1,24 +1,33 @@
 services:
 
   php:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        INSTALL_XDEBUG: "true"
     container_name: francascc25_php
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      - "8001:8080"             # Le dockerfile expose le port 8080
     volumes:
       - ./:/app
     environment:
-      - SERVER_NAME=localhost
+      APP_ENV: dev
+      SERVER_NAME: :8080
+      CADDY_MERCURE: "off"
+      XDEBUG_MODE: "debug"      # active avec XDEBUG_MODE=debug
     depends_on:
       - db
+    networks:
+      - francascc25
 
   # Base de données MariaDB
   db:
     image: mariadb:10.11.2
     container_name: francascc25_db
+    command: --default-authentication-plugin=mysql_native_password
     restart: unless-stopped
     environment:
       - MYSQL_DATABASE=francas2025_db
@@ -28,7 +37,7 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - db_data:/var/lib/mysql
+      - .docker/db_data:/var/lib/mysql
 
   # phpMyAdmin pour gérer la base de données
   phpmyadmin:
@@ -44,5 +53,5 @@ services:
     depends_on:
       - db
 
-volumes:
-  db_data:
+networks:
+  symfony:
