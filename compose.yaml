@@ -38,6 +38,8 @@ services:
       - "3307:3306"
     volumes:
       - .docker/db_data:/var/lib/mysql
+    networks:
+      - francascc25
 
   # phpMyAdmin pour gérer la base de données
   phpmyadmin:
@@ -52,6 +54,8 @@ services:
       - MYSQL_ROOT_PASSWORD=Corwin_40280
     depends_on:
       - db
+    networks:
+      - francascc25
 
 networks:
   symfony:
