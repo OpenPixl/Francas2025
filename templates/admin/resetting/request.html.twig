@@ -2,48 +2,50 @@
 
 {% block title %}Collégiens-citoyens{% endblock %}
 
-{% block main %}
-	<section class="container">
-		<div id="bloc_login">
-			{{form_start(form)}}
-			<div class="row">
-				<div class="col-12">
-					<h3>Renouvellement du mot de passe</h3>
-					<hr>
-					<p>
-						Cet espace est dédié à la modification du mot de passe du compte de {{ user.firstname }} {{ user.lastname }}.<br>
-						Seul le référent de l'établissement possède l'accès à cette page.
-					</p>
+{% block header %}
+{% endblock %}
 
-				</div>
-			</div>
-			<div class="row" id="login_form">
-				<div class="col-12">
-					<div class="form-group row">
-						{{ form_label(form.Password.first, "Nouveau mot de passe", {'label_attr': {'class': 'col-sm-5 col-form-label'}}) }}
-						<div class="col-sm-7">
-							{{ form_widget(form.Password.first) }}
-							<small>{{ form_help(form.Password.first) }}</small>
-							<div class="form-error">
-								{{ form_errors(form.Password.first) }}
-							</div>
-						</div>
-					</div>
-					<div class="form-group row">
-						{{ form_label(form.Password.second, "Confirmer mot de passe", {'label_attr': {'class': 'col-sm-5 col-form-label'}}) }}
-						<div class="col-sm-7">
-							{{ form_widget(form.Password.second) }}
-							<small>{{ form_help(form.Password.second) }}</small>
-							<div class="form-error">
-								{{ form_errors(form.Password.second) }}
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<button class="btn btn-outline-danger"  type="submit">Envoyer</button>
-			{{form_end(form)}}
-		</div>
-	</section>
+{% block main %}
+
+
+
+
+	<section id="op_admin_content_body" class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+
+        <div class="bg-white py-24 sm:py-32 dark:bg-gray-900">
+            <h1 class="font-semibold text-xl text-gray-700 border-b border-b-gray-700 uppercase">Renouveler votre mot de passe.</h1>
+            {% if app.user.isVerified == 0 %}
+                <p class="mt-4">Nous venons de mettre à jour la plateforme en interne. Pour sécuriser vos accès, nous vous invitons à changer votre mot de passe.</p>
+            {% else %}
+                <p class="mt-4">
+                    Cet espace est dédié à la modification du mot de passe du compte de {{ user.firstname }} {{ user.lastname }}.<br>
+                    Seul le référent de l'établissement possède l'accès à cette page.
+                </p>
+            {% endif %}
+
+            <div id="mt-3">
+                {{form_start(form)}}
+                <div class="w-full inline-flex bg-white items-center">
+                    <div class="w-3/12">
+                        {{ form_label(form.Password.first, "Nouveau mot de passe", {'label_attr': {'class': 'text-sm text-slate-700 font-normal'}}) }}
+                    </div>
+                    <div class="w-9/12 inline-flex justify-start overflow-hidden">
+                        {{ form_widget(form.Password.first, {'attr' : {'class': 'w-60 border text-gray-900 text-sm px-2 py-1 rounded focus:outline-none focus:bg-white border-gray-300 bg-gray-100/70', 'placeholder': 'Votre mot de passe', 'oninput':""}}) }}
+                    </div>
+                </div>
+                <div class="w-full inline-flex bg-white items-center mt-3">
+                    <div class="w-3/12">
+                        {{ form_label(form.Password.second, "retapez une seconde fois", {'label_attr': {'class': 'text-sm text-slate-700 font-normal'}}) }}
+                    </div>
+                    <div class="w-9/12 inline-flex justify-start overflow-hidden">
+                        {{ form_widget(form.Password.second, {'attr' : {'class': 'w-60 border text-gray-900 text-sm px-2 py-1 rounded focus:outline-none focus:bg-white border-gray-300 bg-gray-100/70', 'placeholder': 'Votre mot de passe', 'oninput':""}}) }}
+                    </div>
+                </div>
+                <button class="border border-sky-700 text-sm text-sky-700 rounded px-1.5 py-1.5 hover:bg-sky-700 hover:text-white"  type="submit">Envoyer</button>
+                {{form_end(form)}}
+            </div>
+
+        </div>
+    </section>
 
 {% endblock %}

@@ -24,7 +24,13 @@ class DashboardController extends AbstractController
         }
 
         if ($this->isGranted('ROLE_COLLEGE')) {
-            return $this->redirectToRoute('op_webapp_espcoll');
+            if($user->IsVerified() == 0){
+                return new RedirectResponse($this->generateUrl('op_admin_security_resetting', [
+                    'id' => $user->getId()
+                ]));
+            }else{
+                return $this->redirectToRoute('op_webapp_espcoll');
+            }
         }
 
         // fallback si autre rôle
