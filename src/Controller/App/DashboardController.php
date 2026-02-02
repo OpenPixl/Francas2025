@@ -30,8 +30,14 @@ class DashboardController extends AbstractController
         if(!$config)
         {
             return $this->redirectToRoute('op_webapp_public_firstinstall');
+        }else{
+            //dd($config->getIsOffline());
+            if($config->getIsOffline() == true){
+                return $this->redirectToRoute('op_webapp_public_offline');
+            }else{
+                return $this->redirectToRoute('op_webapp_public_homepage');
+            }
         }
-        return $this->redirectToRoute('op_webapp_public_homepage');
     }
 
     /**
@@ -60,12 +66,24 @@ class DashboardController extends AbstractController
     public function HomePage(EntityManagerInterface $entityManager): \Symfony\Component\HttpFoundation\Response
     {
         $config = $entityManager->getRepository(Config::class)->find(1);
+        if($config->getIsOffline() == 1){
+            return $this->render('app/offline.html.twig');
+        }
         $sections = $entityManager->getRepository(Section::class)->findBy(['favorites' => 1], ['position' => 'ASC']);
 
         return $this->render('webapp/public/index.html.twig',[
             'config' => $config,
             'sections' => $sections,
         ]);
+    }
+
+    /**
+     * Affiche automatiquement la page d'acceuil
+     */
+    #[Route(path: '/offline', name: 'op_webapp_public_offline')]
+    public function offline(): Response
+    {
+        return $this->render('app/offline.html.twig');
     }
 
     /**

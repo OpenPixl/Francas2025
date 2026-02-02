@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Collégiens - Citoyens{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
+{% block main %}
+    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="bg-white py-24 sm:py-32 dark:bg-gray-900">
+            <div class="mx-auto max-w-7xl flex items-center justify-between px-6">
+
+                <!-- Texte -->
+                <div class="max-w-2xl">
+                    <h2 class="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl dark:text-white">
+                        Opération de maintenance
+                    </h2>
+
+                    <p class="mt-6 text-lg text-gray-600 dark:text-gray-400">
+                        Petite pause technique<br>
+                        Rien d’inquiétant : nous effectuons simplement quelques améliorations.
+                    </p>
+
+                    <p class="mt-6 text-lg text-gray-600 dark:text-gray-400">
+                        Votre contenu reste en sécurité et sera de nouveau accessible sous peu.
+                        Merci pour votre compréhension.
+                    </p>
+                </div>
+
+                <!-- Image -->
+                <div class="ml-8 hidden lg:block">
+                    <img
+                        src="{{ asset('uploads/images/fixes/img_underconstruction.png')}}"
+                        alt="Maintenance"
+                        class="w-80 object-contain"
+                    >
+                </div>
+
+            </div>
+            <div class="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 text-base/7 sm:grid-cols-2 sm:gap-y-16 lg:mx-0 lg:max-w-none lg:grid-cols-4">
+                <div>
+                    <h3 class="border-l border-[#d84519] pl-6 font-semibold text-gray-900 dark:border-indigo-500 dark:text-white"><i class="fa-sharp-duotone fa-light fa-location-dot"></i> Francas des Landes</h3>
+                    <address class="border-l border-gray-200 pt-2 pl-6 text-gray-600 not-italic dark:border-white/10 dark:text-gray-400">
+                        <p>3 allée de la Solidarité</p>
+                        <p>40000 Mont de Marsan</p>
+                    </address>
+                </div>
+                <div>
+                    <h3 class="border-l border-[#d84519] pl-6 font-semibold text-gray-900 dark:border-indigo-500 dark:text-white">Contact</h3>
+                    <address class="border-l border-gray-200 pt-2 pl-6 text-gray-600 not-italic dark:border-white/10 dark:text-gray-400">
+                        <p><i class="fa-duotone fa-light fa-phone"></i> +33(0)5 58 46 33 54</p>
+                        <p></p>
+                    </address>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

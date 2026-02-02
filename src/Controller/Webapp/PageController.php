@@ -145,6 +145,10 @@ class PageController extends AbstractController
     #[Route(path: '/webapp/page/{slug}', name: 'op_webapp_page_slug', methods: ['GET'])]
     public function page($slug, EntityManagerInterface $entityManager) : response
     {
+        $config = $entityManager->getRepository(Config::class)->find(1);
+        if($config->getIsOffline() == 1){
+            return $this->render('webapp/page/offline.html.twig');
+        };
         $page = $entityManager->getRepository(Page::class)->findbyslug($slug);
 
         return $this->render('webapp/page/page.html.twig');

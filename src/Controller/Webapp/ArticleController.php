@@ -237,10 +237,10 @@ class ArticleController extends AbstractController
         $data = $entityManager->getRepository(Article::class)->listArticlesByCollege($idcollege);
 
         $articles = $paginator->paginate(
-        $data,
-        $request->query->getInt('page', 1),
+            $data,
+            $request->query->getInt('page', 1),
         10
-    );
+        );
 
         return $this->render('webapp/articles/listarticlesbycollege.html.twig',[
             'articles' => $articles,

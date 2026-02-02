@@ -30,12 +30,17 @@ class resettingController extends AbstractController
             $password = $userPasswordHasher->hashPassword($user, $user->getPassword());
             $user->setPassword($password);
 
+            if($user->IsVerified() == false)
+            {
+                $user->setIsVerified(true);
+            }
+
             $entityManager->persist($user);
             $entityManager->flush();
 
             $request->getSession()->getFlashBag()->add('success', "Votre mot de passe a été renouvelé.");
 
-            return $this->redirectToRoute('op_webapp_college_espcoll', [
+            return $this->redirectToRoute('op_webapp_espcoll', [
                 'iduser' => $user->getId(),
             ]);
 

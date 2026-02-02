@@ -1,7 +1,7 @@
 <!-- Include this script tag or install `@tailwindplus/elements` via npm: -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script> -->
 
-<nav class="relative bg-[#ffd100] dark:bg-gray-800/50 dark:after:pointer-events-none dark:after:absolute dark:after:inset-x-0 dark:after:bottom-0 dark:after:h-px dark:after:bg-white/10">
+    <nav class="relative bg-[#ffd100] dark:bg-gray-800/50 dark:after:pointer-events-none dark:after:absolute dark:after:inset-x-0 dark:after:bottom-0 dark:after:h-px dark:after:bg-white/10">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div class="relative flex h-16 items-center justify-between">
             <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -29,7 +29,9 @@
                         <a href="{{ path('op_webapp_page', {slug: page.slug}) }}" {% if app.request.attributes.get('_route') == 'op_webapp_page' %}aria-current="page"{% endif %} class="rounded-md px-3 py-2 text-sm font-medium text-[#d84519] uppercase hover:bg-white/25 hover:text-white">{{ page.title }}</a>
                         {% endfor %}
                         <a href="{{ path('op_webapp_public_contactpage') }}" {% if app.request.attributes.get('_route') == 'op_webapp_public_contactpage' %}aria-current="page"{% endif %} class="rounded-md px-3 py-2 text-sm font-medium text-[#d84519] uppercase hover:bg-white/25 active:text-sky-950 hover:text-white">CONTACT</a>
-
+                        {% if app.request.attributes.get('_route') == 'op_webapp_public_homepage'%}
+                            ok
+                        {% endif %}
                     </div>
                 </div>
             </div>
