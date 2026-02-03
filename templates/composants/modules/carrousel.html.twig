@@ -24,6 +24,7 @@
                 </div>
 
             </div>
+            <a href="{{ path('op_webapp_articles_articleSlug', { 'id': article.id, 'idcollege': article.idcollege }) }}" class="absolute inset-0 z-10" aria-label="Lire l’article {{ article.title }}"></a>
         </div>
         {% endfor %}
 
