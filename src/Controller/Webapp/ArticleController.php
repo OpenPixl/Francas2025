@@ -167,7 +167,7 @@ class ArticleController extends AbstractController
         $article->setAuthor($user);
         $article->setCollege($college);
 
-        $form = $this->createForm(ArticlesType::class, $article);
+        $form = $this->createForm(Articles2Type::class, $article);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -359,7 +359,7 @@ class ArticleController extends AbstractController
     {
         $user = $this->getUser();
 
-        $form = $this->createForm(ArticlesType::class, $article);
+        $form = $this->createForm(Articles2Type::class, $article);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
