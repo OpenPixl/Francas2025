@@ -372,7 +372,7 @@ class ArticleController extends AbstractController
             if($supprvignettechkbx && $supprvignettechkbx == true){
                 // récupération du nom de l'image
                 $imageName = $article->getImageName();
-                $path = $this->getParameter('config_directory').'/'.$imageName;
+                $path = $this->getParameter('article_directory').'/'.$imageName;
                 // On vérifie si l'image existe
                 if(file_exists($path)){
                     unlink($path);
@@ -404,6 +404,50 @@ class ArticleController extends AbstractController
                 // updates the 'brochureFilename' property to store the PDF file name
                 // instead of its contents
                 $article->setImageName($newFilename);
+            }
+
+            // ---------------------------
+            // STEP 3 : Suppression du support lors du click Checkbox
+            // ---------------------------
+            $supprDocChkbx = $form->get('isSupprDoc')->getData();
+
+            if($supprDocChkbx && $supprDocChkbx == true){
+                // récupération du nom de l'image
+                $docName = $article->getdoc();
+                $path = $this->getParameter('article_directory').'/'.$docName;
+                // On vérifie si l'image existe
+                if(file_exists($path)){
+                    unlink($path);
+                }
+                $article->setDoc(null);
+                $article->setIsSupprDoc(0);
+            }
+
+            // ---------------------------
+            // STEP 4 : insertion du Document dans le dossier public/uploads/articles'
+            // ---------------------------
+            $docFile = $form->get('docFile')->getData();
+            if ($docFile) {
+                $originalFilename = pathinfo((string) $docFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $docFile->guessExtension();
+
+
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $docFile->move(
+                        $this->getParameter('article_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $article->setDoc($newFilename);
             }
 
 
