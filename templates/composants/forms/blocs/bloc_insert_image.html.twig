@@ -17,11 +17,21 @@
                 <p>{{ entity_name }}</p>
             </div>
             <div class="text-gray-600 text-xs flex items-center">
-                <a href="{{ path(routename, {'id': entity_id }) }}" class="openModalWarning" data-tw-content="DEL_CI">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                <label class="inline-flex items-center cursor-pointer" for="{{ suppr_file.vars.id }}">
+                    {{ form_widget(suppr_file, { attr: { class: 'peer sr-only' } }) }}
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         class="size-6 text-gray-400 transition-colors duration-200 peer-checked:text-[#d84519]">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+
                     </svg>
-                </a>
+                </label>
+
             </div>
         </div>
         <div class="hidden">

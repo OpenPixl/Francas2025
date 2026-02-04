@@ -36,13 +36,16 @@
     </div>
 
     <div class="mb-1">
+
         {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
             'legend_width' : 'w-3/12',
             'col_width' : 'w-9/12',
             'label' : 'Image',
             'entity_id': article.id,
             'entity_name': article.imageName,
+            'url_file': 'uploads/images/colleges/',
             form : form.imageFile,
+            suppr_file: form.isSupprImage,
             'input_width' : 'w-full',
             'routename' : 'op_webapp_message_new',
         } %}
@@ -71,6 +74,7 @@
                 'entity_name': article.doc,
                 'url_file': 'uploads/images/articles/',
                 form : form.docFile,
+                suppr_file: form.isSupprDoc,
                 'input_width' : 'w-full',
                 'routename' : 'op_webapp_message_new',
             } %}

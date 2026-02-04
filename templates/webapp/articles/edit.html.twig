@@ -4,18 +4,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script>
-        window.onload = function(){
-            ClassicEditor
-                .create(document.querySelector('#articles2_content'), {
-                    toolbar: [ 'heading','bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment', 'mediaEmbed' ,'sourceEditing' ],
-                    height: 50
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-        }
-    </script>
 {% endblock %}
 
 {% block main %}

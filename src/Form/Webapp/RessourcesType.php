@@ -28,7 +28,7 @@ class RessourcesType extends AbstractType
                 'label'=> "Thème du projet",
             ])
             ->add('imageFile', FileType::class, [
-                'label' => 'Banniere au format : png ou jpg',
+                'label' => 'Banniere au format : mp4',
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
@@ -44,23 +44,23 @@ class RessourcesType extends AbstractType
                 ],
             ])
             ->add('docFile', FileType::class, [
-                'label' => 'Banniere au format : png ou jpg',
+                'label' => 'Banniere au format : mp4',
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
                     new File([
                         'maxSize' => '10000k',
                         'mimeTypes' => [
-                            'image/png',
-                            'image/jpeg',
-                            'image/jpg'
+                            'video/mp4',
+                            'video/mpeg',
                         ],
-                        'mimeTypesMessage' => 'Attention, veuillez charger un fichier au format jpg ou png',
+                        'mimeTypesMessage' => 'Attention, veuillez charger un fichier au format mp4.',
                     ])
                 ],
             ])
             ->add('Linkmedia', TextType::class, [
                 'label' => 'Lien du media',
+                'required' => false,
             ])
         ;
     }

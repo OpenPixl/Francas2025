@@ -108,6 +108,12 @@ class Article
     #[ORM\ManyToMany(targetEntity: Section::class, inversedBy: 'articles')]
     private Collection $section;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $isSupprImage = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isSupprDoc = null;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
@@ -451,5 +457,29 @@ class Article
     public function getSection(): Collection
     {
         return $this->section;
+    }
+
+    public function isSupprImage(): ?bool
+    {
+        return $this->isSupprImage;
+    }
+
+    public function setIsSupprImage(?bool $isSupprImage): static
+    {
+        $this->isSupprImage = $isSupprImage;
+
+        return $this;
+    }
+
+    public function isSupprDoc(): ?bool
+    {
+        return $this->isSupprDoc;
+    }
+
+    public function setIsSupprDoc(?bool $isSupprDoc): static
+    {
+        $this->isSupprDoc = $isSupprDoc;
+
+        return $this;
     }
 }

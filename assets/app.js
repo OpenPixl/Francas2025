@@ -13,6 +13,7 @@ import { initShowRessource } from "./js/app/ressources/show";
 import { initShowPage } from "./js/app/page/show";
 import { initNewEditcollege } from "./js/app/college/newEditCollege";
 import { initNewEditMessage } from "./js/admin/webapp/NewEditMessage";
+import { initNewEditArticle } from "./js/app/article/NewEditArticles";
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -35,6 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'op_espcoll_college_edit':
             initNewEditcollege();
             break;
+        case 'op_webapp_articles_new':
+        case 'op_webapp_articles_edit':
+            initNewEditArticle();
+            break
         case 'op_webapp_message_new':
         case 'op_webapp_message_edit':
             initNewEditMessage();

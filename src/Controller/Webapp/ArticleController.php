@@ -14,9 +14,11 @@ use App\Repository\Webapp\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ArticleController extends AbstractController
 {
@@ -70,7 +72,7 @@ class ArticleController extends AbstractController
      * Creation d'articles depuis l'espace College
      */
     #[Route(path: '/espcoll/articles/new', name: 'op_webapp_articles_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $user = $this->getUser();
 
@@ -84,6 +86,57 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // ---------------------------
+            // STEP 1 : insertion de l'image dans le dossier public/uploads/articles'
+            // ---------------------------
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageFile->move(
+                        $this->getParameter('article_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $article->setImageName($newFilename);
+            }
+
+            // ---------------------------
+            // STEP 2 : insertion du Document dans le dossier public/uploads/articles'
+            // ---------------------------
+            $docFile = $form->get('docFile')->getData();
+            if ($docFile) {
+                $originalFilename = pathinfo((string) $docFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $docFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $docFile->move(
+                        $this->getParameter('article_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $article->setDoc($newFilename);
+            }
+
             $entityManager->persist($article);
             $entityManager->flush();
 
@@ -103,7 +156,7 @@ class ArticleController extends AbstractController
      * Création d'article depuis l'espace admin
      */
     #[Route(path: '/webapp/articles/newadmin', name: 'op_webapp_articles_newadmin', methods: ['GET', 'POST'])]
-    public function newAdmin(Request $request, EntityManagerInterface $entityManager): Response
+    public function newAdmin(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $user = $this->getUser();
 
@@ -118,6 +171,56 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // ---------------------------
+            // STEP 1 : insertion de l'image dans le dossier public/uploads/articles'
+            // ---------------------------
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageFile->move(
+                        $this->getParameter('article_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $article->setImageName($newFilename);
+            }
+
+            // ---------------------------
+            // STEP 2 : insertion du Document dans le dossier public/uploads/articles'
+            // ---------------------------
+            $docFile = $form->get('docFile')->getData();
+            if ($docFile) {
+                $originalFilename = pathinfo((string) $docFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $docFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $docFile->move(
+                        $this->getParameter('article_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $article->setDoc($newFilename);
+            }
+
             $entityManager->persist($article);
             $entityManager->flush();
 
@@ -142,7 +245,7 @@ class ArticleController extends AbstractController
     }
 
     #[Route(path: '/espcoll/articles/{id}/edit', name: 'op_webapp_articles_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Article $article, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Article $article, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $user = $this->getUser();
         $college = $entityManager->getRepository(College::class)->CollegeByUser($user);
@@ -151,6 +254,92 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // ---------------------------
+            // STEP 1 : Suppression de l'image lors du click Checkbox
+            // ---------------------------
+            $supprvignettechkbx = $form->get('isSupprImage')->getData();
+
+            if($supprvignettechkbx && $supprvignettechkbx == true){
+                // récupération du nom de l'image
+                $imageName = $article->getImageName();
+                $path = $this->getParameter('article_directory').'/'.$imageName;
+                // On vérifie si l'image existe
+                if(file_exists($path)){
+                    unlink($path);
+                }
+                $article->setImageName(null);
+                $article->setIsSupprImage(0);
+            }
+
+            // ---------------------------
+            // STEP 2 : insertion de l'image dans le dossier public/uploads/articles'
+            // ---------------------------
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageFile->move(
+                        $this->getParameter('article_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $article->setImageName($newFilename);
+            }
+
+            // ---------------------------
+            // STEP 3 : Suppression du support lors du click Checkbox
+            // ---------------------------
+            $supprDocChkbx = $form->get('isSupprDoc')->getData();
+
+            if($supprDocChkbx && $supprDocChkbx == true){
+                // récupération du nom de l'image
+                $docName = $article->getdoc();
+                $path = $this->getParameter('article_directory').'/'.$docName;
+                // On vérifie si l'image existe
+                if(file_exists($path)){
+                    unlink($path);
+                }
+                $article->setDoc(null);
+                $article->setIsSupprDoc(0);
+            }
+
+            // ---------------------------
+            // STEP 4 : insertion du Document dans le dossier public/uploads/articles'
+            // ---------------------------
+            $docFile = $form->get('docFile')->getData();
+            if ($docFile) {
+                $originalFilename = pathinfo((string) $docFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $docFile->guessExtension();
+
+
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $docFile->move(
+                        $this->getParameter('article_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $article->setDoc($newFilename);
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('op_webapp_college_espcoll', [
@@ -166,7 +355,7 @@ class ArticleController extends AbstractController
     }
 
     #[Route(path: '/webapp/articles/{id}/editAdmin', name: 'op_webapp_articles_edit_admin', methods: ['GET', 'POST'])]
-    public function editAdmin(Request $request, Article $article, EntityManagerInterface $entityManager): Response
+    public function editAdmin(Request $request, Article $article, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $user = $this->getUser();
 
@@ -174,6 +363,50 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // ---------------------------
+            // STEP 1 : Suppression de l'image lors du click Checkbox
+            // ---------------------------
+            $supprvignettechkbx = $form->get('isSupprImage')->getData();
+
+            if($supprvignettechkbx && $supprvignettechkbx == true){
+                // récupération du nom de l'image
+                $imageName = $article->getImageName();
+                $path = $this->getParameter('config_directory').'/'.$imageName;
+                // On vérifie si l'image existe
+                if(file_exists($path)){
+                    unlink($path);
+                }
+                $article->setImageName(null);
+                $article->setIsSupprImage(0);
+            }
+
+            // ---------------------------
+            // STEP 2 : insertion de l'image dans le dossier public/uploads/articles'
+            // ---------------------------
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageFile->move(
+                        $this->getParameter('article_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $article->setImageName($newFilename);
+            }
+
+
             $entityManager->flush();
 
             return $this->redirectToRoute('op_webapp_articles_index');
