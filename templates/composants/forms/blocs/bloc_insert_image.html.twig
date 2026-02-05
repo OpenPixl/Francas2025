@@ -17,6 +17,7 @@
                 <p>{{ entity_name }}</p>
             </div>
             <div class="text-gray-600 text-xs flex items-center">
+                {% if suppr_file is defined %}
                 <label class="inline-flex items-center cursor-pointer" for="{{ suppr_file.vars.id }}">
                     {{ form_widget(suppr_file, { attr: { class: 'peer sr-only' } }) }}
 
@@ -31,7 +32,7 @@
 
                     </svg>
                 </label>
-
+                {% endif %}
             </div>
         </div>
         <div class="hidden">
