@@ -1,3 +1,6 @@
+<div class="navigation">
+    {{ knp_pagination_render(ressources) }}
+</div>
 <div class="grid grid-cols-4 gap-4">
     {% for ressource in ressources %}
         <a href="{{ path('op_webapp_ressources_ressourceshow', {'slug': ressource.slug, 'page': page}) }}" class="group">

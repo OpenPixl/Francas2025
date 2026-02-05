@@ -78,6 +78,15 @@ class RessourcesController extends AbstractController
         ], 200);
     }
 
+    #[Route(path: '/webapp/ressources/switchpage', name: 'op_webapp_ressources_switchpage', methods: ['GET', 'POST'])]
+    public function switchPage(Request $request, RessourcesRepository $ressourcesRepository,PaginatorInterface $paginator): Response
+    {
+
+        return $this->json([
+            'code'      => 200,
+        ], 200);
+    }
+
     #[Route(path: '/webapp/ressources/{category}', name: 'op_webapp_ressources_sectiononecategory', methods: ['GET'])]
     public function sectionlistOneCategory(Request $request, PaginatorInterface $paginator, $category, EntityManagerInterface $entityManager): Response
     {

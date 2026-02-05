@@ -64,7 +64,7 @@ class DashboardController extends AbstractController
     }
 
     /**
-     * Affiche automatiquement la page d'acceuil
+     * Affiche automatiquement la page d'accueil
      */
     #[Route(path: '/home', name: 'op_webapp_public_homepage')]
     public function HomePage(EntityManagerInterface $entityManager): \Symfony\Component\HttpFoundation\Response

@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export function initNewEditCollege(){
     ClassicEditor
         .create(document.querySelector('#college_edit_GroupDescription'), {

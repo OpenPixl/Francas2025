@@ -12,6 +12,7 @@ import { initNewEditArticle } from "./js/admin/webapp/NewEditArticles";
 import { initNewEditPage } from "./js/admin/admin/NewEditPage";
 import { initNewEditCollege } from "./js/admin/admin/NewEditCollege";
 import { initEditConfig } from "./js/admin/admin/EditConfig";
+import { initIndexCollege } from "./js/admin/admin/IndexCollege";
 
 document.addEventListener('DOMContentLoaded', () => {
     // Select all dropdown toggle buttons
@@ -25,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'op_admin_college_new':
         case 'op_admin_college_edit':
             initNewEditCollege();
+            break;
+        case 'op_admin_college_index':
+            initIndexCollege();
             break;
         case 'op_webapp_articles_new_admin':
         case 'op_webapp_articles_edit_admin':
