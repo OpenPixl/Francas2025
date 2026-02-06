@@ -13,6 +13,8 @@ import { initNewEditPage } from "./js/admin/admin/NewEditPage";
 import { initNewEditCollege } from "./js/admin/admin/NewEditCollege";
 import { initEditConfig } from "./js/admin/admin/EditConfig";
 import { initIndexCollege } from "./js/admin/admin/IndexCollege";
+import { initNewEditUser } from "./js/admin/admin/NewEditUser";
+import { initIndexUser } from "./js/admin/admin/IndexUser";
 
 document.addEventListener('DOMContentLoaded', () => {
     // Select all dropdown toggle buttons
@@ -30,6 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'op_admin_college_index':
             initIndexCollege();
             break;
+        case 'op_admin_user_index':
+            initIndexUser();
+            break;
+        case 'op_admin_user_new':
+        case 'op_admin_user_edit':
+            initNewEditUser();
+            break
         case 'op_webapp_articles_new_admin':
         case 'op_webapp_articles_edit_admin':
             initNewEditArticle();

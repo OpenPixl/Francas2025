@@ -27,7 +27,7 @@
                                     {% if user.avatarName is null %}
                                         <img class="img-fluid" src="{{ asset('uploads/images/svg/user.svg') }}" alt="sans_avatar">
                                     {% else %}
-                                        <img class="img-fluid" src="{{ vich_uploader_asset(user) }}" alt="{{ user.avatarName }}">
+                                        <img class="img-fluid" src="{{ asset('uploads/images/') }}" alt="{{ user.avatarName }}">
                                     {% endif %}
                                 </div>
                                 <div class="col-4">

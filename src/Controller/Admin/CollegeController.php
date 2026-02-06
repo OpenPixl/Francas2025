@@ -259,7 +259,6 @@ class CollegeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            dd($form->getData());
             /** @var UploadedFile $headerFile */
             $headerFileInput = $form->get('headerFile')->getData();
             $logoFileInput = $form->get('logoFile')->getData();
@@ -349,7 +348,7 @@ class CollegeController extends AbstractController
     {
         $user = $this->getUser();
 
-        $form = $this->createForm(CollegeEditType::class, $college);
+        $form = $this->createForm(CollegeType::class, $college);
 
         $form->handleRequest($request);
 

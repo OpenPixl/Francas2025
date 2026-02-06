@@ -12,10 +12,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class userController extends AbstractController
 {
@@ -30,7 +32,7 @@ class userController extends AbstractController
         $users = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
-            10
+            15
         );
         return $this->render('admin/user/index.html.twig', [
             'users' => $users
@@ -38,7 +40,7 @@ class userController extends AbstractController
     }
 
     #[Route(path: '/admin/user/new', name: 'op_admin_user_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $user = new user();
         $form = $this->createForm(userType::class, $user);
@@ -47,6 +49,33 @@ class userController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $firstname = $form->get("firstName")->getData();
             $lastname = $form->get("lastName")->getData();
+
+            // ---------------------------
+            // STEP 1 : insertion de l'image dans le dossier public/uploads/articles'
+            // ---------------------------
+            $imageFile = $form->get('avatarFile')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageFile->move(
+                        $this->getParameter('user_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $user->setAvatarName($newFilename);
+            }
+
+
             $hash = $this->passwordEncoder->hashPassword($user, $user->getPassword());
             $user->setLoginName($firstname ." ". $lastname);
             $user->setPassword($hash);
@@ -71,12 +100,38 @@ class userController extends AbstractController
     }
 
     #[Route(path: '/admin/user/{id}/edit', name: 'op_admin_user_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, user $user, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, user $user, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
-        $form = $this->createForm(userEditType::class, $user);
+        $form = $this->createForm(userType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // ---------------------------
+            // STEP 2 : insertion de l'image dans le dossier public/uploads/articles'
+            // ---------------------------
+            $imageFile = $form->get('avatarFile')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageFile->move(
+                        $this->getParameter('article_directory'),
+                        $newFilename
+                    );
+                } catch (FileException) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $user->setAvatarName($newFilename);
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('op_admin_user_index');

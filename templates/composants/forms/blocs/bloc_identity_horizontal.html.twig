@@ -19,8 +19,8 @@
         {% if civility is defined %}
             {{ form_widget(firstname, { attr: { class: firstname_width ~ ' border-t border-b border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 focus:outline-none focus:bg-white' } }) }}
         {% else %}
-            {{ form_widget(firstname, { attr: { class: firstname_width ~ ' border-s border-t border-b border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 rounded-l-lg focus:outline-none focus:bg-white' } }) }}
+            {{ form_widget(firstname, { attr: { class: firstname_width ~ ' border-s border-t border-b border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 rounded-l focus:outline-none focus:bg-white' } }) }}
         {% endif %}
-        {{ form_widget(lastname, { attr: { class: lastname_width ~ ' border border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 rounded-r-lg focus:outline-none focus:bg-white' } }) }}
+        {{ form_widget(lastname, { attr: { class: lastname_width ~ ' border border-gray-300 bg-gray-100/70 text-gray-900 text-sm px-2 py-1 rounded-r focus:outline-none focus:bg-white' } }) }}
     </div>
 </div>

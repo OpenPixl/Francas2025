@@ -2,6 +2,28 @@
 
 {% block title %}Edit user{% endblock %}
 
+{% block header %}
+    {{ include('admin/dashboard/include/header.html.twig', {
+        'title' : 'Gestions des utilisateurs',
+        'btns' : {
+            'new': {
+                'id' : null,
+                'href' : path('op_admin_user_new'),
+                'icon' : '<i class="fa-duotone fa-solid fa-square-plus"></i>',
+                'text' : 'Créer un nouvel utiisateur',
+                'array':null
+            },
+            'return': {
+                'id' : null,
+                'href' : path('op_admin_user_index'),
+                'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
+                'text' : 'Retour',
+                'array':null
+            }
+        }
+    }) }}
+{% endblock %}
+
 {% block main %}
 
 
