@@ -1,4 +1,5 @@
 export function initNewEditArticle(){
+    console.log('Bienvenue sur la page d\'ajout ou d\'édition d\'un article par les collèges');
     ClassicEditor
         .create(document.querySelector('#articles2_content'), {
             toolbar: [ 'heading','bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment' ],
@@ -7,12 +8,4 @@ export function initNewEditArticle(){
         .catch(error => {
             console.error(error);
         });
-    // sélection du div contenant le spinneur
-    const spinner = document.getElementById('spinner')
-
-    const button = document.querySelector('button.btn');
-    button.addEventListener('click', event => {
-        button.classList.remove('d-none')
-        console.log('Ok')
-    });
 }
