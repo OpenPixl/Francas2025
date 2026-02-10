@@ -1,5 +1,8 @@
 <div>
-    <img src="{{ asset('/uploads/images/colleges/'~college.headerName ) | imagine_filter('thumb_bandeau_college') }}" alt="" class="h-[250px] w-full object-cover lg:h-48" />
+    {% if college.headerName is not null %}
+        <img src="{{ asset('/uploads/images/colleges/'~college.headerName ) | imagine_filter('thumb_bandeau_college') }}" alt="" class="h-[250px] w-full object-cover lg:h-48" />
+    {% else %}
+    {% endif %}
     <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div class="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
             <div class="flex">

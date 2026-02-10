@@ -40,17 +40,43 @@
         </div>
     </div>
 {% else %}
+    {% set hasError = form.vars.errors|length > 0 %}
     <div class="my-1 flex flex-row justify-between">
-        <label for="{{ form.vars.id }}" class="block {{ legend_width }} text-sm my-1 text-slate-700">
+        <label for="{{ form.vars.id }}" class="block {{ legend_width }} text-sm my-1 {{ hasError ? 'text-red-800' : 'text-slate-700' }}">
             {{ label }}
         </label>
         <div class="{{ col_width }}">
-            {{ form_widget(form, {'attr': {'class': input_width ~ '  text-sm bg-white text-slate-900 border-solid border-[1px] border-gray-300 rounded file:mr-4 file:py-1 file:px-2 file:rounded-s file:border-0 file:text-sm file:font-semibold file:bg-gray-300 file:text-gray-800 hover:file:bg-gray-100 active:file:bg-gray-100"'}}) }}
+            {{ form_widget(form, {
+                attr: {
+                    class:
+                        input_width ~ '  text-sm bg-white text-slate-900 rounded
+                        border-solid border-[1px]
+                        ' ~
+                        (hasError
+                        ? 'border-red-800 focus:ring-red-800 focus:border-red-800'
+                        : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
+                        ) ~ '
+                        file:mr-4 file:py-1 file:px-2 file:rounded-s file:border-0 file:text-sm file:font-semibold file:bg-gray-300 file:text-gray-800
+                        hover:file:bg-gray-100 active:file:bg-gray-100"'
+                    }
+                })
+            }}
+
+            {# Affichage des erreurs #}
+            {% if hasError %}
+                <ul class="mt-1 text-sm text-red-800">
+                    {% for error in form.vars.errors %}
+                        <li>{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
         </div>
         {% if suppr_file is defined %}
         <div class="hidden">
             {{ form_widget(suppr_file) }}
         </div>
         {% endif %}
+
     </div>
 {% endif %}

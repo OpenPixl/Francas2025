@@ -14,9 +14,47 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class ArticlesType extends AbstractType
 {
+    private function getDocConstraintsBySupportId(?int $supportId): array
+    {
+        return match ($supportId) {
+            1 => [ // audio
+                new File([
+                    'maxSize' => '100000k',
+                    'mimeTypes' => ['audio/mpeg', 'audio/wav'],
+                    'mimeTypesMessage' => 'Attention, veuillez charger un fichier au format mp3.',
+                ])
+            ],
+            2 => [ // vidéo
+                new File([
+                    'maxSize' => '100000k',
+                    'mimeTypes' => [
+                        'video/mp4',
+                        'video/mpeg',
+                    ],
+                    'mimeTypesMessage' => 'Attention, veuillez charger un fichier au format mp4.',
+                ])
+            ],
+            3 => [ // document
+                new File([
+                    'maxSize' => '10000k',
+                    'mimeTypes' => [
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    ],
+                    'mimeTypesMessage' => 'Veuillez charger un document PDF ou Word',
+                ])
+            ],
+            default => [],
+        };
+    }
+
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -27,6 +65,15 @@ class ArticlesType extends AbstractType
                 'label'=> "Contenu de l'article",
                 'required' => false
             ])
+            ->add('isShowReadMore', CheckboxType::class,[
+                'label' => 'Afficher "Lire la suite"',
+                'required' => false,
+            ])
+            ->add('isTitleShow', CheckboxType::class,[
+                'label' => 'Afficher le titre',
+                'required' => false,
+            ])
+            ->add('category')
             ->add('theme',EntityType::class,[
                 'class' => Theme::class,
                 'placeholder' => '-- Choisir le thème --',
@@ -39,15 +86,6 @@ class ArticlesType extends AbstractType
                 'required' => false,
                 'label'=> "Support du Projet",
             ])
-            ->add('isShowReadMore', CheckboxType::class,[
-                'label' => 'Afficher "Lire la suite"',
-                'required' => false,
-            ])
-            ->add('isTitleShow', CheckboxType::class,[
-                'label' => 'Afficher le titre',
-                'required' => false,
-            ])
-            ->add('category')
             ->add('imageFile', FileType::class, [
                 'label' => 'Banniere au format : png ou jpg',
                 'mapped' => false,
@@ -82,6 +120,43 @@ class ArticlesType extends AbstractType
             ])
             ->add('isSupprDoc')
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $article = $event->getData();
+            $form = $event->getForm();
+
+            if (!$article) {
+                return;
+            }
+
+            $support = $article->getSupport();
+            $supportId = $support?->getId();
+
+            $form->add('docFile', FileType::class, [
+                'label' => 'Fichier associé',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => $this->getDocConstraintsBySupportId($supportId),
+            ]);
+        });
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+            $form = $event->getForm();
+
+            if (!isset($data['support'])) {
+                return;
+            }
+
+            $supportId = (int) $data['support'];
+
+            $form->add('docFile', FileType::class, [
+                'label' => 'Fichier associé',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => $this->getDocConstraintsBySupportId($supportId),
+            ]);
+        });
 
     }
 

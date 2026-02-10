@@ -15,7 +15,11 @@
             <!-- Contenu -->
             <div class="absolute inset-0 flex flex-col justify-end p-6 text-white">
                 <div class="flex flex-row items-center gap-4">
-                    <img src="{{ asset('/uploads/images/colleges/'~ article.logoName) | imagine_filter('thumb_logo_college') }}" alt="" class="size-20 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
+                    {% if article.logoName is not null %}
+                        <img src="{{ asset('/uploads/images/colleges/'~ article.logoName) | imagine_filter('thumb_logo_college') }}" alt="" class="size-20 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
+                    {% else %}
+                        <img src="{{ asset('/uploads/images/fixes/img_article_none.png') | imagine_filter('thumb_logo_college') }}" alt="" class="size-20 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
+                    {% endif %}
                     <div>
                         <span class="bg-[#d84519] w-40 px-3 py-1 rounded-xl text-sm mb-2 flex justify-center">{{ article.theme }}</span>
                         <h2 class="text-2xl font-bold">{{ article.title }}</h2>
