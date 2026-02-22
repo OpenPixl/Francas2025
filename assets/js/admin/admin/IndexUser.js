@@ -1,4 +1,6 @@
 import axios from 'axios';
+import {showNotification, showDialog, hideDialog} from "../../composants/tailwind";
+
 
 export function initIndexUser(){
     console.log('Bienvenu sur la page d\'index des utilisateurs.');
@@ -56,6 +58,27 @@ export function initIndexUser(){
             })
     }
 
+    function openDialog(e){
+        e.preventDefault()
+        let url = this.href;
+        showDialog(url, 'Vous êtes sur le point de supprimer l\'utilisateur.');
+    }
+
+    function submitModal(e){
+        e.preventDefault()
+        let url = this.href;
+        hideDialog();
+        axios
+            .post(url)
+            .then(function(response){
+                document.getElementById('liste').innerHTML = response.data.liste;
+                reload()
+            })
+            .catch(function(error){
+                console.log(error);
+            })
+    }
+
     function reload(){
 
         // Evènement sur le bouton js-verified
@@ -64,9 +87,15 @@ export function initIndexUser(){
         })
 
         // Bouton de suppression de la ligne en cours
-        document.querySelectorAll('a.js-data-suppr').forEach(function(link){
-            link.addEventListener('click', onClickDelEvent)
+        document.querySelectorAll('a.openDialog').forEach(function(link){
+            link.addEventListener('click', openDialog)
         })
+
+        // Bouton de suppression de la ligne en cours
+        document.querySelectorAll('a.submitModal').forEach(function(link){
+            link.addEventListener('click', submitModal)
+        })
+
     }
 
     reload();

@@ -4,6 +4,7 @@ namespace App\Form\Admin;
 
 use App\Entity\Admin\College;
 use App\Entity\Admin\user;
+use Doctrine\ORM\EntityRepository;
 use phpDocumentor\Reflection\Type;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -30,7 +31,7 @@ class userType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $request = $this->requestStack->getCurrentRequest();
-        $route = $request?->attributes->get('_route');
+        $route = $request->attributes->get('_route');
 
         $builder
             ->add('email')
@@ -64,6 +65,18 @@ class userType extends AbstractType
             ->add('city')
             ->add('phoneDesk')
             ->add('phoneGsm')
+            ->add('college', EntityType::class, [
+                'class' => College::class,
+                //'choice_label' => 'name',
+                'placeholder' => '-- Choisir le collège --',
+                'required' => false,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        ->where('c.isActive = :isActive')
+                        ->setParameter('isActive', 1)
+                        ->orderBy('c.id', 'ASC');
+                },
+            ])
 
         ;
 

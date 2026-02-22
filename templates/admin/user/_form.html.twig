@@ -84,6 +84,18 @@
                     'routename' : 'op_webapp_message_new',
                 } %}
             </div>
+
+            <div class="mt-3 mb-1">
+                {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                    'legend_width' : 'w-3/12',
+                    'col_width' : 'w-9/12',
+                    'label' : 'Anime le collège',
+                    form : form.college,
+                    'placeholder': 'Nom ?',
+                    'input_width' : 'w-40',
+                    'oninput': ''
+                } %}
+            </div>
         </div>
     </div>
 

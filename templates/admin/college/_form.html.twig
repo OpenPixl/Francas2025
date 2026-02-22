@@ -52,6 +52,17 @@
             {% include 'composants/forms/input_text_horizontal.html.twig' with {
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
+                'label' : 'Nos réunions',
+                form : form.user,
+                'placeholder': 'Nous nous retrouvons',
+                'input_width' : 'w-full',
+                'oninput': ''
+            } %}
+        </div>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
                 'label' : 'L\'animateur du groupe',
                 form : form.animateur,
                 'placeholder': 'Nom ?',

@@ -3,6 +3,9 @@
 namespace App\Form\Admin;
 
 use App\Entity\Admin\College;
+use App\Entity\Admin\User;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -60,7 +63,20 @@ class CollegeEditType extends AbstractType
                     ])
                 ],
             ])
-            ->add('user')
+            ->add('user', EntityType::class, [
+                'label' => 'anime le college',
+                'class' => User::class,
+                'placeholder' => '-- Choisir l\'administrateur --',
+                'required' => false,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.isActiv = :isActiv')
+                        ->andWhere('u.roles LIKE :role')
+                        ->setParameter('isActiv', 1)
+                        ->setParameter('role', '%"ROLE_COLLEGE"%')
+                        ->orderBy('u.id', 'ASC');
+                },
+            ])
         ;
     }
 

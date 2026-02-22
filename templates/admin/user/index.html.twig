@@ -4,11 +4,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script>
-        window.onload = function(){
-
-        }
-    </script>
 {% endblock %}
 
 {% block header %}
@@ -40,7 +35,7 @@
         <h2 class="font-normal uppercase text-xl text-sky-700">Liste des membres du site</h2>
         <p class="text-sm font-light">Créer, Modifier ou supprimer des utilisateurs du site.</p>
 
-        <div class="mt-3">
+        <div class="mt-3" id="liste">
             {{ include('admin/user/include/_liste.html.twig') }}
         </div>
 

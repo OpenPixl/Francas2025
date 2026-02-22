@@ -36,7 +36,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findAllUsersWithCollege()
     {
         return $this->createQueryBuilder('u')
-            ->leftJoin('u.colleges' , 'c')
+            ->leftJoin('u.college' , 'c')
             ->addSelect('
                 u.id as id,
                 u.loginName as loginName,

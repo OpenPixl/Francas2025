@@ -5,17 +5,21 @@
         <th class="text-start">Etablissement</th>
         <th class="text-start">Commune</th>
         <th class="text-start">Animateur</th>
-        <th class="text-center">publié</th>
+        <th class="text-center">Publié sur le site</th>
         <th class="text-center">actions</th>
     </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 dark:divide-white/10">
-    {% for college in colleges %}
+    {% for college in colleges|sort((a, b) => a.city <=> b.city) %}
         <tr class="hover:bg-gray-100">
             <td></td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ college.name }}</td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ college.city }}</td>
-            <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">{{ college.animateur }}</td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+                {% if college.user is not null %}
+                    {{ college.user.email }}
+                {% endif %}
+            </td>
             <td class="py-1.5 text-sm text-center whitespace-nowrap text-gray-500 dark:text-gray-400">
                 {% if college.isActive == 0 %}
                     <a class="isPublish" href="{{ path('op_admin_college_verified', {'id': college.id}) }}"><i class="far fa-times-circle text-red-800"></i></a>

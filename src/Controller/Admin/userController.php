@@ -21,14 +21,14 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class userController extends AbstractController
 {
-    public function __construct(private readonly UserPasswordHasherInterface $passwordEncoder)
-    {
-    }
+    public function __construct(
+        private readonly UserPasswordHasherInterface $passwordEncoder)
+    {}
 
     #[Route(path: '/admin/user/', name: 'op_admin_user_index', methods: ['GET'])]
     public function index(userRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $data = $userRepository->findAllUsersWithCollege();
+        $data = $userRepository->findAll();
         $users = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
@@ -106,7 +106,8 @@ class userController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
+            $firstname = $form->get("firstName")->getData();
+            $lastname = $form->get("lastName")->getData();
             // ---------------------------
             // STEP 2 : insertion de l'image dans le dossier public/uploads/articles'
             // ---------------------------
@@ -131,7 +132,7 @@ class userController extends AbstractController
                 // instead of its contents
                 $user->setAvatarName($newFilename);
             }
-
+            $user->setLoginName($firstname ." ". $lastname);
             $entityManager->flush();
 
             return $this->redirectToRoute('op_admin_user_index');
@@ -157,7 +158,7 @@ class userController extends AbstractController
     /**
      * Permet de mettre en menu la poge ou non
      */
-    #[Route(path: '/admin/user/op_admin/user/verified/{id}', name: 'op_admin_user_verified')]
+    #[Route(path: '/admin/user/op_admin/user/actived/{id}', name: 'op_admin_user_actived')]
     public function jsVerified(User $user, EntityManagerInterface $em) : Response
     {
         $admin = $this->getUser();
@@ -185,24 +186,64 @@ class userController extends AbstractController
     /**
      * Suppression d'une ligne index.php
      */
-    #[Route(path: '/admin/user/del/{id}', name: 'op_admin_user_del', methods: ['POST'])]
-    public function Del(User $user, EntityManagerInterface $entityManager) : Response
+    #[Route(path: '/admin/user/del/{id}/{page}', name: 'op_admin_user_del', methods: ['POST'])]
+    public function Del(User $user, $page, PaginatorInterface $paginator, EntityManagerInterface $entityManager, Request $request) : Response
     {
-        // Supression des articles liés à l'user
-        $articles = $entityManager->getRepository(Article::class)->findBy(['author' => $user]);
-        foreach ($articles as $article){
-            $entityManager->remove($article);
-            $entityManager->flush();
+        $admin = $this->getUser();
+        // Migration des articles liés à l'user
+        $articles = $user->getArticles();
+
+        if($articles){
+            foreach($articles as $article){
+                $article->setAuthor($admin);
+            }
         }
+
+        // Désaffectation du college lié
+        $college = $user->getCollege();
+        if ($college) {
+            $college->setUser(null);
+        }
+
+        // Désaffectation du college lié
+        $pages = $user->getPages();
+        if ($pages) {
+            foreach ($pages as $page) {
+                $page->setAuthor($admin);
+            }
+        }
+
+        $comments = $user->getComments();
+        if($comments){
+            foreach($comments as $comment){
+                $entityManager->remove($comment);
+            }
+        }
+
+        $messages = $user->getMessages();
+        if($messages){
+            foreach($messages as $message){
+                $entityManager->remove($message);
+            }
+        }
+
+        $entityManager->flush();
+
         // supression de l'utilisateur
         $entityManager->remove($user);
         $entityManager->flush();
 
-        $users = $entityManager->getRepository(User::class)->findAll();
+        $data = $entityManager->getRepository(User::class)->findAll();
+
+        $users = $paginator->paginate(
+            $data,
+            $request->query->getInt('page', $page),
+            15
+        );
 
         return $this->json([
             'code'=> 200,
-            'message' => "L'évènenemt a été supprimé",
+            'message' => "L'utilisateur a été supprimé",
             'liste' => $this->renderView('admin/user/include/_liste.html.twig', [
                 'users' => $users
             ])

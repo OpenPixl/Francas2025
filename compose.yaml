@@ -14,6 +14,8 @@ services:
       - SERVER_NAME=:80
     depends_on:
       - db
+    networks:
+      - francascc25
 
   # Base de données MariaDB
   db:
@@ -29,6 +31,8 @@ services:
       - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - francascc25
 
   # phpMyAdmin pour gérer la base de données
   phpmyadmin:
@@ -43,6 +47,12 @@ services:
       - MYSQL_ROOT_PASSWORD=Corwin_40280
     depends_on:
       - db
+    networks:
+      - francascc25
 
 volumes:
   db_data:
+
+networks:
+  francascc25:
+    external: true

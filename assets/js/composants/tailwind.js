@@ -77,38 +77,49 @@ export function hideNotification() {
 
 // Module Dialog/Modal
 
-export function showDialog(message = "Successfully saved!", delay = 3000) {
-    let dialog = document.getElementById("dialog");
-    //const closeBtn = document.getElementById("closeNotification");
-
-    // changer le texte si besoin
-    //notification.querySelector("p.font-medium").textContent = message;
-
-    // afficher avec transition
-    dialog.classList.remove("hidden");
+export function showDialog(href, message = null) {
+    const dialog = document.getElementById("dialog");
+    const backdrop = document.getElementById("dialog_backdrop");
+    const modal = document.getElementById("modal");
+    const closeBtn = document.querySelectorAll(".dialog_closed");
+    const validModal = document.getElementById("validModal");
+    console.log(href);
+    // ouvrir
+    dialog.classList.remove("hidden")
     setTimeout(() => {
-        dialog.classList.remove("opacity-0", "translate-y-2", "sm:translate-x-2");
-        dialog.classList.add("opacity-100", "translate-y-0", "sm:translate-x-0");
-    }, 50);
+        backdrop.classList.remove("opacity-0");
+        backdrop.classList.add("opacity-100");
 
-    // auto-fermeture
-    setTimeout(() => hideNotification(), delay);
+        modal.classList.remove("opacity-0", "translate-y-4");
+        modal.classList.add("opacity-100", "translate-y-0");
+    }, 10);
+
+    // fermeture
+    closeBtn.forEach(btn => btn.addEventListener('click', hideDialog));
+    if (validModal) {
+        validModal.href = href;
+    }
+    if (message) {
+        let modal_body_text = document.getElementById("modal_body_text");
+        modal_body_text.innerHTML = '<p class="text-sm font-normal text-slate-700">'+ message +'</p>';
+    }
+
 }
 
 export function hideDialog() {
-    let dialog = document.getElementById("dialog");
+    const dialog = document.getElementById("dialog");
+    const backdrop = document.getElementById("dialog_backdrop");
+    const modal = document.getElementById("modal");
 
-    dialog.classList.remove("opacity-100", "translate-y-0", "sm:translate-x-0");
-    dialog.classList.add("opacity-0", "translate-y-2", "sm:translate-x-2");
+    modal.classList.remove("opacity-100", "translate-y-0");
+    modal.classList.add("opacity-0", "translate-y-4");
 
-    dialog.querySelector('#modal_body_text').innerHTML = "<p class=\"text-sm font-normal text-slate-700\">Présentation d'un contenu selon le besoin de la\n" +
-        "modale</p>"
-    ;
+    backdrop.classList.remove("opacity-100");
+    backdrop.classList.add("opacity-0");
 
-    // attendre la fin de la transition avant de cacher complètement
     setTimeout(() => {
         dialog.classList.add("hidden");
-    }, 300);
+    }, 300); // doit correspondre à duration-300
 }
 
 // carousel

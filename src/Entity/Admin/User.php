@@ -120,17 +120,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Page::class, mappedBy: 'author')]
     private Collection $pages;
 
-    /**
-     * @var Collection<int, College>
-     */
-    #[ORM\OneToMany(targetEntity: College::class, mappedBy: 'user')]
-    private Collection $colleges;
+    #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?College $college = null;
 
     public function __construct()
     {
         $this->articles = new ArrayCollection();
         $this->ressources = new ArrayCollection();
-        $this->colleges = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->pages = new ArrayCollection();
@@ -506,36 +502,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, College>
-     */
-    public function getColleges(): Collection
-    {
-        return $this->colleges;
-    }
-
-    public function addCollege(College $college): static
-    {
-        if (!$this->colleges->contains($college)) {
-            $this->colleges->add($college);
-            $college->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCollege(College $college): static
-    {
-        if ($this->colleges->removeElement($college)) {
-            // set the owning side to null (unless already changed)
-            if ($college->getUser() === $this) {
-                $college->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -565,6 +531,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __toString(): string
     {
-        return (string) $this->firstName.' '.$this->lastName;
+        return (string) $this->loginName;
+    }
+
+    public function getCollege(): ?College
+    {
+        return $this->college;
+    }
+
+    public function setCollege(?College $college): static
+    {
+        $this->college = $college;
+
+        return $this;
     }
 }

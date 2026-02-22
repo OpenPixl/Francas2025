@@ -19,9 +19,6 @@ class College
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\ManyToOne(inversedBy: 'colleges')]
-    private ?User $user = null;
-
     #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
@@ -102,6 +99,9 @@ class College
      */
     #[ORM\OneToMany(targetEntity: Ressources::class, mappedBy: 'college')]
     private Collection $ressources;
+
+    #[ORM\OneToOne(mappedBy: 'college', cascade: ['persist', 'remove'])]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -248,10 +248,7 @@ class College
         return $this;
     }
 
-    public function __toString(): string
-    {
-        return (string) $this->name;
-    }
+
 
     public function setLogoName(?string $logoName): void
     {
@@ -415,18 +412,6 @@ class College
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
@@ -450,6 +435,33 @@ class College
     public function setUpdatedAt(): static
     {
         $this->updatedAt = new \DateTime();
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->name." - ".$this->city;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($user === null && $this->user !== null) {
+            $this->user->setCollege(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($user !== null && $user->getCollege() !== $this) {
+            $user->setCollege($this);
+        }
+
+        $this->user = $user;
 
         return $this;
     }
