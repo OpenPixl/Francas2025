@@ -28,7 +28,7 @@ class userController extends AbstractController
     #[Route(path: '/admin/user/', name: 'op_admin_user_index', methods: ['GET'])]
     public function index(userRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $data = $userRepository->findAll();
+        $data = $userRepository->indexCollegesOnly();
         $users = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
