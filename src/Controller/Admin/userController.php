@@ -49,13 +49,24 @@ class userController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $firstname = $form->get("firstName")->getData();
             $lastname = $form->get("lastName")->getData();
+            $typeuser = $form->get("typeuser")->getData();
+
+            if($firstname || $lastname){
+                $user->setLoginName($firstname ." ". $lastname);
+            }
+            if($typeuser == "college"){
+                $user->setRoles(['ROLE_COLLEGE']);
+            }
+            if($typeuser == "administrator"){
+                $user->setRoles(['ROLE_ADMIN']);
+            }
 
             // ---------------------------
             // STEP 1 : insertion de l'image dans le dossier public/uploads/articles'
             // ---------------------------
             $imageFile = $form->get('avatarFile')->getData();
             if ($imageFile) {
-                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $originalFilename = pathinfo((string)$imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                 // this is needed to safely include the file name as part of the URL
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
@@ -75,9 +86,8 @@ class userController extends AbstractController
                 $user->setAvatarName($newFilename);
             }
 
-
             $hash = $this->passwordEncoder->hashPassword($user, $user->getPassword());
-            $user->setLoginName($firstname ." ". $lastname);
+
             $user->setPassword($hash);
             $entityManager->persist($user);
             $entityManager->flush();
