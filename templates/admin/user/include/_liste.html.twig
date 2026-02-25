@@ -15,7 +15,7 @@
             <tr class="hover:bg-gray-100">
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><input type="checkbox" id="check-liste"></td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
-                    {% if user.loginName is null %}
+                    {% if user.loginName is empty or user.loginName is null %}
                         non précisé
                     {% else %}
                         {{ user.loginName }}
