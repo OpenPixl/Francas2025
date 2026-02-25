@@ -14,7 +14,14 @@
         {% for user in users %}
             <tr class="hover:bg-gray-100">
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><input type="checkbox" id="check-liste"></td>
-                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ user.loginName }}</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                    {% if user.loginName %}
+                        {{ user.loginName }}
+                    {% else %}
+                        non défini
+                    {% endif %}
+
+                </td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ user.email }}</td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
                     {% if user.college is null %}

@@ -73,6 +73,7 @@ class DashboardController extends AbstractController
         if($config->getIsOffline() == 1){
             return $this->render('app/offline.html.twig');
         }
+
         $sections = $entityManager->getRepository(Section::class)->findBy(['favorites' => 1], ['position' => 'ASC']);
 
         return $this->render('webapp/public/index.html.twig',[
