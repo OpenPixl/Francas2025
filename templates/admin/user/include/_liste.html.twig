@@ -15,10 +15,10 @@
             <tr class="hover:bg-gray-100">
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><input type="checkbox" id="check-liste"></td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
-                    {% if user.loginName %}
-                        {{ user.loginName }}
+                    {% if user.loginName is null %}
+                        non précisé
                     {% else %}
-                        non défini
+                        {{ user.loginName }}
                     {% endif %}
 
                 </td>
