@@ -3,9 +3,9 @@
         <tr>
             <th class="px-1 py-1.5"></th>
             <th class="px-1 text-start">Titre de l'article</th>
-            <th></th>
-            <th>publié</th>
-            <th></th>
+            <th class="px-1 text-start"></th>
+            <th class="px-1 text-start">Publié le</th>
+            <th class="px-1 text-center">...</th>
         </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 dark:divide-white/10">
@@ -13,9 +13,9 @@
         <tr class="hover:bg-gray-100">
             <td class="px-1 py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
                 {% if article.imageName is null %}
-                    <img src="{{ asset('uploads/images/fixes/img_article_none.png') }}" alt="avatar de l'image de l'article" class="h-10 object-cover rounded-sm">
+                    <img src="{{ asset('uploads/images/fixes/img_article_none.png') }}" alt="avatar de l'image de l'article" class="h-8 object-cover rounded-sm">
                 {% else %}
-                    <img src="{{ asset('uploads/images/articles/' ~ article.imageName) }}" alt="avatar de l'image de l'article" class="h-10 object-cover rounded-sm">
+                    <img src="{{ asset('uploads/images/articles/' ~ article.imageName) }}" alt="avatar de l'image de l'article" class="h-8 object-cover rounded-sm">
                 {% endif %}
             </td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
@@ -31,15 +31,17 @@
                 </p>
             </td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
-                {{ article.content|u.truncate(50, ' ...') | raw }}
+                <p class="text-slate-900 text-sm">{{ article.content|u.truncate(20, ' ...') | striptags }}</p>
             </td>
-            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ article.updatedAt|date('d-m-Y') }}</td>
-            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400 text-end">
-                <a href="{{ path('op_webapp_articles_edit', {'id' : article.id}) }}"><i class="far fa-edit"></i> Modifier</a> |
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
+                <p class="text-slate-900 text-sm">{{ article.updatedAt|date('d-m-Y') }}</p>
+            </td>
+            <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400 text-center">
+                <a href="{{ path('op_webapp_articles_edit', {'id' : article.id}) }}"><i class="far fa-edit"></i></a> |
                 {% if app.request.attributes.get('_route') == 'op_espcoll_articles_bycollege' %}
-                    <a class="btnArchived" href="{{ path('op_webapp_articles_archived', {'id': article.id, 'idcollege': article.college.id}) }}"><i class="fa fa-eraser"></i> Archiver</a>
+                    <a class="btnArchived" href="{{ path('op_webapp_articles_archived', {'id': article.id, 'idcollege': article.college.id}) }}"><i class="fa fa-eraser"></i></a>
                 {% else %}
-                    <a class="btnArchived" href="{{ path('op_webapp_articles_archived', {'id': article.id, 'idcollege': idcollege}) }}"><i class="fa fa-eraser"></i> Archiver</a>
+                    <a class="btnArchived" href="{{ path('op_webapp_articles_archived', {'id': article.id, 'idcollege': idcollege}) }}"><i class="fa fa-eraser"></i></a>
                 {% endif %}
             </td>
         </tr>
