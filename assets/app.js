@@ -14,6 +14,7 @@ import { initShowPage } from "./js/app/page/show";
 import { initNewEditcollege } from "./js/app/college/newEditCollege";
 import { initNewEditMessage } from "./js/admin/webapp/NewEditMessage";
 import { initNewEditArticle } from "./js/app/article/NewEditArticles";
+import { initIndexAdminArticle } from "./js/admin/webapp/IndexArticles";
 
 
 document.addEventListener('DOMContentLoaded', () => {

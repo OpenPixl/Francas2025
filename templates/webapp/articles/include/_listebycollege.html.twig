@@ -19,7 +19,7 @@
                 {% endif %}
             </td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
-                <p class="px-1 font-semibold text-slate-900 text-sm">{{ article.title }}</p>
+                <p class="px-1 font-semibold text-slate-900 text-sm">{{ article.title|u.truncate(40, ' ...') }}</p>
                 <p>
                     <span class="inline-flex items-center gap-x-1.5 rounded-full px-2 py-1 text-xs font-normal text-gray-900 inset-ring inset-ring-gray-200 dark:text-gray-200 dark:inset-ring-white/10">
                         <svg viewBox="0 0 6 6" aria-hidden="true" class="size-1.5 fill-red-500 dark:fill-red-400">
@@ -31,7 +31,7 @@
                 </p>
             </td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
-                <p class="text-slate-900 text-sm">{{ article.content|u.truncate(20, ' ...') | striptags }}</p>
+                <p class="text-slate-900 text-sm">{{ article.content|u.truncate(40, ' ...') | striptags }}</p>
             </td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
                 <p class="text-slate-900 text-sm">{{ article.updatedAt|date('d-m-Y') }}</p>

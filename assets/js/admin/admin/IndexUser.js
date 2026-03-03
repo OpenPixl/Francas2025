@@ -61,7 +61,7 @@ export function initIndexUser(){
     function openDialog(e){
         e.preventDefault()
         let url = this.href;
-        showDialog(url, 'Vous êtes sur le point de supprimer l\'utilisateur.');
+        showDialog(url,'Suppresssion', 'Vous êtes sur le point de supprimer l\'utilisateur.');
     }
 
     function submitModal(e){

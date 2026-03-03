@@ -15,6 +15,7 @@ import { initEditConfig } from "./js/admin/admin/EditConfig";
 import { initIndexCollege } from "./js/admin/admin/IndexCollege";
 import { initNewEditUser } from "./js/admin/admin/NewEditUser";
 import { initIndexUser } from "./js/admin/admin/IndexUser";
+import { initIndexArticle } from "./js/admin/webapp/IndexArticles";
 
 document.addEventListener('DOMContentLoaded', () => {
     // Select all dropdown toggle buttons
@@ -46,6 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'op_webapp_page_new':
         case 'op_webapp_page_edit':
             initNewEditPage();
+            break;
+        case 'op_webapp_articles_index':
+            initIndexArticle();
             break;
         default:
             console.log('Page non reconnue ou pas de JS spécifique');

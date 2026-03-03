@@ -77,7 +77,7 @@ export function hideNotification() {
 
 // Module Dialog/Modal
 
-export function showDialog(href, message = null) {
+export function showDialog(href, title = null, message = null) {
     const dialog = document.getElementById("dialog");
     const backdrop = document.getElementById("dialog_backdrop");
     const modal = document.getElementById("modal");
@@ -98,6 +98,10 @@ export function showDialog(href, message = null) {
     closeBtn.forEach(btn => btn.addEventListener('click', hideDialog));
     if (validModal) {
         validModal.href = href;
+    }
+    if(message) {
+        let block_title = document.getElementById("dialog_header");
+        block_title.innerHTML = '<h3 id="dialog_header_title" class="font-normal uppercase text-xl text-sky-700">' + title + '</h3>';
     }
     if (message) {
         let modal_body_text = document.getElementById("modal_body_text");

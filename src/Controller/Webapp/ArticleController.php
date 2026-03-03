@@ -28,7 +28,7 @@ class ArticleController extends AbstractController
     #[Route(path: '/webapp/articles/', name: 'op_webapp_articles_index', methods: ['GET', 'POST'])]
     public function index(ArticleRepository $articleRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $data = $articleRepository->findAll();
+        $data = $articleRepository->findBy([], ['id' => 'DESC']);
         $articles = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
@@ -567,16 +567,16 @@ class ArticleController extends AbstractController
     /**
      * Suppression d'une ligne index.php
      */
-    #[Route(path: '/webapp/article/del/{id}', name: 'op_webapp_article_del', methods: ['POST'])]
-    public function DelEvent(Request $request, Article $article, PaginatorInterface $paginator, EntityManagerInterface $entityManager) : Response
+    #[Route(path: '/webapp/article/del/{id}/{page}', name: 'op_webapp_article_del', methods: ['POST'])]
+    public function DelEvent(Request $request, Article $article, PaginatorInterface $paginator, EntityManagerInterface $entityManager, $page) : Response
     {
         $entityManager->remove($article);
         $entityManager->flush();
 
-        $data = $entityManager->getRepository(Article::class)->findAll();
+        $data = $entityManager->getRepository(Article::class)->findBy([], ['id' => 'DESC']);
         $articles = $paginator->paginate(
             $data,
-            $request->query->getInt('page', 1),
+            $request->query->getInt('page', $page),
             15
         );
 
@@ -585,7 +585,6 @@ class ArticleController extends AbstractController
             'message' => "L'article a été supprimé",
             'liste' => $this->renderView('webapp/articles/include/_liste.html.twig', [
                 'articles' => $articles,
-                'page' => $request->query->getInt('page', 1),
             ]),
 
         ], 200);
