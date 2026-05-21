@@ -228,12 +228,12 @@ class CollegeController extends AbstractController
         $articles = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
-            10
+            30
         );
 
         return $this->render('admin/college/show2.html.twig', [
             'college' => $college,
-            'articles' => $data,
+            'articles' => $articles,
             'config' => $config,
             'page' => $request->query->getInt('page', 1),
         ]);
