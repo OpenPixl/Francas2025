@@ -233,7 +233,7 @@ class CollegeController extends AbstractController
 
         return $this->render('admin/college/show2.html.twig', [
             'college' => $college,
-            'articles' => $articles,
+            'articles' => $data,
             'config' => $config,
             'page' => $request->query->getInt('page', 1),
         ]);
