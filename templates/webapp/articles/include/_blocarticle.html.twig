@@ -2,7 +2,11 @@
     {% for article in articles %}
         <article class="relative isolate flex flex-col gap-8 lg:flex-row">
             <div class="relative aspect-video sm:aspect-2/1 lg:aspect-square lg:w-64 lg:shrink-0">
-                <img src="{{ asset('/uploads/images/articles/'~article.imageName) | imagine_filter('thumb_img_article') }}" alt="" class="absolute inset-0 size-full rounded-2xl bg-gray-50 object-cover dark:bg-gray-800 shadow" />
+                {% if article.imageName is not null %}
+                    <img src="{{ asset('/uploads/images/articles/'~article.imageName) | imagine_filter('thumb_img_article') }}" alt="" class="absolute inset-0 size-full rounded-2xl bg-gray-50 object-cover dark:bg-gray-800 shadow" />
+                {% else %}
+                    <img src="{{ asset('/uploads/images/colleges/'~college.logoName) | imagine_filter('thumb_img_article') }}" alt="" class="absolute inset-0 size-full rounded-2xl bg-gray-50 object-cover dark:bg-gray-800 shadow" />
+                {% endif %}
                 <div class="absolute inset-0 rounded-2xl inset-ring inset-ring-gray-900/10 dark:inset-ring-white/10"></div>
             </div>
             <div class="w-full">
