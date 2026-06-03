@@ -442,6 +442,38 @@ class CollegeController extends AbstractController
         ]);
     }
 
+    #[Route(path: '/op_admin/college/{id}/delete-media/{field}', name: 'op_admin_college_delete_media', methods: ['POST'])]
+    public function deleteMedia(College $college, string $field, EntityManagerInterface $em): Response
+    {
+        if (!in_array($field, ['logo', 'header'])) {
+            return $this->json(['code' => 400, 'message' => 'Champ invalide'], 400);
+        }
+
+        if ($field === 'logo') {
+            $fileName = $college->getLogoName();
+            if ($fileName) {
+                $path = $this->getParameter('college_directory') . '/' . $fileName;
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+                $college->setLogoName(null);
+            }
+        } else {
+            $fileName = $college->getHeaderName();
+            if ($fileName) {
+                $path = $this->getParameter('college_directory') . '/' . $fileName;
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+                $college->setHeaderName(null);
+            }
+        }
+
+        $em->flush();
+
+        return $this->json(['code' => 200, 'message' => 'Fichier supprimé avec succès'], 200);
+    }
+
     #[Route(path: '/op_admin/college/{id}', name: 'op_admin_college_delete', methods: ['DELETE'])]
     public function delete(
         Request $request,

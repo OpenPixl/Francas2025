@@ -110,7 +110,7 @@
         </div>
     </div>
     <div class="my-2">
-        <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mb-1">AVATAR & BANDEAU</h3>
+        <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mb-1">AVATARs & BANDEAU</h3>
         <div class="mb-1">
             {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
                 'legend_width' : 'w-3/12',
@@ -122,6 +122,7 @@
                 form : form.headerFile,
                 'input_width' : 'w-full',
                 'routename' : 'op_webapp_message_new',
+                'delete_url': college.id is defined ? path('op_admin_college_delete_media', {'id': college.id, 'field': 'header'}) : '',
             } %}
         </div>
 
@@ -136,6 +137,7 @@
                 form : form.logoFile,
                 'input_width' : 'w-full',
                 'routename' : 'op_webapp_message_new',
+                'delete_url': college.id is defined ? path('op_admin_college_delete_media', {'id': college.id, 'field': 'logo'}) : '',
             } %}
         </div>
     </div>

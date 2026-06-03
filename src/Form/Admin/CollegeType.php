@@ -57,7 +57,8 @@ class CollegeType extends AbstractType
                         'maxSize' => '10000k',
                         'mimeTypes' => [
                             'image/png',
-                            'image/jpg',
+                            'image/jpeg',
+                            'image/jpg'
                         ],
                         'mimeTypesMessage' => 'Attention, veuillez charger un fichier au format jpg ou png',
                     ])
