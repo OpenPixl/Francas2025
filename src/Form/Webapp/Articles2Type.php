@@ -23,14 +23,14 @@ class Articles2Type extends AbstractType
         return match ($supportId) {
             1 => [ // audio
                 new File([
-                    'maxSize' => '100000k',
+                    'maxSize' => '200000k',
                     'mimeTypes' => ['audio/mpeg', 'audio/wav'],
                     'mimeTypesMessage' => 'Attention, veuillez charger un fichier au format mp3.',
                 ])
             ],
             2 => [ // vidéo
                 new File([
-                    'maxSize' => '100000k',
+                    'maxSize' => '400000k',
                     'mimeTypes' => [
                         'video/mp4',
                         'video/mpeg',
