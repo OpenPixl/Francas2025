@@ -1,5 +1,9 @@
 {{ form_start(form) }}
 <div>
+
+    <div class="my-custom-class-for-errors">
+        {{ form_errors(form) }}
+    </div>
     <div class="mb-1">
         {% include 'composants/forms/input_text_horizontal.html.twig' with {
             'legend_width' : 'w-3/12',

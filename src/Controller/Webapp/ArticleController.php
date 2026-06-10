@@ -149,6 +149,7 @@ class ArticleController extends AbstractController
             'article' => $article,
             'college' =>$college,
             'form' => $form->createView(),
+            'errors' => $form->getErrors()
         ]);
     }
 
