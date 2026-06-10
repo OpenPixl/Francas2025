@@ -54,9 +54,9 @@
             'entity_name': article.imageName,
             'url_file': 'uploads/images/colleges/',
             form : form.imageFile,
-            suppr_file: form.isSupprImage,
             'input_width' : 'w-full',
             'routename' : 'op_webapp_message_new',
+            'delete_url': article.id ? path('op_webapp_articles_delete_media', {'id': article.id, 'field': 'image'}) : '',
         } %}
     </div>
 
@@ -83,9 +83,10 @@
                 'entity_name': article.doc,
                 'url_file': 'uploads/images/articles/',
                 form : form.docFile,
-                suppr_file: form.isSupprDoc,
                 'input_width' : 'w-full',
                 'routename' : 'op_webapp_message_new',
+                'delete_url': article.id ? path('op_webapp_articles_delete_media', {'id': article.id, 'field': 'doc'}) : '',
+
             } %}
         </div>
     </div>

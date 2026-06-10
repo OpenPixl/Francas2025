@@ -93,7 +93,6 @@ class Articles2Type extends AbstractType
                     ])
                 ],
             ])
-            ->add('isSupprImage')
             ->add('docFile', FileType::class, [
                 'label' => 'Banniere au format : mp4',
                 'mapped' => false,
@@ -109,7 +108,6 @@ class Articles2Type extends AbstractType
                     ])
                 ],
             ])
-            ->add('isSupprDoc')
         ;
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {

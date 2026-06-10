@@ -256,23 +256,6 @@ class ArticleController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // ---------------------------
-            // STEP 1 : Suppression de l'image lors du click Checkbox
-            // ---------------------------
-            $supprvignettechkbx = $form->get('isSupprImage')->getData();
-
-            if($supprvignettechkbx && $supprvignettechkbx == true){
-                // récupération du nom de l'image
-                $imageName = $article->getImageName();
-                $path = $this->getParameter('article_directory').'/'.$imageName;
-                // On vérifie si l'image existe
-                if(file_exists($path)){
-                    unlink($path);
-                }
-                $article->setImageName(null);
-                $article->setIsSupprImage(0);
-            }
-
-            // ---------------------------
             // STEP 2 : insertion de l'image dans le dossier public/uploads/articles'
             // ---------------------------
             $imageFile = $form->get('imageFile')->getData();
@@ -298,23 +281,6 @@ class ArticleController extends AbstractController
             }
 
             // ---------------------------
-            // STEP 3 : Suppression du support lors du click Checkbox
-            // ---------------------------
-            $supprDocChkbx = $form->get('isSupprDoc')->getData();
-
-            if($supprDocChkbx && $supprDocChkbx == true){
-                // récupération du nom de l'image
-                $docName = $article->getdoc();
-                $path = $this->getParameter('article_directory').'/'.$docName;
-                // On vérifie si l'image existe
-                if(file_exists($path)){
-                    unlink($path);
-                }
-                $article->setDoc(null);
-                $article->setIsSupprDoc(0);
-            }
-
-            // ---------------------------
             // STEP 4 : insertion du Document dans le dossier public/uploads/articles'
             // ---------------------------
             $docFile = $form->get('docFile')->getData();
@@ -323,8 +289,6 @@ class ArticleController extends AbstractController
                 // this is needed to safely include the file name as part of the URL
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename . '-' . uniqid() . '.' . $docFile->guessExtension();
-
-
 
                 // Move the file to the directory where brochures are stored
                 try {
@@ -563,6 +527,38 @@ class ArticleController extends AbstractController
             'college' => $college,
             'config' => $config,
         ]);
+    }
+
+    #[Route(path: '/webapp/articles/{id}/delete-media/{field}', name: 'op_webapp_articles_delete_media', methods: ['POST'])]
+    public function deleteMedia(Article $article, string $field, EntityManagerInterface $em): Response
+    {
+        if (!in_array($field, ['image', 'doc'])) {
+            return $this->json(['code' => 400, 'message' => 'Champ invalide'], 400);
+        }
+
+        if ($field === 'image') {
+            $fileName = $article->getImageName();
+            if ($fileName) {
+                $path = $this->getParameter('article_directory') . '/' . $fileName;
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+                $article->setImageName(null);
+            }
+        } else {
+            $fileName = $article->getDoc();
+            if ($fileName) {
+                $path = $this->getParameter('article_directory') . '/' . $fileName;
+                if (file_exists($path)) {
+                    unlink($path);
+                }
+                $article->setDoc(null);
+            }
+        }
+
+        $em->flush();
+
+        return $this->json(['code' => 200, 'message' => 'Fichier supprimé avec succès'], 200);
     }
 
     /**
