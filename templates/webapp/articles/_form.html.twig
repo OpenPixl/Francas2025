@@ -1,9 +1,14 @@
 {{ form_start(form) }}
 <div>
 
-    <div class="my-custom-class-for-errors">
-        {{ form_errors(form) }}
+    {% if form_errors(form) %}
+    <div class="flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-red-800 mb-4">
+        <svg class="mt-0.5 h-5 w-5 shrink-0 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-9.25a.75.75 0 011.5 0v3.5a.75.75 0 01-1.5 0v-3.5zm.75 6a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd"/>
+        </svg>
+        <div class="text-sm font-medium">{{ form_errors(form) }}</div>
     </div>
+    {% endif %}
     <div class="mb-1">
         {% include 'composants/forms/input_text_horizontal.html.twig' with {
             'legend_width' : 'w-3/12',
