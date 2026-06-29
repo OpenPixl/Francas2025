@@ -354,6 +354,9 @@ class CollegeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            // handleRequest a déjà appelé setUser() avec le nouveau user,
+            // qui grâce au setUser() corrigé a bien détaché l'ancien animateur
+
             // si on change de photo
             /** @var UploadedFile $headerFile **/
             $headerFileInput = $form->get('headerFile')->getData();

@@ -452,7 +452,7 @@ class College
     public function setUser(?User $user): static
     {
         // unset the owning side of the relation if necessary
-        if ($user === null && $this->user !== null) {
+        if ($this->user !== null && $this->user !== $user) {
             $this->user->setCollege(null);
         }
 
