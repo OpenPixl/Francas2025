@@ -9,10 +9,10 @@ import './stimulus_bootstrap.js';
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
 import { initHomePage } from "./js/app/page/home";
-import { initArticleIndex } from "./js/app/college/article";
+import { initArticleIndex } from "./js/app/etablissement/article";
 import { initShowRessource } from "./js/app/ressources/show";
 import { initShowPage } from "./js/app/page/show";
-import { initNewEditcollege } from "./js/app/college/newEditCollege";
+import { initNewEditEtablissement } from "./js/app/etablissement/newEditEtablissement";
 import { initNewEditMessage } from "./js/admin/webapp/NewEditMessage";
 import { initNewEditArticle } from "./js/app/article/NewEditArticles";
 import { initIndexAdminArticle } from "./js/admin/webapp/IndexArticles";
@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'op_webapp_public_homepage':
             initHomePage();
             break;
-        case 'op_espcoll_college_edit':
-            initNewEditcollege();
+        case 'op_espetab_etablissement_edit':
+            initNewEditEtablissement();
             break;
         case 'op_webapp_articles_new':
         case 'op_webapp_articles_edit':

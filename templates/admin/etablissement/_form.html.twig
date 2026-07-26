@@ -1,7 +1,18 @@
 <div>
     {{ form_start(form) }}
     <div class="my-2">
-        <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mb-1">Le COLLEGE</h3>
+        <h3 class="font-semibold text-gray-800 border-b border-b-gray-600 mb-1">L'ETABLISSEMENT</h3>
+        <div class="mb-1">
+            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : "Type d'établissement",
+                form : form.typeEtablissement,
+                'placeholder': "Type d'établissement ?",
+                'input_width' : 'w-40',
+                'oninput': ''
+            } %}
+        </div>
         <div class="mb-1">
             {% include 'composants/forms/input_text_horizontal.html.twig' with {
                 'legend_width' : 'w-3/12',
@@ -33,11 +44,11 @@
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
                 'label' : 'Contacts',
-                form : form.collegePhone,
+                form : form.etablissementPhone,
                 'placeholder': 'Téléphone',
                 'input_width' : 'w-40',
                 'oninput': '',
-                form2 : form.collegeEmail,
+                form2 : form.etablissementEmail,
                 'placeholder2': 'Email',
                 'input_width2' : 'w-80',
                 'oninput2': ''
@@ -52,10 +63,10 @@
             {% include 'composants/forms/input_text_horizontal.html.twig' with {
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
-                'label' : 'Nos réunions',
+                'label' : "L'administrateur.trice",
                 form : form.user,
-                'placeholder': 'Nous nous retrouvons',
-                'input_width' : 'w-full',
+                'placeholder': 'Choisir un administrateur.trice',
+                'input_width' : 'w-80',
                 'oninput': ''
             } %}
         </div>
@@ -116,13 +127,13 @@
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
                 'label' : 'Bandeau',
-                'entity_id': college.id,
-                'entity_name': college.headerName,
-                'url_file': 'uploads/images/colleges/',
+                'entity_id': etablissement.id,
+                'entity_name': etablissement.headerName,
+                'url_file': 'uploads/images/etablissements/',
                 form : form.headerFile,
                 'input_width' : 'w-full',
                 'routename' : 'op_webapp_message_new',
-                'delete_url': college.id ? path('op_admin_college_delete_media', {'id': college.id, 'field': 'header'}) : '',
+                'delete_url': etablissement.id ? path('op_admin_etablissement_delete_media', {'id': etablissement.id, 'field': 'header'}) : '',
             } %}
         </div>
 
@@ -131,13 +142,13 @@
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
                 'label': 'Avatar',
-                'entity_id': college.id,
-                'entity_name': college.logoName,
-                'url_file': 'uploads/images/colleges/',
+                'entity_id': etablissement.id,
+                'entity_name': etablissement.logoName,
+                'url_file': 'uploads/images/etablissements/',
                 form : form.logoFile,
                 'input_width' : 'w-full',
                 'routename' : 'op_webapp_message_new',
-                'delete_url': college.id ? path('op_admin_college_delete_media', {'id': college.id, 'field': 'logo'}) : '',
+                'delete_url': etablissement.id ? path('op_admin_etablissement_delete_media', {'id': etablissement.id, 'field': 'logo'}) : '',
             } %}
         </div>
     </div>

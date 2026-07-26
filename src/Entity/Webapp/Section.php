@@ -2,7 +2,7 @@
 
 namespace App\Entity\Webapp;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use App\Entity\Gestapp\RessourceCat;
 use App\Repository\Webapp\SectionRepository;
 use Cocur\Slugify\Slugify;
@@ -61,7 +61,7 @@ class Section
     private $isShowdescription = false;
 
     #[ORM\ManyToOne(inversedBy: 'sections')]
-    private ?College $singleCollege = null;
+    private ?Etablissement $singleEtablissement = null;
 
     #[ORM\ManyToOne(inversedBy: 'sections')]
     private ?Page $page = null;
@@ -72,8 +72,8 @@ class Section
     #[ORM\ManyToOne(inversedBy: 'sections')]
     private ?Category $category = null;
 
-    #[ORM\ManyToMany(targetEntity: College::class, mappedBy: 'section')]
-    private Collection $colleges;
+    #[ORM\ManyToMany(targetEntity: Etablissement::class, mappedBy: 'section')]
+    private Collection $etablissements;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $createdAt;
@@ -93,7 +93,7 @@ class Section
 
     public function __construct()
     {
-        $this->colleges = new ArrayCollection();
+        $this->etablissements = new ArrayCollection();
         $this->articles = new ArrayCollection();
     }
 
@@ -288,40 +288,40 @@ class Section
         return $this;
     }
 
-    public function getSingleCollege(): ?College
+    public function getSingleEtablissement(): ?Etablissement
     {
-        return $this->singleCollege;
+        return $this->singleEtablissement;
     }
 
-    public function setSingleCollege(?College $singleCollege): static
+    public function setSingleEtablissement(?Etablissement $singleEtablissement): static
     {
-        $this->singleCollege = $singleCollege;
+        $this->singleEtablissement = $singleEtablissement;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, College>
+     * @return Collection<int, Etablissement>
      */
-    public function getColleges(): Collection
+    public function getEtablissements(): Collection
     {
-        return $this->colleges;
+        return $this->etablissements;
     }
 
-    public function addCollege(College $college): static
+    public function addEtablissement(Etablissement $etablissement): static
     {
-        if (!$this->colleges->contains($college)) {
-            $this->colleges->add($college);
-            $college->addSection($this);
+        if (!$this->etablissements->contains($etablissement)) {
+            $this->etablissements->add($etablissement);
+            $etablissement->addSection($this);
         }
 
         return $this;
     }
 
-    public function removeCollege(College $college): static
+    public function removeEtablissement(Etablissement $etablissement): static
     {
-        if ($this->colleges->removeElement($college)) {
-            $college->removeSection($this);
+        if ($this->etablissements->removeElement($etablissement)) {
+            $etablissement->removeSection($this);
         }
 
         return $this;

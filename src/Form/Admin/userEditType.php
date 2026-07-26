@@ -2,7 +2,6 @@
 
 namespace App\Form\Admin;
 
-use App\Entity\Admin\College;
 use App\Entity\Admin\user;
 use phpDocumentor\Reflection\Type;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

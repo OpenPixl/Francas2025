@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Collège {{ college.name }}{% endblock %}
+{% block title %}Établissement {{ etablissement.name }}{% endblock %}
 
 {% block main %}
-    <section class="bg-[#ffd100]/20 py-4" id="college_page_header">
+    <section class="bg-[#ffd100]/20 py-4" id="etablissement_page_header">
         <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-            {% include 'admin/college/include/banner_college.html.twig' %}
+            {% include 'admin/etablissement/include/banner_etablissement.html.twig' %}
         </div>
     </section>
 
-    <section class="mx-auto max-w-7xl px-2 py-2 sm:px-6 lg:px-8" id="college_page_content">
-        <h1 class="font-semibold text-2xl text-gray-700 border-b border-b-gray-700">Les articles de notre collège</h1>
-        {{ include('webapp/articles/listarticlesbypagecollege.html.twig') }}
+    <section class="mx-auto max-w-7xl px-2 py-2 sm:px-6 lg:px-8" id="etablissement_page_content">
+        <h1 class="font-semibold text-2xl text-gray-700 border-b border-b-gray-700">Les articles de notre établissement</h1>
+        {{ include('webapp/articles/listarticlesbypageetablissement.html.twig') }}
     </section>
 
 

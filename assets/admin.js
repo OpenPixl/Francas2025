@@ -10,9 +10,9 @@ import { initDropdowns } from './js/composants/tailwind.js';
 import { initDashboardIndex } from './js/admin/dashboard/index';
 import { initNewEditArticle } from "./js/admin/webapp/NewEditArticles";
 import { initNewEditPage } from "./js/admin/admin/NewEditPage";
-import { initNewEditCollege } from "./js/admin/admin/NewEditCollege";
+import { initNewEditEtablissement } from "./js/admin/admin/NewEditEtablissement";
 import { initEditConfig } from "./js/admin/admin/EditConfig";
-import { initIndexCollege } from "./js/admin/admin/IndexCollege";
+import { initIndexEtablissement } from "./js/admin/admin/IndexEtablissement";
 import { initNewEditUser } from "./js/admin/admin/NewEditUser";
 import { initIndexUser } from "./js/admin/admin/IndexUser";
 import { initIndexArticle } from "./js/admin/webapp/IndexArticles";
@@ -26,12 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'op_admin_config_edit':
             initEditConfig();
             break;
-        case 'op_admin_college_new':
-        case 'op_admin_college_edit':
-            initNewEditCollege();
+        case 'op_admin_etablissement_new':
+        case 'op_admin_etablissement_edit':
+            initNewEditEtablissement();
             break;
-        case 'op_admin_college_index':
-            initIndexCollege();
+        case 'op_admin_etablissement_index':
+            initIndexEtablissement();
             break;
         case 'op_admin_user_index':
             initIndexUser();

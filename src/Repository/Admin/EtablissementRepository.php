@@ -2,55 +2,55 @@
 
 namespace App\Repository\Admin;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<College>
+ * @extends ServiceEntityRepository<Etablissement>
  */
-class CollegeRepository extends ServiceEntityRepository
+class EtablissementRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, College::class);
+        parent::__construct($registry, Etablissement::class);
     }
 
-    public function listCollegesBySection($idsection)
+    public function listEtablissementsBySection($idsection)
     {
-        return $this->createQueryBuilder('c')
-            ->addSelect('c.id, c.name, c.city, c.isActive, c.logoName, s.id as idsection')
-            ->leftJoin('c.section', 's')
-            ->andWhere('c.isActive = :isActive ')
+        return $this->createQueryBuilder('e')
+            ->addSelect('e.id, e.name, e.city, e.isActive, e.logoName, s.id as idsection')
+            ->leftJoin('e.section', 's')
+            ->andWhere('e.isActive = :isActive ')
             ->setParameter('isActive', 1)
-            ->orderBy('c.city', 'ASC')
+            ->orderBy('e.city', 'ASC')
             ->getQuery()
             ->getResult()
             ;
     }
 
-    public function CollegeByUser($iduser)
+    public function EtablissementByUser($iduser)
     {
-        return $this->createQueryBuilder('c')
-            ->leftJoin('c.user', 'u')
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.user', 'u')
             ->andWhere('u.id = :iduser')
             ->setParameter('iduser', $iduser)
-            ->orderBy('c.id', 'ASC')
+            ->orderBy('e.id', 'ASC')
             ->getQuery()
             ->getOneOrNullResult()
             ;
     }
 
     // /**
-    //  * @return College[] Returns an array of College objects
+    //  * @return Etablissement[] Returns an array of Etablissement objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
+            ->orderBy('e.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
@@ -59,10 +59,10 @@ class CollegeRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?College
+    public function findOneBySomeField($value): ?Etablissement
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.exampleField = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()

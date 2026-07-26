@@ -5,7 +5,7 @@ liip_imagine:
     twig:
         mode: lazy
     filter_sets:
-        thumb_bandeau_college:
+        thumb_bandeau_etablissement:
             quality: 75
             filters:
                 thumbnail:
@@ -19,7 +19,7 @@ liip_imagine:
                     # center input image on the newly created background
                     position: center
 
-        thumb_logo_college:
+        thumb_logo_etablissement:
             quality: 75
             filters:
                 thumbnail:
@@ -33,7 +33,7 @@ liip_imagine:
                     # center input image on the newly created background
                     position: center
 
-        thumb_card_college:
+        thumb_card_etablissement:
             quality: 75
             filters:
                 thumbnail:

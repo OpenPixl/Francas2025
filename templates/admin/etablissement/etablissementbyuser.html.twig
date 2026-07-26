@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Espace Collège{% endblock %}
+{% block title %}Espace Etablissement{% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
         window.onload = function(){
 
-            // Archivage d'un article depuis le compte college
+            // Archivage d'un article depuis le compte etablissement
             function updateArticleArchived(event){
                 event.preventDefault()
                 const urlArchived = this.href
@@ -70,7 +70,7 @@
 {% block main %}
     <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div class="row" id="content">
-            {{ include('espacecollege/dashboard/_header_college.html.twig') }}
+            {{ include('espace_etablissement/dashboard/_header_etablissement.html.twig') }}
         </div>
     </section>
     <section class="mb-4 mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 border-b border-b-gray-700 text-gray-700 flex justify-between">
@@ -83,10 +83,10 @@
             <div class="col-span-3">
                 <h5>LISTE DES ARTICLES PRODUIT PAR LE GROUPE</h5>
                 <p>Tous vos articles publiés sur votre page personelle sont listées ci-dessous.</p>
-                {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesByCollege', {'idcollege': college.id})) }}
+                {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesByEtablissement', {'idetablissement': etablissement.id})) }}
             </div>
             <div>
-                {{ render(controller('App\\Controller\\Admin\\CollegeController::blocAdminCollege', {'id':college.id})) }}
+                {{ render(controller('App\\Controller\\Admin\\EtablissementController::blocAdminEtablissement', {'id':etablissement.id})) }}
             </div>
         </div>
     </section>

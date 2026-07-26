@@ -9,15 +9,15 @@
 {% block main %}
     <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div class="row" id="content">
-            {{ include('espacecollege/dashboard/_header_college.html.twig') }}
+            {{ include('espace_etablissement/dashboard/_header_etablissement.html.twig') }}
         </div>
     </section>
     <section class="my-4 mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 border-b border-b-gray-700 text-gray-700 flex justify-between items-center">
-        <h2 class="font-normal uppercase text-2xl">Tableau de bord | collège {{ article.college.name }}</h2>
+        <h2 class="font-normal uppercase text-2xl">Tableau de bord | établissement {{ article.etablissement.name }}</h2>
         <a href="{{ path('op_admin_security_logout') }}"><i class="fa-duotone fa-solid fa-right-from-bracket"></i> Se déconnecter</a>
     </section>
 
-    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8" id="espace_college_content">
+    <section class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8" id="espace_etablissement_content">
         <div class="grid grid-cols-4 gap-4">
             <div class="col-span-3">
                 <h5 class="text-xl font-normal text-[#d84519]">MODIFIE TON ARTICLE</h5>
@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div>
-                {{ include('espacecollege/dashboard/_blocAdminCollege.html.twig') }}
+                {{ include('espace_etablissement/dashboard/_blocAdminEtablissement.html.twig') }}
             </div>
         </div>
 

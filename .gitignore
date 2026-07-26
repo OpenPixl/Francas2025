@@ -9,7 +9,6 @@
 /public/media/
 /public/uploads/
 /.idea/
-/migrations/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###

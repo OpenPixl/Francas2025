@@ -20,7 +20,7 @@ class ArticleRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('a')
             ->leftJoin('a.sections', 's')
-            ->leftJoin('a.college', 'c')
+            ->leftJoin('a.etablissement', 'e')
             ->leftJoin('a.theme', 't')
             ->leftJoin('a.support' , 'su')
             ->addSelect('
@@ -39,7 +39,7 @@ class ArticleRepository extends ServiceEntityRepository
                 a.doc as doc,
                 su.id as idsupport,
                 su.name as support,
-                c.id AS idcollege
+                e.id AS idetablissement
                 '
             )
             ->andWhere('s.id = :idsection')
@@ -52,11 +52,11 @@ class ArticleRepository extends ServiceEntityRepository
             ;
     }
 
-    public function listArticlesByColleges($idsection)
+    public function listArticlesByEtablissements($idsection)
     {
         return $this->createQueryBuilder('a')
             ->leftJoin('a.section', 's')
-            ->andWhere('a.college > 0')
+            ->andWhere('a.etablissement > 0')
             ->andWhere('a.isArchived = :isArchived')
             ->setParameter('isArchived', 0)
             ->orderBy('a.id', 'ASC')
@@ -65,7 +65,7 @@ class ArticleRepository extends ServiceEntityRepository
             ;
     }
 
-    public function listArticlesByCollege($idcollege)
+    public function listArticlesByEtablissement($idetablissement)
     {
         return $this->createQueryBuilder('a')
             ->addSelect('
@@ -80,16 +80,16 @@ class ArticleRepository extends ServiceEntityRepository
                 a.updatedAt,
                 s.id as idsupport,
                 s.name as support,
-                c.id AS idCollege,
-                c.name AS nameCollege,
-                c.animateur As animateur,
-                c.logoName As logoNameCollege
+                e.id AS idEtablissement,
+                e.name AS nameEtablissement,
+                e.animateur As animateur,
+                e.logoName As logoNameEtablissement
                 ')
-            ->leftJoin('a.college', 'c')
+            ->leftJoin('a.etablissement', 'e')
             ->leftJoin('a.theme', 't')
             ->leftJoin('a.support' , 's')
-            ->andWhere('c.id = :idcollege')
-            ->setParameter('idcollege', $idcollege)
+            ->andWhere('e.id = :idetablissement')
+            ->setParameter('idetablissement', $idetablissement)
             ->andWhere('a.isArchived = :isArchived')
             ->setParameter('isArchived', 0)
             ->orderBy('a.updatedAt', 'DESC')
@@ -101,7 +101,7 @@ class ArticleRepository extends ServiceEntityRepository
     public function listFiveArticles($category)
     {
         return $this->createQueryBuilder('a')
-            ->leftJoin('a.college', 'c')
+            ->leftJoin('a.etablissement', 'e')
             ->leftJoin('a.author', 'u')
             ->leftJoin('a.theme', 't')
             ->addSelect('
@@ -111,13 +111,13 @@ class ArticleRepository extends ServiceEntityRepository
                 a.content as content,
                 a.imageName as imageName,
                 a.updatedAt as updatedAt,
-                c.id AS idcollege,
-                c.logoName AS logoName,
+                e.id AS idetablissement,
+                e.logoName AS logoName,
                 u.typeuser as typeuser,
                 t.name as theme
                  ')
             ->where('u.typeuser = :typeuser')
-            ->setParameter('typeuser', 'college')
+            ->setParameter('typeuser', 'etablissement')
             ->orderBy('a.updatedAt', 'DESC')
             ->setMaxResults(5)
             ->getQuery()
@@ -131,7 +131,7 @@ class ArticleRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\NonUniqueResultException
      * Affiche un articel selon son slug
      */
-    public function articlecollegeSlug($id)
+    public function articleEtablissementSlug($id)
     {
         return $this->createQueryBuilder('a')
             ->addSelect('
@@ -149,15 +149,15 @@ class ArticleRepository extends ServiceEntityRepository
                 a.intro,
                 a.isShowIntro,
                 a.createdAt As createdAt,
-                c.name, c.id AS idcollege,
-                c.headerName,
-                c.logoName,
-                c.GroupDescription,
+                e.name, e.id AS idetablissement,
+                e.headerName,
+                e.logoName,
+                e.GroupDescription,
                 a.isShowReadMore,
                 s.id as idsupport,
                 s.name as support
                  ')
-            ->leftJoin('a.college', 'c')
+            ->leftJoin('a.etablissement', 'e')
             ->leftJoin('a.theme', 't')
             ->leftJoin('a.support' , 's')
             ->leftJoin('a.category', 'ca')

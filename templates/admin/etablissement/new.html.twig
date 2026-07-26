@@ -1,6 +1,6 @@
 {% extends 'admin.html.twig' %}
 
-{% block title %}New College{% endblock %}
+{% block title %}New Etablissement{% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
@@ -8,18 +8,18 @@
 
 {% block header %}
     {{ include('admin/dashboard/include/header.html.twig', {
-        'title' : 'Gestions des colleges',
+        'title' : 'Gestions des établissements',
         'btns' : {
             'new': {
                 'id' : null,
-                'href' : path('op_webapp_college_newcollege'),
+                'href' : path('op_webapp_etablissement_newetablissement'),
                 'icon' : '<i class="fa-duotone fa-solid fa-square-plus"></i>',
-                'text' : 'Créer un nouveau college',
+                'text' : 'Créer un nouvel établissement',
                 'array':null
             },
             'return': {
                 'id' : null,
-                'href' : path('op_admin_college_index'),
+                'href' : path('op_admin_etablissement_index'),
                 'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
                 'text' : 'Retour',
                 'array':null
@@ -34,7 +34,7 @@
         <h2 class="font-normal uppercase text-xl text-sky-700">Ajouter un nouvel établissement</h2>
 
         <div class="mt-3">
-            {{ include('admin/college/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+            {{ include('admin/etablissement/_form.html.twig', {'button_label': 'Enregistrer'}) }}
         </div>
 
 

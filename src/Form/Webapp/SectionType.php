@@ -31,9 +31,9 @@ class SectionType extends AbstractType
                         'Une catégorie'=> 'ONE_RESSOURCE_CAT',
                         'Une ressources' => 'ONE_RESSOURCES',
                     ],
-                    'Collèges' =>[
-                        "un collège" => "ONE_COLLEGE",
-                        "tous les collèges" => 'ALL_COLLEGES'
+                    'Établissements' =>[
+                        "un établissement" => "ONE_ETABLISSEMENT",
+                        "tous les établissements" => 'ALL_ETABLISSEMENTS'
                     ],
                     'DIVERS' => [
                         'Autres' => 'OTHER_CONTENT',

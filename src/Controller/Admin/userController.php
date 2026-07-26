@@ -28,7 +28,7 @@ class userController extends AbstractController
     #[Route(path: '/admin/user/', name: 'op_admin_user_index', methods: ['GET'])]
     public function index(userRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $data = $userRepository->indexCollegesOnly();
+        $data = $userRepository->indexEtablissementsOnly();
         $users = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
@@ -54,8 +54,8 @@ class userController extends AbstractController
             if($firstname || $lastname){
                 $user->setLoginName($firstname ." ". $lastname);
             }
-            if($typeuser == "college"){
-                $user->setRoles(['ROLE_COLLEGE']);
+            if($typeuser == "etablissement"){
+                $user->setRoles(['ROLE_ETABLISSEMENT']);
             }
             if($typeuser == "administrator"){
                 $user->setRoles(['ROLE_ADMIN']);
@@ -209,13 +209,13 @@ class userController extends AbstractController
             }
         }
 
-        // Désaffectation du college lié
-        $college = $user->getCollege();
-        if ($college) {
-            $college->setUser(null);
+        // Désaffectation de l'établissement lié
+        $etablissement = $user->getEtablissement();
+        if ($etablissement) {
+            $etablissement->setUser(null);
         }
 
-        // Désaffectation du college lié
+        // Désaffectation de l'établissement lié
         $pages = $user->getPages();
         if ($pages) {
             foreach ($pages as $page) {

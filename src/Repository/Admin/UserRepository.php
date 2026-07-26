@@ -19,11 +19,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
-    public function indexCollegesOnly()
+    public function indexEtablissementsOnly()
     {
         return $this->createQueryBuilder('u')
             ->where('u.typeuser LIKE :role')
-            ->setParameter('role', 'college')
+            ->setParameter('role', 'etablissement')
             ->getQuery()
             ->getResult()
             ;
@@ -43,16 +43,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    public function findAllUsersWithCollege()
+    public function findAllUsersWithEtablissement()
     {
         return $this->createQueryBuilder('u')
-            ->leftJoin('u.college' , 'c')
+            ->leftJoin('u.etablissement' , 'e')
             ->addSelect('
                 u.id as id,
                 u.loginName as loginName,
                 u.email as email,
                 u.isVerified as isVerified,
-                c.name as college
+                e.name as etablissement
             ')
             ->orderBy('u.id', 'ASC')
             ->getQuery()

@@ -78,7 +78,7 @@
                     'label' : 'Avatar',
                     'entity_id': user.id,
                     'entity_name': user.avatarName,
-                    'url_file': 'uploads/images/colleges/',
+                    'url_file': 'uploads/images/etablissements/',
                     form : form.avatarFile,
                     'input_width' : 'w-200',
                     'routename' : 'op_webapp_message_new',
@@ -89,8 +89,8 @@
                 {% include 'composants/forms/input_text_horizontal.html.twig' with {
                     'legend_width' : 'w-3/12',
                     'col_width' : 'w-9/12',
-                    'label' : 'Anime le collège',
-                    form : form.college,
+                    'label' : 'Anime l\'établissement',
+                    form : form.etablissement,
                     'placeholder': 'Nom ?',
                     'input_width' : 'w-40',
                     'oninput': ''

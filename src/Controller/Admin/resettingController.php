@@ -40,7 +40,7 @@ class resettingController extends AbstractController
 
             $request->getSession()->getFlashBag()->add('success', "Votre mot de passe a été renouvelé.");
 
-            return $this->redirectToRoute('op_webapp_espcoll', [
+            return $this->redirectToRoute('op_webapp_espetab', [
                 'iduser' => $user->getId(),
             ]);
 

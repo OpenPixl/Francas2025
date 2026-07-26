@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export function initIndexCollege(){
+export function initIndexEtablissement(){
     console.log('Bienvenue sur la page de gestions des établissements.')
 
     // active ou désactive l'utilisateur sélectionné de la plateforme

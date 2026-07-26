@@ -2,7 +2,7 @@
 
 namespace App\Entity\Webapp;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use App\Entity\Admin\User;
 use App\Entity\Gestapp\Support;
 use App\Entity\Gestapp\Theme;
@@ -82,7 +82,7 @@ class Article
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
-    private ?College $college = null;
+    private ?Etablissement $etablissement = null;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     private ?Theme $theme = null;
@@ -369,14 +369,14 @@ class Article
         return $this;
     }
 
-    public function getCollege(): ?College
+    public function getEtablissement(): ?Etablissement
     {
-        return $this->college;
+        return $this->etablissement;
     }
 
-    public function setCollege(?College $college): static
+    public function setEtablissement(?Etablissement $etablissement): static
     {
-        $this->college = $college;
+        $this->etablissement = $etablissement;
 
         return $this;
     }

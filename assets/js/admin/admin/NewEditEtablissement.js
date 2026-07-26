@@ -2,9 +2,9 @@ import axios from 'axios';
 import {showNotification, showDialog, hideDialog} from "../../composants/tailwind";
 import {zipcode, change_selectcity} from "../../composants/fonctions";
 
-export function initNewEditCollege(){
-    console.log('Bienvenu sur la page d\'edition d\'un college.');
-    const Textarea = document.getElementById('college_GroupDescription');
+export function initNewEditEtablissement(){
+    console.log('Bienvenu sur la page d\'edition d\'un établissement.');
+    const Textarea = document.getElementById('etablissement_GroupDescription');
     ClassicEditor
         .create(Textarea, {
             toolbar: [ 'heading','bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment' ],
@@ -27,8 +27,8 @@ export function initNewEditCollege(){
             console.error(error);
         });
 
-    const zipcode_input = document.getElementById('college_zipcode');
-    const commune_input = document.getElementById('college_city');
+    const zipcode_input = document.getElementById('etablissement_zipcode');
+    const commune_input = document.getElementById('etablissement_city');
     const commune_select = document.getElementById('selectcity');
 
     if (commune_input) {

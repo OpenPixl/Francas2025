@@ -11,14 +11,14 @@
         <tbody>
             <tr>
                 <td colspan="4">
-                <p>Pour le moment, aucun article n'a été produit par le groupe de collégiens</p>
+                <p>Pour le moment, aucun article n'a été produit par le groupe de jeunes</p>
                 </td>
             </tr>
         </tbody>
     </table>
 {% else %}
     <div id="listeArticles">
-        {{include('webapp/articles/include/_listebycollege.html.twig')}}
+        {{include('webapp/articles/include/_listebyetablissement.html.twig')}}
     </div>
 {% endif %}
 

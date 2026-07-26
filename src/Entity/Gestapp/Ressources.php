@@ -2,7 +2,7 @@
 
 namespace App\Entity\Gestapp;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use App\Entity\Admin\User;
 use App\Repository\Webapp\RessourcesRepository;
 use Cocur\Slugify\Slugify;
@@ -65,7 +65,7 @@ class Ressources
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'ressources')]
-    private ?College $college = null;
+    private ?Etablissement $etablissement = null;
 
     #[ORM\ManyToOne(inversedBy: 'ressources')]
     private ?RessourceCat $category = null;
@@ -223,14 +223,14 @@ class Ressources
         return $this;
     }
 
-    public function getCollege(): ?College
+    public function getEtablissement(): ?Etablissement
     {
-        return $this->college;
+        return $this->etablissement;
     }
 
-    public function setCollege(?College $college): static
+    public function setEtablissement(?Etablissement $etablissement): static
     {
-        $this->college = $college;
+        $this->etablissement = $etablissement;
 
         return $this;
     }

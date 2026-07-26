@@ -38,10 +38,10 @@
             </td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400 text-center">
                 <a href="{{ path('op_webapp_articles_edit', {'id' : article.id}) }}"><i class="far fa-edit"></i></a> |
-                {% if app.request.attributes.get('_route') == 'op_espcoll_articles_bycollege' %}
-                    <a class="btnArchived" href="{{ path('op_webapp_articles_archived', {'id': article.id, 'idcollege': article.college.id}) }}"><i class="fa fa-eraser"></i></a>
+                {% if app.request.attributes.get('_route') == 'op_espetab_articles_byetablissement' %}
+                    <a class="btnArchived" href="{{ path('op_webapp_articles_archived', {'id': article.id, 'idetablissement': article.etablissement.id}) }}"><i class="fa fa-eraser"></i></a>
                 {% else %}
-                    <a class="btnArchived" href="{{ path('op_webapp_articles_archived', {'id': article.id, 'idcollege': idcollege}) }}"><i class="fa fa-eraser"></i></a>
+                    <a class="btnArchived" href="{{ path('op_webapp_articles_archived', {'id': article.id, 'idetablissement': idetablissement}) }}"><i class="fa fa-eraser"></i></a>
                 {% endif %}
             </td>
         </tr>

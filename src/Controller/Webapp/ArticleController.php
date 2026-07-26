@@ -2,14 +2,14 @@
 
 namespace App\Controller\Webapp;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use App\Entity\Admin\Config;
 use App\Entity\Webapp\Article;
 use App\Entity\Webapp\Section;
 use App\Form\Webapp\ArticlesType;
 use App\Form\Webapp\Articles2Type;
 use App\Form\Webapp\SearcharticleType;
-use App\Repository\Admin\CollegeRepository;
+use App\Repository\Admin\EtablissementRepository;
 use App\Repository\Webapp\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -42,45 +42,45 @@ class ArticleController extends AbstractController
     }
 
     /**
-     * Liste des articles depuis l'espace College
+     * Liste des articles depuis l'espace Etablissement
      */
-    #[Route(path: '/espcoll/college/articles/{idcollege}', name: 'op_espcoll_articles_bycollege', methods: ['GET', 'POST'])]
-    public function articlesByCollege(
+    #[Route(path: '/espetab/etablissement/articles/{idetablissement}', name: 'op_espetab_articles_byetablissement', methods: ['GET', 'POST'])]
+    public function articlesByEtablissement(
         ArticleRepository $articleRepository,
         PaginatorInterface $paginator,
         Request $request,
-        CollegeRepository $collegeRepository,
-        $idcollege
+        EtablissementRepository $etablissementRepository,
+        $idetablissement
     ): Response
     {
-        $college = $collegeRepository->find($idcollege);
-        $data = $articleRepository->findBy(['college' => $college], ['updatedAt' => 'DESC']);
+        $etablissement = $etablissementRepository->find($idetablissement);
+        $data = $articleRepository->findBy(['etablissement' => $etablissement], ['updatedAt' => 'DESC']);
         $articles = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
             15
         );
 
-        return $this->render('webapp/articles/articlesbycollege.html.twig', [
-            'college' => $college,
+        return $this->render('webapp/articles/articlesbyetablissement.html.twig', [
+            'etablissement' => $etablissement,
             'articles' => $articles,
             'page' => $request->query->getInt('page', 1),
         ]);
     }
 
     /**
-     * Creation d'articles depuis l'espace College
+     * Creation d'articles depuis l'espace Etablissement
      */
-    #[Route(path: '/espcoll/articles/new', name: 'op_webapp_articles_new', methods: ['GET', 'POST'])]
+    #[Route(path: '/espetab/articles/new', name: 'op_webapp_articles_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $user = $this->getUser();
 
-        // récupération de l'objet college
-        $college = $entityManager->getRepository(College::class)->CollegeByUser($user);
+        // récupération de l'objet etablissement
+        $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
         $article = new Article();
         $article->setAuthor($user);
-        $article->setCollege($college);
+        $article->setEtablissement($etablissement);
 
         $form = $this->createForm(Articles2Type::class, $article);
         $form->handleRequest($request);
@@ -140,14 +140,14 @@ class ArticleController extends AbstractController
             $entityManager->persist($article);
             $entityManager->flush();
 
-            return $this->redirectToRoute('op_webapp_college_espcoll', [
+            return $this->redirectToRoute('op_webapp_espetab', [
                 'iduser' => $user->getId(),
             ]);
         }
 
-        return $this->render('espacecollege/newarticles.html.twig', [
+        return $this->render('espace_etablissement/newarticles.html.twig', [
             'article' => $article,
-            'college' =>$college,
+            'etablissement' =>$etablissement,
             'form' => $form->createView(),
             'errors' => $form->getErrors()
         ]);
@@ -161,12 +161,12 @@ class ArticleController extends AbstractController
     {
         $user = $this->getUser();
 
-        // récupération de l'objet college
-        $college = $entityManager->getRepository(College::class)->CollegeByUser($user);
+        // récupération de l'objet etablissement
+        $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
 
         $article = new Article();
         $article->setAuthor($user);
-        $article->setCollege($college);
+        $article->setEtablissement($etablissement);
 
         $form = $this->createForm(ArticlesType::class, $article);
         $form->handleRequest($request);
@@ -232,7 +232,7 @@ class ArticleController extends AbstractController
 
         return $this->render('webapp/articles/newadmin.html.twig', [
             'article' => $article,
-            'college' =>$college,
+            'etablissement' =>$etablissement,
             'form' => $form->createView(),
         ]);
     }
@@ -245,11 +245,11 @@ class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/espcoll/articles/{id}/edit', name: 'op_webapp_articles_edit', methods: ['GET', 'POST'])]
+    #[Route(path: '/espetab/articles/{id}/edit', name: 'op_webapp_articles_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Article $article, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $user = $this->getUser();
-        $college = $entityManager->getRepository(College::class)->CollegeByUser($user);
+        $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
 
         $form = $this->createForm(Articles2Type::class, $article);
         $form->handleRequest($request);
@@ -307,14 +307,14 @@ class ArticleController extends AbstractController
 
             $entityManager->flush();
 
-            return $this->redirectToRoute('op_webapp_college_espcoll', [
+            return $this->redirectToRoute('op_webapp_espetab', [
                 'iduser' => $user->getId(),
             ]);
         }
 
         return $this->render('webapp/articles/edit.html.twig', [
             'article' => $article,
-            'college' =>$college,
+            'etablissement' =>$etablissement,
             'form' => $form->createView(),
         ]);
     }
@@ -471,12 +471,12 @@ class ArticleController extends AbstractController
     }
 
     /**
-     * Affiche les articles d'un college dans sa page
+     * Affiche les articles d'un établissement dans sa page
      */
-    #[Route(path: '/webapp/articles/college/{idcollege}', name: 'op_webapp_articles_articlesbycollege', methods: ['GET'])]
-    public function listArticlesByCollege($idcollege, Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
+    #[Route(path: '/webapp/articles/etablissement/{idetablissement}', name: 'op_webapp_articles_articlesbyetablissement', methods: ['GET'])]
+    public function listArticlesByEtablissement($idetablissement, Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
     {
-        $data = $entityManager->getRepository(Article::class)->listArticlesByCollege($idcollege);
+        $data = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($idetablissement);
 
         $articles = $paginator->paginate(
             $data,
@@ -484,19 +484,19 @@ class ArticleController extends AbstractController
         10
         );
 
-        return $this->render('webapp/articles/listarticlesbycollege.html.twig',[
+        return $this->render('webapp/articles/listarticlesbyetablissement.html.twig',[
             'articles' => $articles,
-            'idcollege' => $idcollege
+            'idetablissement' => $idetablissement
         ]);
     }
 
-    #[Route(path: '/webapp/articles/college2/{idcollege}', name: 'op_webapp_articles_pagebycollege', methods: ['GET'])]
-    public function listArticlesByPageCollege($idcollege, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/webapp/articles/etablissement2/{idetablissement}', name: 'op_webapp_articles_pagebyetablissement', methods: ['GET'])]
+    public function listArticlesByPageEtablissement($idetablissement, EntityManagerInterface $entityManager): Response
     {
-        $articles = $entityManager->getRepository(Article::class)->listArticlesByCollege($idcollege)
+        $articles = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($idetablissement)
         ;
 
-        return $this->render('webapp/articles/listarticlesbypagecollege.html.twig',[
+        return $this->render('webapp/articles/listarticlesbypageetablissement.html.twig',[
             'articles' => $articles,
         ]);
     }
@@ -512,19 +512,19 @@ class ArticleController extends AbstractController
     }
 
     /**
-     * Affiche un article depuis la page du collège
+     * Affiche un article depuis la page de l'établissement
      */
-    #[Route(path: '/webapp/articles/slug/{id}/{idcollege}', name: 'op_webapp_articles_articleSlug', methods: ['GET'])]
-    public function articleCollegeSlug($id, EntityManagerInterface $entityManager, $idcollege): Response
+    #[Route(path: '/webapp/articles/slug/{id}/{idetablissement}', name: 'op_webapp_articles_articleSlug', methods: ['GET'])]
+    public function articleEtablissementSlug($id, EntityManagerInterface $entityManager, $idetablissement): Response
     {
-        $college = $entityManager->getRepository(College::class)->find($idcollege);
+        $etablissement = $entityManager->getRepository(Etablissement::class)->find($idetablissement);
         // Code pour afficher l'article depuis le slug'
-        $article = $entityManager->getRepository(Article::class)->articleCollegeSlug($id);
+        $article = $entityManager->getRepository(Article::class)->articleEtablissementSlug($id);
         $config = $entityManager->getRepository(Config::class)->find(1);
 
-        return $this->render('webapp/articles/articleCollegeSlug.html.twig',[
+        return $this->render('webapp/articles/articleEtablissementSlug.html.twig',[
             'article' => $article,
-            'college' => $college,
+            'etablissement' => $etablissement,
             'config' => $config,
         ]);
     }
@@ -590,22 +590,22 @@ class ArticleController extends AbstractController
     /**
      * Mise en archive d'un article
      */
-    #[Route(path: '/webapp/articles/archived/{id}/{idcollege}', name: 'op_webapp_articles_archived', methods: ['POST'])]
-    public function archived(Article $articles, EntityManagerInterface $entityManager, $idcollege ): \Symfony\Component\HttpFoundation\JsonResponse
+    #[Route(path: '/webapp/articles/archived/{id}/{idetablissement}', name: 'op_webapp_articles_archived', methods: ['POST'])]
+    public function archived(Article $articles, EntityManagerInterface $entityManager, $idetablissement ): \Symfony\Component\HttpFoundation\JsonResponse
     {
         // articles archivés
         $articles->setIsArchived(1);
         $entityManager->flush();
 
-        // actualiser la liste des articles du collège
-        $listearticles = $entityManager->getRepository(Article::class)->listArticlesByCollege($idcollege);
+        // actualiser la liste des articles de l'établissement
+        $listearticles = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($idetablissement);
 
         return $this->json([
             'code'=> 200,
             'message' => "L'article a été correctement archivé",
-            'listeArticles' => $this->renderView('webapp/articles/include/_listebycollege.html.twig', [
+            'listeArticles' => $this->renderView('webapp/articles/include/_listebyetablissement.html.twig', [
                 'articles' => $listearticles,
-                'idcollege' => $idcollege
+                'idetablissement' => $idetablissement
             ]),
         ], 200);
     }

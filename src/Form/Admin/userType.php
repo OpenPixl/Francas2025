@@ -2,7 +2,7 @@
 
 namespace App\Form\Admin;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use App\Entity\Admin\user;
 use Doctrine\ORM\EntityRepository;
 use phpDocumentor\Reflection\Type;
@@ -37,7 +37,7 @@ class userType extends AbstractType
             ->add('email')
             ->add('typeuser', ChoiceType::class, [
                 'choices'  => [
-                    'College' => 'college',
+                    'Établissement' => 'etablissement',
                     'Administrateur' => "administrator",
                 ],
             ])
@@ -65,16 +65,16 @@ class userType extends AbstractType
             ->add('city')
             ->add('phoneDesk')
             ->add('phoneGsm')
-            ->add('college', EntityType::class, [
-                'class' => College::class,
+            ->add('etablissement', EntityType::class, [
+                'class' => Etablissement::class,
                 //'choice_label' => 'name',
-                'placeholder' => '-- Choisir le collège --',
+                'placeholder' => '-- Choisir l\'établissement --',
                 'required' => false,
                 'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('c')
-                        ->where('c.isActive = :isActive')
+                    return $er->createQueryBuilder('e')
+                        ->where('e.isActive = :isActive')
                         ->setParameter('isActive', 1)
-                        ->orderBy('c.id', 'ASC');
+                        ->orderBy('e.id', 'ASC');
                 },
             ])
 

@@ -5,14 +5,14 @@ namespace App\Entity\Admin;
 use App\Entity\Gestapp\Ressources;
 use App\Entity\Webapp\Article;
 use App\Entity\Webapp\Section;
-use App\Repository\Admin\CollegeRepository;
+use App\Repository\Admin\EtablissementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CollegeRepository::class)]
+#[ORM\Entity(repositoryClass: EtablissementRepository::class)]
 
-class College
+class Etablissement
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -35,13 +35,13 @@ class College
     private $city;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $collegeEmail;
+    private $etablissementEmail;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $groupEmail;
 
     #[ORM\Column(type: 'string', length: 14, nullable: true)]
-    private $collegePhone;
+    private $etablissementPhone;
 
     #[ORM\Column(type: 'string', length: 14, nullable: true)]
     private $groupPhone;
@@ -76,31 +76,35 @@ class College
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updatedAt;
 
+    #[ORM\ManyToOne(inversedBy: 'etablissements')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TypeEtablissement $typeEtablissement = null;
+
     /**
      * @var Collection<int, Article>
      */
-    #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'college')]
+    #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'etablissement')]
     private Collection $articles;
 
     /**
      * @var Collection<int, Section>
      */
-    #[ORM\OneToMany(targetEntity: Section::class, mappedBy: 'singleCollege')]
+    #[ORM\OneToMany(targetEntity: Section::class, mappedBy: 'singleEtablissement')]
     private Collection $sections;
 
     /**
      * @var Collection<int, Section>
      */
-    #[ORM\ManyToMany(targetEntity: Section::class, inversedBy: 'colleges')]
+    #[ORM\ManyToMany(targetEntity: Section::class, inversedBy: 'etablissements')]
     private Collection $section;
 
     /**
      * @var Collection<int, Ressources>
      */
-    #[ORM\OneToMany(targetEntity: Ressources::class, mappedBy: 'college')]
+    #[ORM\OneToMany(targetEntity: Ressources::class, mappedBy: 'etablissement')]
     private Collection $ressources;
 
-    #[ORM\OneToOne(mappedBy: 'college', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'etablissement', cascade: ['persist', 'remove'])]
     private ?User $user = null;
 
     public function __construct()
@@ -176,14 +180,14 @@ class College
         return $this;
     }
 
-    public function getCollegeEmail(): ?string
+    public function getEtablissementEmail(): ?string
     {
-        return $this->collegeEmail;
+        return $this->etablissementEmail;
     }
 
-    public function setCollegeEmail(?string $collegeEmail): self
+    public function setEtablissementEmail(?string $etablissementEmail): self
     {
-        $this->collegeEmail = $collegeEmail;
+        $this->etablissementEmail = $etablissementEmail;
 
         return $this;
     }
@@ -200,14 +204,14 @@ class College
         return $this;
     }
 
-    public function getCollegePhone(): ?string
+    public function getEtablissementPhone(): ?string
     {
-        return $this->collegePhone;
+        return $this->etablissementPhone;
     }
 
-    public function setCollegePhone(?string $collegePhone): self
+    public function setEtablissementPhone(?string $etablissementPhone): self
     {
-        $this->collegePhone = $collegePhone;
+        $this->etablissementPhone = $etablissementPhone;
 
         return $this;
     }
@@ -314,6 +318,18 @@ class College
         return $this;
     }
 
+    public function getTypeEtablissement(): ?TypeEtablissement
+    {
+        return $this->typeEtablissement;
+    }
+
+    public function setTypeEtablissement(?TypeEtablissement $typeEtablissement): self
+    {
+        $this->typeEtablissement = $typeEtablissement;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Article>
      */
@@ -326,7 +342,7 @@ class College
     {
         if (!$this->articles->contains($article)) {
             $this->articles->add($article);
-            $article->setCollege($this);
+            $article->setEtablissement($this);
         }
 
         return $this;
@@ -336,8 +352,8 @@ class College
     {
         if ($this->articles->removeElement($article)) {
             // set the owning side to null (unless already changed)
-            if ($article->getCollege() === $this) {
-                $article->setCollege(null);
+            if ($article->getEtablissement() === $this) {
+                $article->setEtablissement(null);
             }
         }
 
@@ -356,7 +372,7 @@ class College
     {
         if (!$this->sections->contains($section)) {
             $this->sections->add($section);
-            $section->setSingleCollege($this);
+            $section->setSingleEtablissement($this);
         }
 
         return $this;
@@ -366,8 +382,8 @@ class College
     {
         if ($this->sections->removeElement($section)) {
             // set the owning side to null (unless already changed)
-            if ($section->getSingleCollege() === $this) {
-                $section->setSingleCollege(null);
+            if ($section->getSingleEtablissement() === $this) {
+                $section->setSingleEtablissement(null);
             }
         }
 
@@ -394,7 +410,7 @@ class College
     {
         if (!$this->ressources->contains($ressource)) {
             $this->ressources->add($ressource);
-            $ressource->setCollege($this);
+            $ressource->setEtablissement($this);
         }
 
         return $this;
@@ -404,8 +420,8 @@ class College
     {
         if ($this->ressources->removeElement($ressource)) {
             // set the owning side to null (unless already changed)
-            if ($ressource->getCollege() === $this) {
-                $ressource->setCollege(null);
+            if ($ressource->getEtablissement() === $this) {
+                $ressource->setEtablissement(null);
             }
         }
 
@@ -453,12 +469,12 @@ class College
     {
         // unset the owning side of the relation if necessary
         if ($this->user !== null && $this->user !== $user) {
-            $this->user->setCollege(null);
+            $this->user->setEtablissement(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($user !== null && $user->getCollege() !== $this) {
-            $user->setCollege($this);
+        if ($user !== null && $user->getEtablissement() !== $this) {
+            $user->setEtablissement($this);
         }
 
         $this->user = $user;

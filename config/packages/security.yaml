@@ -41,8 +41,8 @@ security:
             # switch_user: true
 
     role_hierarchy:
-        ROLE_COLLEGE: ROLE_USER
-        ROLE_ADMIN: ROLE_COLLEGE
+        ROLE_ETABLISSEMENT: ROLE_USER
+        ROLE_ADMIN: ROLE_ETABLISSEMENT
         ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
 
     # Easy way to control access for large sections of your site

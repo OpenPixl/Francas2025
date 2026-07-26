@@ -2,7 +2,7 @@
 
 namespace App\Controller\Webapp;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use App\Entity\Admin\Message;
 use App\Form\Admin\MessageType;
 use App\Form\Webapp\ReplyType;
@@ -15,25 +15,25 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MessageController extends AbstractController
 {
-    #[Route(path: '/espcoll/message/', name: 'op_webapp_message_index', methods: ['GET'])]
+    #[Route(path: '/espetab/message/', name: 'op_webapp_message_index', methods: ['GET'])]
     public function index(MessageRepository $messageRepository, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
-        $college = $entityManager->getRepository(College::class)->CollegeByUser($user);
+        $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
 
         return $this->render('webapp/message/index.html.twig', [
             'messages' => $messageRepository->findAll(),
-            'college' => $college
+            'etablissement' => $etablissement
         ]);
     }
 
-    #[Route(path: '/espcoll/message/new', name: 'op_webapp_message_new', methods: ['GET', 'POST'])]
+    #[Route(path: '/espetab/message/new', name: 'op_webapp_message_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
-        // code d'information du college en cours d'utilisation
-        $college = $entityManager->getRepository(College::class)->CollegeByUser($user);
+        // code d'information de l'établissement en cours d'utilisation
+        $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
 
         $message = new Message();
         $message
@@ -51,19 +51,19 @@ class MessageController extends AbstractController
             return $this->redirectToRoute('op_webapp_message_messagesbyuser', ['iduser' => $user->getId()]);
         }
 
-        return $this->render('espacecollege/newmessage.html.twig', [
+        return $this->render('espace_etablissement/newmessage.html.twig', [
             'message' => $message,
             'form' => $form->createView(),
-            'college' => $college
+            'etablissement' => $etablissement
         ]);
     }
 
-    #[Route(path: '/espcoll/message/{id}', name: 'op_webapp_message_show', methods: ['GET'])]
+    #[Route(path: '/espetab/message/{id}', name: 'op_webapp_message_show', methods: ['GET'])]
     public function show(Message $message, EntityManagerInterface $entityManager): Response
     {
         // code pour afficher la bannière de l'établissement en haut de page
         $user = $this->getUser();
-        $college = $entityManager->getRepository(College::class)->CollegeByUser($user);
+        $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
 
         // code pour basculer le message en statut lu
         $read = $message->getIsRead();
@@ -75,11 +75,11 @@ class MessageController extends AbstractController
 
         return $this->render('webapp/message/show.html.twig', [
             'message' => $message,
-            'college' => $college
+            'etablissement' => $etablissement
         ]);
     }
 
-    #[Route(path: '/espcoll/message/{id}/edit', name: 'op_webapp_message_edit', methods: ['GET', 'POST'])]
+    #[Route(path: '/espetab/message/{id}/edit', name: 'op_webapp_message_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Message $message, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
@@ -98,7 +98,7 @@ class MessageController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/espcoll/message/{id}', name: 'op_webapp_message_delete', methods: ['DELETE'])]
+    #[Route(path: '/espetab/message/{id}', name: 'op_webapp_message_delete', methods: ['DELETE'])]
     public function delete(Request $request, Message $message, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
@@ -110,7 +110,7 @@ class MessageController extends AbstractController
         return $this->redirectToRoute('op_webapp_message_messagesbyuser', ['iduser' => $user->getId()]);
     }
 
-    #[Route(path: '/espcoll/message/deletemessageview/{id}', name: 'op_webapp_message_deletemessageview', methods: ['POST', 'GET'])]
+    #[Route(path: '/espetab/message/deletemessageview/{id}', name: 'op_webapp_message_deletemessageview', methods: ['POST', 'GET'])]
     public function delete_message_view(Request $request, Message $message, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
@@ -121,18 +121,18 @@ class MessageController extends AbstractController
         return $this->redirectToRoute('op_webapp_message_messagesbyuser', ['iduser' => $user->getId()]);
     }
 
-    #[Route(path: '/espcoll/message/messagesbyuser/{iduser}', name: 'op_webapp_message_messagesbyuser', methods: ['GET'])]
+    #[Route(path: '/espetab/message/messagesbyuser/{iduser}', name: 'op_webapp_message_messagesbyuser', methods: ['GET'])]
     public function listMessageByUser($iduser, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
-        $college = $entityManager->getRepository(College::class)->CollegeByUser($user);
+        $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
 
 
         $messages = $entityManager->getRepository(Message::class)->listMessagesByUser($iduser);
 
         return $this->render('webapp/message/index.html.twig',[
             'messages' => $messages,
-            'college' => $college
+            'etablissement' => $etablissement
 
         ]);
     }
@@ -140,10 +140,10 @@ class MessageController extends AbstractController
     /**
      * Action de réponse à un mail
      */
-    #[Route(path: '/espcoll/message/reply_mail/{id}', name: 'op_webapp_message_reply_mail', methods: ['GET', 'POST'])]
+    #[Route(path: '/espetab/message/reply_mail/{id}', name: 'op_webapp_message_reply_mail', methods: ['GET', 'POST'])]
     public function reply_mail(Message $message, Request $request, EntityManagerInterface $em){
         $user = $this->getUser();
-        $college = $em->getRepository(College::class)->CollegeByUser($user);
+        $etablissement = $em->getRepository(Etablissement::class)->EtablissementByUser($user);
 
         $recipient = $message->getAuthor();
         $content = $message->getContent();
@@ -171,7 +171,7 @@ class MessageController extends AbstractController
         }
 
         return $this->render('webapp/message/reply_mail.html.twig',[
-            'college'=> $college,
+            'etablissement'=> $etablissement,
             'message'=> $message,
             'reply' => $reply,
             'replyform' => $replyform->createView()
@@ -181,7 +181,7 @@ class MessageController extends AbstractController
     /**
      * Liste les réponses selon le "follow"
      */
-    #[Route(path: '/espcoll/message/reply_mail/{follow}', name: 'op_webapp_message_reply_mail_follow')]
+    #[Route(path: '/espetab/message/reply_mail/{follow}', name: 'op_webapp_message_reply_mail_follow')]
     public function followmessage($follow, EntityManagerInterface $em): \Symfony\Component\HttpFoundation\Response
     {
         $user = $this->getUser();
@@ -196,10 +196,10 @@ class MessageController extends AbstractController
     /**
      * Action de réponse à un mail
      */
-    #[Route(path: '/espcoll/message/trans_mail/{id}', name: 'op_webapp_message_trans_mail', methods: ['GET', 'POST'])]
+    #[Route(path: '/espetab/message/trans_mail/{id}', name: 'op_webapp_message_trans_mail', methods: ['GET', 'POST'])]
     public function trans_mail(Message $message, Request $request, EntityManagerInterface $em){
         $user = $this->getUser();
-        $college = $em->getRepository(College::class)->CollegeByUser($user);
+        $etablissement = $em->getRepository(Etablissement::class)->EtablissementByUser($user);
 
         $trans = new Message();
 
@@ -221,7 +221,7 @@ class MessageController extends AbstractController
         }
 
         return $this->render('webapp/message/reply_mail.html.twig',[
-            'college'=> $college,
+            'etablissement'=> $etablissement,
             'message'=> $message,
             'trans' => $trans,
             'transform' => $transform->createView()
@@ -229,9 +229,9 @@ class MessageController extends AbstractController
     }
 
     /**
-     * Supprimer les messages par Javascript depuis l'interface Espcoll
+     * Supprimer les messages par Javascript depuis l'interface Espetab
      */
-    #[Route(path: '/espcoll/message/delete/{id}', name: 'op_webapp_message_delete', methods: ['POST'])]
+    #[Route(path: '/espetab/message/delete/{id}', name: 'op_webapp_message_delete', methods: ['POST'])]
     public function deleteMessage(Message $message, EntityManagerInterface $em): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $user = $this->getUser();

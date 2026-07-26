@@ -36,10 +36,10 @@
                 {% elseif section.content == 'ONE_CATEGORY' %}
                 {% elseif section.content == 'FIVE_ARTICLES' %}
                     {{ render(controller('App\\Controller\\Webapp\\ArticleController::listFiveArticles', {'category': section.category})) }}
-                {% elseif section.content == 'ONE_COLLEGE' %}
-                    {{ render(controller('App\\Controller\\Admin\\CollegeController::show', {'id': section.singleCollege})) }}
-                {% elseif section.content == 'ALL_COLLEGES' %}
-                    {{ render(controller('App\\Controller\\Admin\\CollegeController::listCollegesBySection', {'idsection': section.id})) }}
+                {% elseif section.content == 'ONE_ETABLISSEMENT' %}
+                    {{ render(controller('App\\Controller\\Admin\\EtablissementController::show', {'id': section.singleEtablissement})) }}
+                {% elseif section.content == 'ALL_ETABLISSEMENTS' %}
+                    {{ render(controller('App\\Controller\\Admin\\EtablissementController::listEtablissementsBySection', {'idsection': section.id})) }}
                 {% elseif section.content == 'OTHER_CONTENT' %}
                     {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesBySectionOther', {'idsection': section.id})) }}
                 {% elseif section.content == 'ALL_RESSOURCES' %}

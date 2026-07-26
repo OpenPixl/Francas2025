@@ -121,7 +121,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $pages;
 
     #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
-    private ?College $college = null;
+    private ?Etablissement $etablissement = null;
 
     public function __construct()
     {
@@ -534,14 +534,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return (string) $this->loginName;
     }
 
-    public function getCollege(): ?College
+    public function getEtablissement(): ?Etablissement
     {
-        return $this->college;
+        return $this->etablissement;
     }
 
-    public function setCollege(?College $college): static
+    public function setEtablissement(?Etablissement $etablissement): static
     {
-        $this->college = $college;
+        $this->etablissement = $etablissement;
 
         return $this;
     }

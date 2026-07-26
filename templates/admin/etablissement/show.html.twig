@@ -1,54 +1,54 @@
 {% extends 'admin.html.twig' %}
 
-{% block title %}New College{% endblock %}
+{% block title %}New Etablissement{% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
 {%  endblock %}
 
 {% block header %}
-    <section class="container" id="college_page_header">
+    <section class="container" id="etablissement_page_header">
         <div class="row" id="content">
-            {% if college.headerName is null %}
-            {% elseif college.logoName is null %}
+            {% if etablissement.headerName is null %}
+            {% elseif etablissement.logoName is null %}
                 <div class="col-12" id="content_header_img">
-                    <img id="college_header" class="img-fluid" src="{{ asset('uploads/images/colleges/'~ college.headerName) }}" alt="{{ college.headerName }}">
-                    <div id="college_logo">
+                    <img id="etablissement_header" class="img-fluid" src="{{ asset('uploads/images/etablissements/'~ etablissement.headerName) }}" alt="{{ etablissement.headerName }}">
+                    <div id="etablissement_logo">
                         <img class="img-fluid" src="/uploads/images/fixes/logo-radio-francas" alt="logo_cc">
                     </div>
-                    <div id="college_titre">
-                        {% if college.id == 29 %}
-                            <h3>{{ college.name }}</h3>
+                    <div id="etablissement_titre">
+                        {% if etablissement.id == 29 %}
+                            <h3>{{ etablissement.name }}</h3>
                         {% else %}
-                            <h3>Collège {{ college.name }}</h3>
+                            <h3>Établissement {{ etablissement.name }}</h3>
                         {% endif %}
                     </div>
                 </div>
             {% else %}
                 <div class="col-12" id="content_header_img">
-                    <img id="college_header" class="img-fluid" src="{{ asset('uploads/images/colleges/'~ college.headerName) }}" alt="{{ college.headerName }}">
-                    <div id="college_logo">
-                        <img class="img-fluid" src="{{ asset('uploads/images/colleges/'~ college.logoName) }}" alt="{{ college.logoName }}">
+                    <img id="etablissement_header" class="img-fluid" src="{{ asset('uploads/images/etablissements/'~ etablissement.headerName) }}" alt="{{ etablissement.headerName }}">
+                    <div id="etablissement_logo">
+                        <img class="img-fluid" src="{{ asset('uploads/images/etablissements/'~ etablissement.logoName) }}" alt="{{ etablissement.logoName }}">
                     </div>
-                    <div id="college_titre">
-                        {% if college.id == 29 %}
-                            <h3>{{ college.name }}</h3>
+                    <div id="etablissement_titre">
+                        {% if etablissement.id == 29 %}
+                            <h3>{{ etablissement.name }}</h3>
                         {% else %}
-                            <h3>Collège {{ college.name }}</h3>
+                            <h3>Établissement {{ etablissement.name }}</h3>
                         {% endif %}
                     </div>
                 </div>
             {% endif %}
-            <div class="col-12" id="college_intro">
+            <div class="col-12" id="etablissement_intro">
                 <div id="content_text">
-                    {{ college.GroupDescription|raw }}
+                    {{ etablissement.GroupDescription|raw }}
                 </div>
             </div>
         </div>
 
     </section>
-    <section class="container" id="college_page_content">
-       {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesByPageCollege', {'idcollege': college.id})) }}
+    <section class="container" id="etablissement_page_content">
+       {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesByPageEtablissement', {'idetablissement': etablissement.id})) }}
     </section>
 {% endblock %}
 

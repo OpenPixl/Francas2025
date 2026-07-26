@@ -112,7 +112,7 @@ class ConfigController extends AbstractController
 
                 // suppression du Fichier
                 if($vignetteName){
-                    $pathvignette = $this->getParameter('college_directory').'/'.$vignetteName;
+                    $pathvignette = $this->getParameter('etablissement_directory').'/'.$vignetteName;
                     // On vérifie si l'image existe
                     if(file_exists($pathvignette)){
                         unlink($pathvignette);

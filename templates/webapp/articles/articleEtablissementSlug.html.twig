@@ -5,16 +5,16 @@
 {% block main %}
     {% if article.headerName is null %}
     {% else %}
-        <section class="bg-[#ffd100]/20 py-4" id="college_page_header">
+        <section class="bg-[#ffd100]/20 py-4" id="etablissement_page_header">
             <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-                {% include 'admin/college/include/banner_college.html.twig' %}
+                {% include 'admin/etablissement/include/banner_etablissement.html.twig' %}
             </div>
         </section>
     {% endif %}
-    <section class="mx-auto max-w-7xl px-2 py-2 sm:px-6 lg:px-8 mb-6" id="college_page_content">
+    <section class="mx-auto max-w-7xl px-2 py-2 sm:px-6 lg:px-8 mb-6" id="etablissement_page_content">
         {% include 'composants/modules/breadcrumb.html.twig' with {
             'level_1' : {
-                'title' : 'Colleges',
+                'title' : 'Etablissements',
                 'href' : path('op_webapp_page', {'slug': 'les_medias_collegiens'})
             },
             'level_2' : {

@@ -9,7 +9,7 @@
 parameters:
     article_directory: '%kernel.project_dir%/public/uploads/images/articles'
     user_directory: '%kernel.project_dir%/public/uploads/images/user'
-    college_directory: '%kernel.project_dir%/public/uploads/images/colleges'
+    etablissement_directory: '%kernel.project_dir%/public/uploads/images/etablissements'
     config_directory: '%kernel.project_dir%/public/uploads/images/config'
 
 services:

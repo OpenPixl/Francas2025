@@ -2,14 +2,14 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use App\Entity\Admin\Config;
 use App\Entity\Admin\User;
 use App\Entity\Webapp\Article;
 use App\Entity\Webapp\Message;
-use App\Form\Admin\CollegeEditType;
-use App\Form\Admin\CollegeType;
-use App\Repository\Admin\CollegeRepository;
+use App\Form\Admin\EtablissementEditType;
+use App\Form\Admin\EtablissementType;
+use App\Repository\Admin\EtablissementRepository;
 use App\Repository\Admin\ConfigRepository;
 use App\Repository\Webapp\ArticleRepository;
 use App\Repository\Webapp\MessageRepository;
@@ -27,58 +27,58 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
-class CollegeController extends AbstractController
+class EtablissementController extends AbstractController
 {
-    #[Route(path: '/op_admin/college', name: 'op_admin_college_index', methods: ['GET'])]
-    public function index(CollegeRepository $collegeRepository, PaginatorInterface $paginator, Request $request): Response
+    #[Route(path: '/op_admin/etablissement', name: 'op_admin_etablissement_index', methods: ['GET'])]
+    public function index(EtablissementRepository $etablissementRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $data = $collegeRepository->findAll();
+        $data = $etablissementRepository->findAll();
 
-        $colleges = $paginator->paginate(
+        $etablissements = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
             15
         );
 
-        return $this->render('admin/college/index.html.twig', [
-            'colleges' => $colleges,
+        return $this->render('admin/etablissement/index.html.twig', [
+            'etablissements' => $etablissements,
         ]);
     }
 
-    #[Route(path: '/webapp/college/newcollege', name: 'op_webapp_college_newcollege', methods: ['GET', 'POST'])]
-    public function newcollege(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/webapp/etablissement/newetablissement', name: 'op_webapp_etablissement_newetablissement', methods: ['GET', 'POST'])]
+    public function newEtablissement(Request $request, EntityManagerInterface $entityManager): Response
     {
 
         // on récupére l'objet user de l'administrateur en cours
         //$iduser = $this->getUser()->getId();
         //$user = $this->getDoctrine()->getRepository(User::class)->find($iduser);
-        // on crée l'instance College depuis la classe "College" et on injecte l'admin en cours
-        $college = new College();
-        //$college->setUser($user);
-        $form = $this->createForm(CollegeType::class, $college);
+        // on crée l'instance Etablissement depuis la classe "Etablissement" et on injecte l'admin en cours
+        $etablissement = new Etablissement();
+        //$etablissement->setUser($user);
+        $form = $this->createForm(EtablissementType::class, $etablissement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($college);
+            $entityManager->persist($etablissement);
             $entityManager->flush();
 
-            return $this->redirectToRoute('op_webapp_college_espcoll');
+            return $this->redirectToRoute('op_webapp_etablissement_espetab');
         }
 
-        return $this->render('admin/college/new.html.twig', [
-            'college' => $college,
+        return $this->render('admin/etablissement/new.html.twig', [
+            'etablissement' => $etablissement,
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route(path: '/admin/college/newcollegeAdmin/{iduser}', name: 'op_admin_college_newcollegeadmin', methods: ['GET', 'POST'])]
-    public function newcollegeAdmin(Request $request, $iduser, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/admin/etablissement/newetablissementAdmin/{iduser}', name: 'op_admin_etablissement_newetablissementadmin', methods: ['GET', 'POST'])]
+    public function newEtablissementAdmin(Request $request, $iduser, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
         $user = $entityManager->getRepository(User::class)->find($iduser);
 
-        $college = new College();
-        $college->setUser($user);
-        $form = $this->createForm(CollegeType::class, $college);
+        $etablissement = new Etablissement();
+        $etablissement->setUser($user);
+        $form = $this->createForm(EtablissementType::class, $etablissement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -95,7 +95,7 @@ class CollegeController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $headerFile->move(
-                        $this->getParameter('college_directory'),
+                        $this->getParameter('etablissement_directory'),
                         $newHeaderFilename
                     );
                 } catch (FileException) {
@@ -104,7 +104,7 @@ class CollegeController extends AbstractController
 
                 // updates the 'brochureFilename' property to store the PDF file name
                 // instead of its contents
-                $college->setHeaderName($newHeaderFilename);
+                $etablissement->setHeaderName($newHeaderFilename);
             }
 
             if ($logoFile) {
@@ -115,7 +115,7 @@ class CollegeController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $logoFile->move(
-                        $this->getParameter('college_directory'),
+                        $this->getParameter('etablissement_directory'),
                         $newlogoFilename
                     );
                 } catch (FileException) {
@@ -124,29 +124,29 @@ class CollegeController extends AbstractController
 
                 // updates the 'brochureFilename' property to store the PDF file name
                 // instead of its contents
-                $college->setLogoName($newlogoFilename);
+                $etablissement->setLogoName($newlogoFilename);
             }
 
-            $entityManager->persist($college);
+            $entityManager->persist($etablissement);
             $entityManager->flush();
 
-            return $this->redirectToRoute('op_admin_college_index');
+            return $this->redirectToRoute('op_admin_etablissement_index');
         }
 
-        return $this->render('admin/college/new.html.twig', [
-            'college' => $college,
+        return $this->render('admin/etablissement/new.html.twig', [
+            'etablissement' => $etablissement,
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route(path: '/op_admin/college/new', name: 'op_admin_college_new', methods: ['GET', 'POST'])]
+    #[Route(path: '/op_admin/etablissement/new', name: 'op_admin_etablissement_new', methods: ['GET', 'POST'])]
     public function new(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         //dd($user);
-        $college = new College();
-        $college->setUser($user);
-        $form = $this->createForm(CollegeType::class, $college);
+        $etablissement = new Etablissement();
+        $etablissement->setUser($user);
+        $form = $this->createForm(EtablissementType::class, $etablissement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -163,7 +163,7 @@ class CollegeController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $headerFileName->move(
-                        $this->getParameter('college_directory'),
+                        $this->getParameter('etablissement_directory'),
                         $newheaderFilename
                     );
                 } catch (FileException) {
@@ -172,7 +172,7 @@ class CollegeController extends AbstractController
 
                 // updates the 'brochureFilename' property to store the PDF file name
                 // instead of its contents
-                $college->setHeaderName($newheaderFilename);
+                $etablissement->setHeaderName($newheaderFilename);
             }
 
             if ($logoFileName) {
@@ -183,7 +183,7 @@ class CollegeController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $logoFileName->move(
-                        $this->getParameter('college_directory'),
+                        $this->getParameter('etablissement_directory'),
                         $newlogoFilename
                     );
                 } catch (FileException) {
@@ -192,37 +192,37 @@ class CollegeController extends AbstractController
 
                 // updates the 'brochureFilename' property to store the PDF file name
                 // instead of its contents
-                $college->setLogoName($newlogoFilename);
+                $etablissement->setLogoName($newlogoFilename);
             }
 
-            $entityManager->persist($college);
+            $entityManager->persist($etablissement);
             $entityManager->flush();
 
-            return $this->redirectToRoute('op_admin_college_index');
+            return $this->redirectToRoute('op_admin_etablissement_index');
         }
 
 
-        return $this->render('admin/college/new.html.twig', [
-            'college' => $college,
+        return $this->render('admin/etablissement/new.html.twig', [
+            'etablissement' => $etablissement,
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route(path: '/op_admin/college/{id}', name: 'op_admin_college_show', methods: ['GET'])]
-    public function show(College $college): Response
+    #[Route(path: '/op_admin/etablissement/{id}', name: 'op_admin_etablissement_show', methods: ['GET'])]
+    public function show(Etablissement $etablissement): Response
     {
-        return $this->render('admin/college/show.html.twig', [
-            'college' => $college,
+        return $this->render('admin/etablissement/show.html.twig', [
+            'etablissement' => $etablissement,
         ]);
     }
 
     /**
-     * Affiche un collège depuis la page des collèges
+     * Affiche un établissement depuis la page des établissements
      */
-    #[Route(path: '/webapp/college/blog/{id}', name: 'op_webapp_college_show2', methods: ['GET'])]
-    public function show2(College $college,Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
+    #[Route(path: '/webapp/etablissement/blog/{id}', name: 'op_webapp_etablissement_show2', methods: ['GET'])]
+    public function show2(Etablissement $etablissement,Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
     {
-        $data = $entityManager->getRepository(Article::class)->listArticlesByCollege($college->getId());
+        $data = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($etablissement->getId());
         $config = $entityManager->getRepository(Config::class)->find(1);
 
         $articles = $paginator->paginate(
@@ -231,8 +231,8 @@ class CollegeController extends AbstractController
             10
         );
 
-        return $this->render('admin/college/show2.html.twig', [
-            'college' => $college,
+        return $this->render('admin/etablissement/show2.html.twig', [
+            'etablissement' => $etablissement,
             'articles' => $articles,
             'config' => $config,
             'page' => $request->query->getInt('page', 1),
@@ -240,22 +240,22 @@ class CollegeController extends AbstractController
     }
 
     /**
-     * Affiche le bloc d'admin des collèges leur espace privé
+     * Affiche le bloc d'admin des établissements leur espace privé
      */
-    #[Route(path: '/webapp/college/bloc_admin/', name: 'op_webapp_college_adminonly', methods: ['GET'])]
-    public function blocAdminCollege(College $college): Response
+    #[Route(path: '/webapp/etablissement/bloc_admin/', name: 'op_webapp_etablissement_adminonly', methods: ['GET'])]
+    public function blocAdminEtablissement(Etablissement $etablissement): Response
     {
-        return $this->render('espacecollege/dashboard/_blocAdminCollege.html.twig', [
-            'college' => $college,
+        return $this->render('espace_etablissement/dashboard/_blocAdminEtablissement.html.twig', [
+            'etablissement' => $etablissement,
         ]);
     }
 
-    #[Route(path: '/espcoll/college/{id}/edit', name: 'op_espcoll_college_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, College $college, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/espetab/etablissement/{id}/edit', name: 'op_espetab_etablissement_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Etablissement $etablissement, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
-        $form = $this->createForm(CollegeType::class, $college);
+        $form = $this->createForm(EtablissementType::class, $etablissement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -266,11 +266,11 @@ class CollegeController extends AbstractController
             if ($headerFileInput) {
                 // Effacement du fichier bannièreFileName si il est présent en BDD
                 // récupération du nom de l'image
-                $headerName = $college->getHeaderName();
+                $headerName = $etablissement->getHeaderName();
                 // suppression du Fichier
                 if($headerName){
 
-                    $pathheader = $this->getParameter('college_directory').'/'.$headerName;
+                    $pathheader = $this->getParameter('etablissement_directory').'/'.$headerName;
                     // On vérifie si l'image existe
                     if(file_exists($pathheader)){
                         unlink($pathheader);
@@ -285,7 +285,7 @@ class CollegeController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $headerFileInput->move(
-                        $this->getParameter('college_directory'),
+                        $this->getParameter('etablissement_directory'),
                         $newheaderFilename
                     );
                 } catch (FileException) {
@@ -294,16 +294,16 @@ class CollegeController extends AbstractController
 
                 // updates the 'brochureFilename' property to store the PDF file name
                 // instead of its contents
-                $college->setHeaderName($newheaderFilename);
+                $etablissement->setHeaderName($newheaderFilename);
             }
 
             if ($logoFileInput) {
                 // Effacement du fichier bannièreFileName si il est présent en BDD
                 // récupération du nom de l'image
-                $logoName = $college->getLogoName();
+                $logoName = $etablissement->getLogoName();
                 // suppression du Fichier
                 if($logoName){
-                    $pathlogo = $this->getParameter('college_directory').'/'.$logoName;
+                    $pathlogo = $this->getParameter('etablissement_directory').'/'.$logoName;
                     // On vérifie si l'image existe
                     if(file_exists($pathlogo)){
                         unlink($pathlogo);
@@ -317,7 +317,7 @@ class CollegeController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $logoFileInput->move(
-                        $this->getParameter('college_directory'),
+                        $this->getParameter('etablissement_directory'),
                         $newlogoFilename
                     );
                 } catch (FileException) {
@@ -326,29 +326,29 @@ class CollegeController extends AbstractController
 
                 // updates the 'brochureFilename' property to store the PDF file name
                 // instead of its contents
-                $college->setLogoName($newlogoFilename);
+                $etablissement->setLogoName($newlogoFilename);
             }
 
             $entityManager->flush();
 
-            return $this->redirectToRoute('op_espcoll_college_edit',[
-                'id' => $college->getId(),
+            return $this->redirectToRoute('op_espetab_etablissement_edit',[
+                'id' => $etablissement->getId(),
             ]);
         }
 
-        return $this->render('espacecollege/editcollege.html.twig', [
+        return $this->render('espace_etablissement/editetablissement.html.twig', [
             'layout' => 'base.html.twig',
-            'college' => $college,
+            'etablissement' => $etablissement,
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route(path: '/admin/college/{id}/editcollege', name: 'op_admin_college_edit', methods: ['GET', 'POST'])]
-    public function editCollegeAdmin(Request $request, College $college, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/admin/etablissement/{id}/editetablissement', name: 'op_admin_etablissement_edit', methods: ['GET', 'POST'])]
+    public function editEtablissementAdmin(Request $request, Etablissement $etablissement, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
-        $form = $this->createForm(CollegeType::class, $college);
+        $form = $this->createForm(EtablissementType::class, $etablissement);
 
         $form->handleRequest($request);
 
@@ -366,10 +366,10 @@ class CollegeController extends AbstractController
             if ($headerFileInput) {
                 // Effacement du fichier bannièreFileName si il est présent en BDD
                 // récupération du nom de l'image
-                $headerName = $college->getHeaderName();
+                $headerName = $etablissement->getHeaderName();
                 // suppression du Fichier
                 if($headerName){
-                    $pathheader = $this->getParameter('college_directory').'/'.$headerName;
+                    $pathheader = $this->getParameter('etablissement_directory').'/'.$headerName;
                     // On vérifie si l'image existe
                     if(file_exists($pathheader)){
                         unlink($pathheader);
@@ -384,7 +384,7 @@ class CollegeController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $headerFileInput->move(
-                        $this->getParameter('college_directory'),
+                        $this->getParameter('etablissement_directory'),
                         $newheaderFilename
                     );
                 } catch (FileException) {
@@ -393,16 +393,16 @@ class CollegeController extends AbstractController
 
                 // updates the 'brochureFilename' property to store the PDF file name
                 // instead of its contents
-                $college->setHeaderName($newheaderFilename);
+                $etablissement->setHeaderName($newheaderFilename);
             }
 
             if ($logoFileInput) {
                 // Effacement du fichier bannièreFileName si il est présent en BDD
                 // récupération du nom de l'image
-                $logoName = $college->getLogoName();
+                $logoName = $etablissement->getLogoName();
                 // suppression du Fichier
                 if($logoName){
-                    $pathlogo = $this->getParameter('college_directory').'/'.$logoName;
+                    $pathlogo = $this->getParameter('etablissement_directory').'/'.$logoName;
                     // On vérifie si l'image existe
                     if(file_exists($pathlogo)){
                         unlink($pathlogo);
@@ -416,7 +416,7 @@ class CollegeController extends AbstractController
                 // Move the file to the directory where brochures are stored
                 try {
                     $logoFileInput->move(
-                        $this->getParameter('college_directory'),
+                        $this->getParameter('etablissement_directory'),
                         $newlogoFilename
                     );
                 } catch (FileException) {
@@ -425,50 +425,50 @@ class CollegeController extends AbstractController
 
                 // updates the 'brochureFilename' property to store the PDF file name
                 // instead of its contents
-                $college->setLogoName($newlogoFilename);
+                $etablissement->setLogoName($newlogoFilename);
             }
 
-            //dd($college);
+            //dd($etablissement);
 
             $entityManager->flush();
 
-            return $this->redirectToRoute('op_admin_college_edit',[
+            return $this->redirectToRoute('op_admin_etablissement_edit',[
                // 'id' => $user->getId(),
-                'id' => $college->getId(),
+                'id' => $etablissement->getId(),
             ]);
         }
 
-        return $this->render('admin/college/edit.html.twig', [
+        return $this->render('admin/etablissement/edit.html.twig', [
             'layout' => 'admin.html.twig',
-            'college' => $college,
+            'etablissement' => $etablissement,
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route(path: '/op_admin/college/{id}/delete-media/{field}', name: 'op_admin_college_delete_media', methods: ['POST'])]
-    public function deleteMedia(College $college, string $field, EntityManagerInterface $em): Response
+    #[Route(path: '/op_admin/etablissement/{id}/delete-media/{field}', name: 'op_admin_etablissement_delete_media', methods: ['POST'])]
+    public function deleteMedia(Etablissement $etablissement, string $field, EntityManagerInterface $em): Response
     {
         if (!in_array($field, ['logo', 'header'])) {
             return $this->json(['code' => 400, 'message' => 'Champ invalide'], 400);
         }
 
         if ($field === 'logo') {
-            $fileName = $college->getLogoName();
+            $fileName = $etablissement->getLogoName();
             if ($fileName) {
-                $path = $this->getParameter('college_directory') . '/' . $fileName;
+                $path = $this->getParameter('etablissement_directory') . '/' . $fileName;
                 if (file_exists($path)) {
                     unlink($path);
                 }
-                $college->setLogoName(null);
+                $etablissement->setLogoName(null);
             }
         } else {
-            $fileName = $college->getHeaderName();
+            $fileName = $etablissement->getHeaderName();
             if ($fileName) {
-                $path = $this->getParameter('college_directory') . '/' . $fileName;
+                $path = $this->getParameter('etablissement_directory') . '/' . $fileName;
                 if (file_exists($path)) {
                     unlink($path);
                 }
-                $college->setHeaderName(null);
+                $etablissement->setHeaderName(null);
             }
         }
 
@@ -477,36 +477,36 @@ class CollegeController extends AbstractController
         return $this->json(['code' => 200, 'message' => 'Fichier supprimé avec succès'], 200);
     }
 
-    #[Route(path: '/op_admin/college/{id}', name: 'op_admin_college_delete', methods: ['DELETE'])]
+    #[Route(path: '/op_admin/etablissement/{id}', name: 'op_admin_etablissement_delete', methods: ['DELETE'])]
     public function delete(
         Request $request,
-        College $college,
+        Etablissement $etablissement,
         Filesystem $filesystem,
         ArticleRepository $articlesRepository,
         RessourcesRepository $RessourcesRepository,
         EntityManagerInterface $entityManager
     ): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$college->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$etablissement->getId(), $request->request->get('_token'))) {
 
-            // Concerne la suppression des relations par rapport au college
-            $articles = $articlesRepository->findBy(['college'=>$college]);
+            // Concerne la suppression des relations par rapport à l'établissement
+            $articles = $articlesRepository->findBy(['etablissement'=>$etablissement]);
             foreach ($articles as $article) {
-                $college->removeArticle($article);
+                $etablissement->removeArticle($article);
             }
-            $ressources = $RessourcesRepository->findBy(['college'=>$college]);
+            $ressources = $RessourcesRepository->findBy(['etablissement'=>$etablissement]);
             foreach ($ressources as $ressource){
-                $college->removeRessource($ressource);
+                $etablissement->removeRessource($ressource);
             }
 
             // on instancie la classe de gestion des entités
 
             // Récupération des noms des images enregistrées
-            $headerName = $college->getHeaderName();
-            $logoName = $college->getLogoName();
+            $headerName = $etablissement->getHeaderName();
+            $logoName = $etablissement->getLogoName();
             // Suppression de l'image physique liée à la bannière de l'établissement
             if($headerName){
-                $pathheader = $this->getParameter('college_directory').'/'.$headerName;
+                $pathheader = $this->getParameter('etablissement_directory').'/'.$headerName;
                 // On vérifie si l'image existe
                 if(file_exists($pathheader)){
                     unlink($pathheader);
@@ -514,48 +514,48 @@ class CollegeController extends AbstractController
             }
             // Suppression de l'image physique liée à l'image de profil de l'établissement
             if($logoName){
-                $pathlogo = $this->getParameter('college_directory').'/'.$logoName;
+                $pathlogo = $this->getParameter('etablissement_directory').'/'.$logoName;
                 // On vérifie si l'image existe
                 if(file_exists($pathlogo)){
                     unlink($pathlogo);
                 }
             }
 
-            $entityManager->remove($college);
+            $entityManager->remove($etablissement);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('op_admin_college_index');
+        return $this->redirectToRoute('op_admin_etablissement_index');
     }
 
     /**
      * Suppression d'une ligne dans le index.php
      */
-    #[Route(path: '/op_admin/college/del/{id}', name: 'op_admin_college_del', methods: ['POST'])]
-    public function Del(College $college, EntityManagerInterface $entityManager) : Response
+    #[Route(path: '/op_admin/etablissement/del/{id}', name: 'op_admin_etablissement_del', methods: ['POST'])]
+    public function Del(Etablissement $etablissement, EntityManagerInterface $entityManager) : Response
     {
-        $entityManager->remove($college);
+        $entityManager->remove($etablissement);
         $entityManager->flush();
 
         $users = $entityManager->getRepository(User::class)->findAll();
 
         return $this->json([
             'code'=> 200,
-            'message' => "Le college a été supprimé",
+            'message' => "L'établissement a été supprimé",
             'liste' => $this->renderView('admin/user/include/_liste.html.twig', [
                 'users' => $users
             ])
         ], 200);
     }
 
-    #[Route(path: '/section/{idsection}', name: '_collegesbysection', methods: ['GET'])]
-    public function listCollegesBySection($idsection, ConfigRepository $configRepository, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/section/{idsection}', name: '_etablissementsbysection', methods: ['GET'])]
+    public function listEtablissementsBySection($idsection, ConfigRepository $configRepository, EntityManagerInterface $entityManager): Response
     {
         $config = $configRepository->find(1);
-        $colleges = $entityManager->getRepository(College::class)->listCollegesBySection($idsection);
+        $etablissements = $entityManager->getRepository(Etablissement::class)->listEtablissementsBySection($idsection);
 
-        return $this->render('admin/college/listcollegesbysection.html.twig',[
-            'colleges' => $colleges,
+        return $this->render('admin/etablissement/listetablissementsbysection.html.twig',[
+            'etablissements' => $etablissements,
             'config' => $config
         ]);
     }
@@ -564,28 +564,28 @@ class CollegeController extends AbstractController
      * @param $iduser
      * @return Response
      */
-    #[Route(path: 'webapp/college/espace/{iduser}', name: 'op_webapp_college_espcoll')]
-    public function findCollegeById($iduser, EntityManagerInterface $entityManager): Response
+    #[Route(path: 'webapp/etablissement/espace/{iduser}', name: 'op_webapp_etablissement_espetab')]
+    public function findEtablissementById($iduser, EntityManagerInterface $entityManager): Response
     {
-        $college = $entityManager->getRepository(College::class)->CollegeByUser($iduser);
+        $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($iduser);
 
-        if (!$college) {
+        if (!$etablissement) {
             $this->redirectToRoute('op_admin_dashboard_index');
         }
 
-        return $this->render('admin/college/collegebyuser.html.twig', [
-            'college' => $college,
+        return $this->render('admin/etablissement/etablissementbyuser.html.twig', [
+            'etablissement' => $etablissement,
         ]);
     }
 
     /**
      * Permet de mettre en menu la poge ou non
      */
-    #[Route(path: '/op_admin/college/verified/{id}', name: 'op_admin_college_verified')]
-    public function jsVerified(College $college, EntityManagerInterface $em) : Response
+    #[Route(path: '/op_admin/etablissement/verified/{id}', name: 'op_admin_etablissement_verified')]
+    public function jsVerified(Etablissement $etablissement, EntityManagerInterface $em) : Response
     {
         $admin = $this->getUser();
-        $isActive = $college->getIsActive();
+        $isActive = $etablissement->getIsActive();
         // renvoie une erreur car l'utilisateur n'est pas connecté
         if(!$admin) return $this->json([
             'code' => 403,
@@ -593,16 +593,16 @@ class CollegeController extends AbstractController
         ], 403);
         // Si la page est déja publiée, alors on dépublie
         if($isActive == true){
-            $college->setIsActive(0);
+            $etablissement->setIsActive(0);
             $em->flush();
-            return $this->json(['code'=> 200, 'message' => "Le college est désactivé pour l'instant"], 200);
+            return $this->json(['code'=> 200, 'message' => "L'établissement est désactivé pour l'instant"], 200);
         }
         // Si la page est déja dépubliée, alors on publie
-        $college->setIsActive(1);
+        $etablissement->setIsActive(1);
         $em->flush();
         return $this->json([
             'code'=> 200,
-            'message' => "Le college est activé et sera visible sur le site."],
+            'message' => "L'établissement est activé et sera visible sur le site."],
             200);
     }
 }

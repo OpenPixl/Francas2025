@@ -2,7 +2,7 @@
 
 namespace App\Controller\App;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use App\Entity\Admin\Config;
 use App\Entity\Admin\Message;
 use App\Entity\Webapp\Article;
@@ -110,20 +110,20 @@ class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/espcoll/dashboard/', name: 'op_webapp_espcoll')]
-    public function epscoll(EntityManagerInterface $entityManager, MessageRepository $messageRepository, ArticleRepository $articleRepository, RessourcesRepository $ressourcesRepository) : Response
+    #[Route(path: '/espetab/dashboard/', name: 'op_webapp_espetab')]
+    public function espetab(EntityManagerInterface $entityManager, MessageRepository $messageRepository, ArticleRepository $articleRepository, RessourcesRepository $ressourcesRepository) : Response
     {
-        $this->denyAccessUnlessGranted('ROLE_COLLEGE');
+        $this->denyAccessUnlessGranted('ROLE_ETABLISSEMENT');
         $user = $this->getUser();
 
-        $college = $entityManager->getRepository(College::class)->CollegeByUser($user);
+        $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
         $messages = $messageRepository->listMessagesByUser($user->getId());
-        $articles = $articleRepository->findBy(['college' => $college]);
-        $ressources = $ressourcesRepository->findBy(['college' => $college]);
+        $articles = $articleRepository->findBy(['etablissement' => $etablissement]);
+        $ressources = $ressourcesRepository->findBy(['etablissement' => $etablissement]);
 
-        return $this->render('espacecollege/dashboard/espcoll.html.twig', [
+        return $this->render('espace_etablissement/dashboard/espetab.html.twig', [
             'user' => $user,
-            'college' => $college,
+            'etablissement' => $etablissement,
             'articles'  => $articles,
             'ressources' => $ressources,
             'messages' => $messages

@@ -5,18 +5,18 @@
                 {% if article.imageName is not null %}
                     <img src="{{ asset('/uploads/images/articles/'~article.imageName) | imagine_filter('thumb_img_article') }}" alt="" class="absolute inset-0 size-full rounded-2xl bg-gray-50 object-cover dark:bg-gray-800 shadow" />
                 {% else %}
-                    <img src="{{ asset('/uploads/images/colleges/'~college.logoName) | imagine_filter('thumb_img_article') }}" alt="" class="absolute inset-0 size-full rounded-2xl bg-gray-50 object-cover dark:bg-gray-800 shadow" />
+                    <img src="{{ asset('/uploads/images/etablissements/'~etablissement.logoName) | imagine_filter('thumb_img_article') }}" alt="" class="absolute inset-0 size-full rounded-2xl bg-gray-50 object-cover dark:bg-gray-800 shadow" />
                 {% endif %}
                 <div class="absolute inset-0 rounded-2xl inset-ring inset-ring-gray-900/10 dark:inset-ring-white/10"></div>
             </div>
             <div class="w-full">
                 <div class="flex items-center gap-x-4 text-xs">
                     <time datetime="{{ article.updatedAt|date('dd/mm/yyyy') }}" class="text-gray-500 dark:text-gray-400">{{ article.updatedAt|date('d/m/Y') }}</time>
-                    <a href="{{ path('op_webapp_articles_articleSlug', {'id': article.id, 'idcollege':article.idCollege}) }}" class="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100 dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800">{{ article.theme }}</a>
+                    <a href="{{ path('op_webapp_articles_articleSlug', {'id': article.id, 'idetablissement':article.idEtablissement}) }}" class="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100 dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-gray-800">{{ article.theme }}</a>
                 </div>
                 <div class="group relative w-full">
                     <h3 class="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600 dark:text-white dark:group-hover:text-gray-300">
-                        <a href="{{ path('op_webapp_articles_articleSlug', {'id': article.id, 'idcollege':article.idCollege}) }}">
+                        <a href="{{ path('op_webapp_articles_articleSlug', {'id': article.id, 'idetablissement':article.idEtablissement}) }}">
                             <span class="absolute inset-0"></span>
                             {{ article.title }}
                         </a>
@@ -25,7 +25,7 @@
                 </div>
                 <div class="mt-6 flex border-t border-gray-900/5 pt-6 dark:border-white/10">
                     <div class="relative flex items-center gap-x-4">
-                        <img src="{{ asset('/uploads/images/colleges/'~article.logoNameCollege) | imagine_filter('thumb_logo_college') }}" alt="" class="size-10 rounded-full bg-gray-50 dark:bg-gray-800" />
+                        <img src="{{ asset('/uploads/images/etablissements/'~article.logoNameEtablissement) | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-10 rounded-full bg-gray-50 dark:bg-gray-800" />
                         <div class="text-sm/6">
                             <p class="font-semibold text-gray-900 dark:text-white">
                                 <a href="">
@@ -33,7 +33,7 @@
                                     {{ article.animateur }}
                                 </a>
                             </p>
-                            <p class="text-gray-600 dark:text-gray-400">College {{ article.nameCollege }}</p>
+                            <p class="text-gray-600 dark:text-gray-400">Établissement {{ article.nameEtablissement }}</p>
                         </div>
                     </div>
                 </div>

@@ -1,15 +1,15 @@
-{% if not college %}
+{% if not etablissement %}
    <div class="py-4">
         <h3 class="font-medium text-4xl mb-4">Bienvenue {{ app.user.firstName }} {{ app.user.lastName }}</h3>
     </div>
-{% elseif college.headerName is null %}
+{% elseif etablissement.headerName is null %}
 {% else %}
     <div class="col-12" id="content_header_img">
-        <img id="college_header" class="img-fluid" src="{{ asset('uploads/images/colleges/' ~ college.headerName)|imagine_filter('thumb_bandeau_college') }}" alt="{{ college.headerName }}">
-        {% if college.logoName is null %}
+        <img id="etablissement_header" class="img-fluid" src="{{ asset('uploads/images/etablissements/' ~ etablissement.headerName)|imagine_filter('thumb_bandeau_etablissement') }}" alt="{{ etablissement.headerName }}">
+        {% if etablissement.logoName is null %}
         {% else %}
-        <div id="college_logo">
-            <img class="img-fluid" src="{{ asset('uploads/images/colleges/' ~ college.logoName)|imagine_filter('thumb_logo_college') }}" alt="{{ college.logoName }}">
+        <div id="etablissement_logo">
+            <img class="img-fluid" src="{{ asset('uploads/images/etablissements/' ~ etablissement.logoName)|imagine_filter('thumb_logo_etablissement') }}" alt="{{ etablissement.logoName }}">
         </div>
         {% endif %}
     </div>

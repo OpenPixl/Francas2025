@@ -2,7 +2,7 @@
 
 namespace App\Controller\App;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
 use App\Entity\Gestapp\RessourceCat;
 use App\Entity\Gestapp\Ressources;
 use App\Form\Webapp\RessourcesType;
@@ -129,14 +129,14 @@ class RessourcesController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/espcoll/ressources/collegenew/{idcollege}', name: 'op_webapp_ressources_collegenew', methods: ['GET', 'POST'])]
-    public function collegeNew($idcollege, Request $request, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/espetab/ressources/etablissementnew/{idetablissement}', name: 'op_webapp_ressources_etablissementnew', methods: ['GET', 'POST'])]
+    public function etablissementNew($idetablissement, Request $request, EntityManagerInterface $entityManager): Response
     {
-        // On récupère l'entité collège
-        $college = $entityManager->getRepository(College::class)->find($idcollege);
+        // On récupère l'entité établissement
+        $etablissement = $entityManager->getRepository(Etablissement::class)->find($idetablissement);
 
         $ressource = new Ressources();
-        $ressource->setCollege($college);
+        $ressource->setEtablissement($etablissement);
         $form = $this->createForm(RessourcesType::class, $ressource);
         $form->handleRequest($request);
 
@@ -145,12 +145,12 @@ class RessourcesController extends AbstractController
             $entityManager->flush();
 
             return $this->redirectToRoute('op_webapp_ressources_index', [
-                'id' => $college->getId()
+                'id' => $etablissement->getId()
             ], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('webapp/ressources/newressourcebycollege.html.twig', [
-            'college' => $college,
+        return $this->render('webapp/ressources/newressourcebyetablissement.html.twig', [
+            'etablissement' => $etablissement,
             'ressource' => $ressource,
             'form' => $form->createView(),
         ]);

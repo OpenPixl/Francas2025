@@ -2,9 +2,9 @@ import axios from 'axios';
 import {showNotification, showDialog, hideDialog} from "../../composants/tailwind";
 import {player_audio} from "../../composants/fonctions";
 
-export function initNewEditcollege(){
-    console.log('Bienvenu sur la page d\'edition d\'un college.');
-    const Textarea = document.getElementById('college_GroupDescription');
+export function initNewEditEtablissement(){
+    console.log('Bienvenu sur la page d\'edition d\'un établissement.');
+    const Textarea = document.getElementById('etablissement_GroupDescription');
     ClassicEditor
         .create(Textarea, {
             toolbar: [ 'heading','bold', 'italic', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment' ],

@@ -16,20 +16,20 @@ class DashboardController extends AbstractController
     #[Route(path: '/security/redirect_login', name: 'op_admin_security_redirect_login')]
     public function redirectLogin()
     {
-        $this->denyAccessUnlessGranted('ROLE_COLLEGE');
+        $this->denyAccessUnlessGranted('ROLE_ETABLISSEMENT');
         $user = $this->getUser();
 
         if ($this->isGranted('ROLE_SUPER_ADMIN') || $this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('op_admin_dashboard_index');
         }
 
-        if ($this->isGranted('ROLE_COLLEGE')) {
+        if ($this->isGranted('ROLE_ETABLISSEMENT')) {
             if($user->IsVerified() == 0){
                 return new RedirectResponse($this->generateUrl('op_admin_security_resetting', [
                     'id' => $user->getId()
                 ]));
             }else{
-                return $this->redirectToRoute('op_webapp_espcoll');
+                return $this->redirectToRoute('op_webapp_espetab');
             }
         }
 
@@ -41,7 +41,7 @@ class DashboardController extends AbstractController
     public function index(ArticleRepository $articleRepository): Response
     {
         $listArticles = $articleRepository->createQueryBuilder('a')
-            ->join('a.college', 'c')
+            ->join('a.etablissement', 'e')
             ->orderBy('a.id', 'DESC')   // ou 'a.createdAt' si tu as un champ de date
             ->setMaxResults(10)
             ->getQuery()

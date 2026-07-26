@@ -5,7 +5,7 @@
             <th></th>
             <th class="text-start">Nom</th>
             <th class="text-start">Identifiant</th>
-            <th class="text-start">Collège</th>
+            <th class="text-start">Établissement</th>
             <th class="text-center">Actif</th>
             <th class="text-center">actions</th>
         </tr>
@@ -24,10 +24,10 @@
                 </td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ user.email }}</td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
-                    {% if user.college is null %}
-                    <a href="{{ path('op_admin_college_newcollegeadmin', {'iduser': user.id}) }}" class="btn btn-secondary btn-sm">Ajout du college</a>
+                    {% if user.etablissement is null %}
+                    <a href="{{ path('op_admin_etablissement_newetablissementadmin', {'iduser': user.id}) }}" class="btn btn-secondary btn-sm">Ajout de l'établissement</a>
                     {% else %}
-                    {{ user.college }}
+                    {{ user.etablissement }}
                     {% endif %}
                 </td>
                 <td class="py-1.5 text-sm text-center whitespace-nowrap text-gray-800 dark:text-gray-400">

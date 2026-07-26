@@ -9,12 +9,12 @@
 
 
 {% block main %}
-    <section class="container" id="espace_college_header">
+    <section class="container" id="espace_etablissement_header">
         <div class="row" id="content">
-            {{ include('admin/college/include/_header_college.html.twig') }}
+            {{ include('admin/etablissement/include/_header_etablissement.html.twig') }}
         </div>
     </section>
-    <section class="container" id="espace_college_content">
+    <section class="container" id="espace_etablissement_content">
         <div class="row">
             <div class="col-9" id="content">
                 <div class="row" id="content_title">
@@ -29,7 +29,7 @@
                     </div>
                 </div>
             </div>
-            {{ render(controller('App\\Controller\\Admin\\CollegeController:blocAdminCollege', {'id': article.college})) }}
+            {{ render(controller('App\\Controller\\Admin\\EtablissementController:blocAdminEtablissement', {'id': article.etablissement})) }}
         </div>
     </section>
 

@@ -2,7 +2,8 @@
 
 namespace App\Form\Admin;
 
-use App\Entity\Admin\College;
+use App\Entity\Admin\Etablissement;
+use App\Entity\Admin\TypeEtablissement;
 use App\Entity\Admin\User;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -14,7 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
 use Vich\UploaderBundle\Form\Type\VichImageType;
 
-class CollegeType extends AbstractType
+class EtablissementType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -24,13 +25,19 @@ class CollegeType extends AbstractType
             ->add('complement')
             ->add('zipcode')
             ->add('city')
-            ->add('collegeEmail')
+            ->add('etablissementEmail')
             ->add('groupEmail')
-            ->add('collegePhone')
+            ->add('etablissementPhone')
             ->add('groupPhone')
             ->add('animateur')
             ->add('GroupDescription')
             ->add('workMeeting')
+            ->add('typeEtablissement', EntityType::class, [
+                'class' => TypeEtablissement::class,
+                'choice_label' => 'libelle',
+                'label' => 'Type d\'établissement',
+                'placeholder' => '-- Choisir le type --',
+            ])
             ->add('headerFile', FileType::class, [
                 'label' => 'Banniere au format : png ou jpg',
                 'mapped' => false,
@@ -65,7 +72,7 @@ class CollegeType extends AbstractType
                 ],
             ])
             ->add('user', EntityType::class, [
-                'label' => 'anime le college',
+                'label' => 'anime l\'établissement',
                 'class' => User::class,
                 'placeholder' => '-- Choisir l\'administrateur --',
                 'required' => false,
@@ -74,7 +81,7 @@ class CollegeType extends AbstractType
                         ->where('u.isActiv = :isActiv')
                         ->andWhere('u.roles LIKE :role')
                         ->setParameter('isActiv', 1)
-                        ->setParameter('role', '%"ROLE_COLLEGE"%')
+                        ->setParameter('role', '%"ROLE_ETABLISSEMENT"%')
                         ->orderBy('u.id', 'ASC');
                 },
             ])
@@ -84,7 +91,7 @@ class CollegeType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => College::class,
+            'data_class' => Etablissement::class,
         ]);
     }
 }

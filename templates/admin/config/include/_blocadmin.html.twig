@@ -1,5 +1,5 @@
-{% if not college %}
-    {{ render(controller('App\\Controller\\Admin\\CollegeController:blocAdmin')) }}
+{% if not etablissement %}
+    {{ render(controller('App\\Controller\\Admin\\EtablissementController:blocAdmin')) }}
 {% else %}
-    {{ render(controller('App\\Controller\\Admin\\CollegeController:blocAdminCollege', {'id': college.id})) }}
+    {{ render(controller('App\\Controller\\Admin\\EtablissementController:blocAdminEtablissement', {'id': etablissement.id})) }}
 {% endif %}
