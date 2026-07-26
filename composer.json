@@ -12,6 +12,7 @@
         "doctrine/doctrine-bundle": "^2.19",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.6.7",
+        "friendsofsymfony/elastica-bundle": "*",
         "knplabs/knp-paginator-bundle": "^6.9",
         "liip/imagine-bundle": "^2.17.1",
         "phpdocumentor/reflection-docblock": "^5.6.7",

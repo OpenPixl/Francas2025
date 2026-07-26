@@ -1,0 +1,24 @@
+# Read the documentation: https://github.com/FriendsOfSymfony/FOSElasticaBundle/blob/master/doc/setup.md
+fos_elastica:
+    clients:
+        default:
+            hosts: ['%env(ELASTICSEARCH_URL)%']
+    indexes:
+        articles:
+            persistence:
+                driver: orm
+                model: App\Entity\Gestapp\Articles
+                elastica_to_model_transformer:
+                    ignore_missing: true
+                listener:
+                    enabled: true
+                    defer: false   # false = update direct, true = différé
+                    insert: true   # indexe à la création
+                    update: true   # met à jour à la modification
+                    delete: true   # supprime à la suppression
+                provider: ~
+                finder: ~
+            properties:
+                title:
+                    type: text
+
