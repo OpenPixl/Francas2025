@@ -19,10 +19,27 @@ class EtablissementRepository extends ServiceEntityRepository
     public function listEtablissementsBySection($idsection)
     {
         return $this->createQueryBuilder('e')
-            ->addSelect('e.id, e.name, e.city, e.isActive, e.logoName, s.id as idsection')
+            ->addSelect('e.id, e.name, e.city, e.isActive, e.logoName, s.id as idsection, t.id as idTypeEtablissement, t.libelle as typeEtablissementLibelle')
             ->leftJoin('e.section', 's')
+            ->leftJoin('e.typeEtablissement', 't')
             ->andWhere('e.isActive = :isActive ')
             ->setParameter('isActive', 1)
+            ->orderBy('t.libelle', 'ASC')
+            ->addOrderBy('e.city', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+    public function listEtablissementsByType($idTypeEtablissement)
+    {
+        return $this->createQueryBuilder('e')
+            ->addSelect('e.id, e.name, e.city, e.isActive, e.logoName, t.id as idTypeEtablissement, t.libelle as typeEtablissementLibelle')
+            ->leftJoin('e.typeEtablissement', 't')
+            ->andWhere('e.isActive = :isActive')
+            ->andWhere('t.id = :idTypeEtablissement')
+            ->setParameter('isActive', 1)
+            ->setParameter('idTypeEtablissement', $idTypeEtablissement)
             ->orderBy('e.city', 'ASC')
             ->getQuery()
             ->getResult()

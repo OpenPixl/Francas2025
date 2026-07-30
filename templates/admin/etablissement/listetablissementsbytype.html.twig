@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Établissements - {{ typeEtablissement.libelle }}{% endblock %}
+
+{% block main %}
+    <section class="mx-auto max-w-7xl px-2 py-4 sm:px-6 lg:px-8" id="etablissement_type_page">
+        <h1 class="font-semibold text-2xl text-gray-700 border-b border-b-gray-700 mb-4">{{ typeEtablissement.libelle }}</h1>
+
+        <div class="grid grid-cols-4 gap-4" id="row_etablissement">
+            {% for etablissement in etablissements %}
+                <a href="{{ path('op_webapp_etablissement_show2', {'id': etablissement.id}) }}" class="group">
+                    {% if etablissement.logoName %}
+                        <img src="{{ asset('/uploads/images/etablissements/'~etablissement.logoName)}}" alt="Logo du groupe de jeunes de {{ etablissement.city }}" class="aspect-square w-full rounded-lg bg-gray-200 object-contain group-hover:opacity-75 xl:aspect-square" />
+                    {% else %}
+                        <img src="{{ asset('/uploads/images/config/' ~ config.vignetteName)}}" alt="Tall slender porcelain bottle with natural clay textured body and cork stopper." class="aspect-square w-full rounded-lg bg-gray-200 object-contain group-hover:opacity-75 xl:aspect-square" />
+                    {% endif %}
+                    <h3 class="mt-3 text-sm text-[#d84519]">{{ etablissement.name }}</h3>
+                    <p class="font-semibold text-gray-900">{{ etablissement.city }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Admin\Etablissement;
 use App\Entity\Admin\Config;
+use App\Entity\Admin\TypeEtablissement;
 use App\Entity\Admin\User;
 use App\Entity\Webapp\Article;
 use App\Entity\Webapp\Message;
@@ -554,8 +555,31 @@ class EtablissementController extends AbstractController
         $config = $configRepository->find(1);
         $etablissements = $entityManager->getRepository(Etablissement::class)->listEtablissementsBySection($idsection);
 
+        $etablissementsByType = [];
+        foreach ($etablissements as $etablissement) {
+            $type = $etablissement['typeEtablissementLibelle'] ?? 'Autre';
+            $etablissementsByType[$type][] = $etablissement;
+        }
+
         return $this->render('admin/etablissement/listetablissementsbysection.html.twig',[
+            'etablissementsByType' => $etablissementsByType,
+            'config' => $config
+        ]);
+    }
+
+    /**
+     * Affiche tous les établissements d'un type donné
+     */
+    #[Route(path: '/webapp/etablissement/type/{idtype}', name: 'op_webapp_etablissement_bytype', methods: ['GET'])]
+    public function listEtablissementsByType($idtype, ConfigRepository $configRepository, EntityManagerInterface $entityManager): Response
+    {
+        $config = $configRepository->find(1);
+        $etablissements = $entityManager->getRepository(Etablissement::class)->listEtablissementsByType($idtype);
+        $typeEtablissement = $entityManager->getRepository(TypeEtablissement::class)->find($idtype);
+
+        return $this->render('admin/etablissement/listetablissementsbytype.html.twig', [
             'etablissements' => $etablissements,
+            'typeEtablissement' => $typeEtablissement,
             'config' => $config
         ]);
     }
