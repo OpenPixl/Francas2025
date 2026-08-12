@@ -2,35 +2,37 @@
 @import "tom-select/dist/css/tom-select.css";
 @source not "../../public";
 
-body {
-    min-height: 100vh;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-}
+@layer base {
+    body {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+    }
 
-main a{
-    color: #d84519;
-}
-main a:hover{
-    color: #d84519;
-}
+    main a{
+        color: #d84519;
+    }
+    main a:hover{
+        color: #d84519;
+    }
 
-main p{
-    margin-bottom: 0.5rem;
-}
+    main p{
+        margin-bottom: 0.5rem;
+    }
 
-main #bloc_admin a{
-    color: #d84519;
-}
-main #bloc_admin a:hover{
-    color: #d84519;
-    font-weight: bold;
-}
+    main #bloc_admin a{
+        color: #d84519;
+    }
+    main #bloc_admin a:hover{
+        color: #d84519;
+        font-weight: bold;
+    }
 
-main #etablissement_intro #content_text{
-    font-size: 0.9rem;
-}
+    main #etablissement_intro #content_text{
+        font-size: 0.9rem;
+    }
 
-main .ck-editor{
-    width: 100% !important;
+    main .ck-editor{
+        width: 100% !important;
+    }
 }

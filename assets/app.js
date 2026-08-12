@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
             initShowRessource();
             break;
         case 'op_webapp_page':
+        case 'op_webapp_page_slug':
+        case 'op_webapp_page_display':
             initShowPage();
             break;
         case 'op_webapp_public_homepage':
@@ -41,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'op_webapp_articles_new':
         case 'op_webapp_articles_edit':
             initNewEditArticle();
-            break
+            break;
         case 'op_webapp_message_new':
         case 'op_webapp_message_edit':
             initNewEditMessage();

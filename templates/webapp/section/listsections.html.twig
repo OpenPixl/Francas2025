@@ -1,6 +1,6 @@
 {% if sections %}
     {% for section in sections %}
-        <section class="{% if section.fluid == 1 %}{% else %}mx-auto max-w-7xl px-2 sm:px-6 lg:px-8{% endif %}" id="page_content">
+        <section class="{% if section.fluid == 1 %}{% else %}mx-auto my-8 max-w-7xl px-2 sm:px-6 lg:px-8{% endif %}" id="page_content">
             {% if section.content == 'ONE_ARTICLE' %}
                 {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesBySection', {'idsection': section.id})) }}
             {% elseif section.content == 'ONE_CATEGORY' %}

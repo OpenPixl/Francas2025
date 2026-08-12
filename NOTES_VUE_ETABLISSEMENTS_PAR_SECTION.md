@@ -70,3 +70,156 @@ recherche sur cette entité.
 - `php bin/console lint:twig` sur les deux templates — OK.
 - `php -l` sur le contrôleur et le repository — OK.
 - `php bin/console debug:router` — route `op_webapp_etablissement_bytype` bien enregistrée, pas de conflit.
+
+---
+
+## Mise à jour du 12/08/2026 — Branchement du formulaire (JS, contrôleur, Elasticsearch)
+
+Le formulaire de recherche décrit en section 3 (jusque-là pur HTML, non branché) a été rendu opérationnel de
+bout en bout : soumission JS en AJAX, validation côté Symfony, filtrage Elasticsearch, réinjection du résultat.
+Au passage, plusieurs bugs préexistants et sans lien direct avec la recherche ont été corrigés sur le chemin
+(dispatch JS par route, doublon de nom de route Symfony, index Elasticsearch orphelin).
+
+### 4. Dispatch JS par route (`assets/app.js`)
+
+Le script de page (`initShowPage()`, `assets/js/app/page/show.js`) n'était appelé que pour la route nommée
+`op_webapp_page`. Or le template `webapp/page/page.html.twig` est rendu par trois routes différentes
+(`op_webapp_page`, et deux routes portant le **même nom** `op_webapp_page_slug` — voir point suivant), donc le
+JS de page ne s'exécutait pas selon le chemin d'accès emprunté.
+
+- `assets/app.js` : ajout des cas `op_webapp_page_slug` et `op_webapp_page_display` dans le `switch` du
+  dispatcher, en plus de `op_webapp_page`.
+
+### 5. Doublon de route Symfony (`PageController.php`)
+
+`PageController` définissait **deux routes nommées `op_webapp_page_slug`** :
+- `page()` (ligne ~145, chemin `/webapp/page/{slug}`, avec vérification "site hors-ligne"), et
+- `pagebyslug()` (ligne ~221, chemin `/page/{slug}`).
+
+Un nom de route dupliqué fait que Symfony ne conserve que la dernière route déclarée sous ce nom pour la
+génération d'URL (`path()`) — la première (`page()`, avec la logique hors-ligne) était donc **inaccessible**
+depuis les templates, bien que son URL reste théoriquement valide.
+
+- `page()` renommée en `op_webapp_page_display`.
+- Bug additionnel corrigé dans la foulée : `page()` ne transmettait pas la variable `page` au template
+  (`return $this->render('webapp/page/page.html.twig')` sans paramètre), contrairement à `pagebyslug()` et à
+  `DashboardController::showPage()` — corrigé pour passer `'page' => $page`.
+
+### 6. Soumission JS du formulaire (`show.js`)
+
+`initShowPage()` détecte la présence d'un formulaire dans `#form_search`, intercepte sa soumission et l'envoie
+en AJAX via `axios` plutôt que de laisser le navigateur naviguer nativement :
+
+```js
+const section = document.querySelector('#form_search');
+if (section) {
+    const form = section.querySelector('form');
+    const button = section.querySelector('button[type="submit"], input[type="submit"]');
+    if (form && button) {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+            axios.post(form.action, formData).then(response => {
+                const results = document.querySelector('#form_results');
+                if (results && response.data.liste) {
+                    results.innerHTML = response.data.liste;
+                }
+            }).catch(error => console.error('Erreur lors de la recherche', error));
+        });
+    }
+}
+```
+
+Le formulaire s'appuie sur son `action`/`method` propres (générés par Symfony) plutôt que sur une URL codée en
+dur côté JS. Le mécanisme de protection CSRF "same-origin" existant (`assets/controllers/csrf_protection_controller.js`,
+double-submit cookie) fonctionne tel quel avec ce flux : le `submit` natif déclenché avant `preventDefault()`
+laisse le listener CSRF (posé en phase de capture sur `document`) régénérer le token et le cookie avant que le
+handler ci-dessus ne lise le `FormData`.
+
+### 7. `EtablissementSearchType` et cohérence des choix du `<select>`
+
+Plusieurs bugs en cascade sur le champ `etablissementChoice` (`ChoiceType`) :
+
+- Les `choices` passées au formulaire (`$etablissementsChoices[$type] = $e`, une ligne brute) ne correspondaient
+  ni aux valeurs que Symfony génère pour ses `<option>`, ni à ce qui était écrit à la main dans le twig
+  (`<option value="{{ type }}">`) — le formulaire échouait systématiquement sa validation dès qu'un type était
+  sélectionné (`isValid() === false`, sans autre message explicite côté template).
+- Le template (`listetablissementsbysection.html.twig`) rend maintenant les options depuis
+  `form.etablissementChoice.vars.choices` (`choice.value` / `choice.label`, la liste réelle générée par
+  Symfony) plutôt que depuis une boucle manuelle sur les données brutes — garantit que la valeur soumise
+  correspondra toujours à ce que le formulaire attend, quelle que soit l'évolution des `choices`.
+- Les `choices` construites côté contrôleur utilisent désormais l'**ID** du type comme valeur et le **libellé**
+  comme clé/label (`$etablissementsChoices[$type] = $e['idTypeEtablissement']`) — pour matcher le mapping
+  Elasticsearch (`typeEtablissement.id`, cf. section 8) plutôt qu'une comparaison par libellé.
+
+### 8. Contrôleur : filtrage Elasticsearch et cohérence des formats de données
+
+`EtablissementController::listEtablissementsBySection` (route renommée `op_admin_etablissement_bysection`,
+désormais `methods: ['GET', 'POST']` — elle n'acceptait que `GET`, incompatible avec la méthode `POST` par
+défaut d'un formulaire Symfony) :
+
+- **Fusion incorrecte des résultats** : après une recherche, les résultats Elasticsearch étaient ajoutés à
+  `$etablissementsByType` déjà rempli avec la liste complète (non filtrée) construite en haut de la méthode,
+  au lieu de la remplacer — corrigé en réinitialisant `$etablissementsByType = []` avant d'y injecter les
+  résultats filtrés.
+- **Incompatibilité entité/tableau** : `finder->find($query)` (FOSElastica) retourne des objets `Etablissement`
+  hydratés, alors que la requête native utilisée au chargement initial (`EtablissementRepository::listEtablissementsBySection`)
+  renvoie des tableaux associatifs bruts (`id`, `name`, `city`, `isActive`, `logoName`, `idsection`,
+  `idTypeEtablissement`, `typeEtablissementLibelle`). Le même template (`_listesearch.html.twig`) consommant
+  les deux, chaque source cassait l'autre selon la clé/le getter attendu. Corrigé en normalisant les résultats
+  Elasticsearch en tableaux du même format avant de les passer au twig :
+  ```php
+  foreach ($results as $r) {
+      $type = $r->getTypeEtablissement()?->getLibelle() ?? 'Autre';
+      $etablissementsByType[$type][] = [
+          'id' => $r->getId(),
+          'name' => $r->getName(),
+          'city' => $r->getCity(),
+          'isActive' => $r->getIsActive(),
+          'logoName' => $r->getLogoName(),
+          'idTypeEtablissement' => $r->getTypeEtablissement()?->getId(),
+          'typeEtablissementLibelle' => $type,
+      ];
+  }
+  ```
+- Réponse JSON de la branche AJAX : ajout de la variable `config` manquante au `renderView('admin/etablissement/include/_listesearch.html.twig', ...)` (utilisée pour l'image de secours quand un établissement n'a pas de logo).
+- Clé de données incorrecte corrigée : `$data['structure']` (n'existe pas) → `$data['etablissementChoice']`
+  dans la construction du `Term` Elasticsearch.
+- Nom de champ Elasticsearch corrigé pour le filtre par type : `structure.id` (hérité d'un autre outil, sans
+  rapport avec le mapping `Etablissement`) → `typeEtablissement.id`, conforme au mapping (voir section 9).
+
+### 9. Elasticsearch : ré-indexation après renommage `articles` → `etablissement`
+
+`config/packages/fos_elastica.yaml` a été reconfiguré : l'index `articles` (modèle inexistant
+`App\Entity\Gestapp\Articles`, cf. constat section 3 ci-dessus) a été remplacé par un index `etablissement`
+(modèle `App\Entity\Admin\Etablissement`, propriétés `name`, `zipcode`, `city`, `typeEtablissement.id`).
+
+Renommer la configuration ne renomme ni ne supprime l'index déjà créé côté Elasticsearch : `GET /_cat/indices?v`
+montrait encore un index `articles` (44 docs) en plus du nouvel index `etablissement`, tous deux visibles via
+`GET /_search` (qui interroge l'ensemble des index du cluster en l'absence de nom d'index explicite dans l'URL).
+
+- Ancien index supprimé : `DELETE http://127.0.0.1:9202/articles`.
+- Ré-indexation : `php bin/console fos:elastica:populate` (reset + 44/44 documents réindexés sous `etablissement`).
+
+---
+
+## Fichiers modifiés (session du 12/08/2026)
+
+- `assets/app.js`
+- `assets/js/app/page/show.js`
+- `src/Controller/Webapp/PageController.php`
+- `src/Controller/Admin/EtablissementController.php`
+- `src/Form/Search/EtablissementSearchType.php`
+- `templates/admin/etablissement/listetablissementsbysection.html.twig`
+- `templates/admin/etablissement/include/_listesearch.html.twig`
+- `config/packages/fos_elastica.yaml`
+
+## Vérifications effectuées (session du 12/08/2026)
+
+- `php -l` sur les contrôleurs modifiés — OK.
+- `php bin/console lint:twig` sur les templates modifiés — OK.
+- `php bin/console debug:router` — plus de doublon sur `op_webapp_page_slug` / `op_webapp_page_display`.
+- Tests `curl` simulant la soumission du formulaire (CSRF "same-origin" reconstitué manuellement, cookie +
+  token) : chargement (GET) 200, soumission sans filtre 200 avec résultats complets, soumission avec filtre
+  type 200, lien "voir tous" (>8 résultats) sans erreur.
+- `GET /_cat/indices?v` avant/après suppression de l'index `articles` et ré-indexation de `etablissement`.

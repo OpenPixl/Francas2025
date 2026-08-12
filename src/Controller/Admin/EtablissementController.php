@@ -10,12 +10,18 @@ use App\Entity\Webapp\Article;
 use App\Entity\Webapp\Message;
 use App\Form\Admin\EtablissementEditType;
 use App\Form\Admin\EtablissementType;
+use App\Form\Search\EtablissementSearchType;
 use App\Repository\Admin\EtablissementRepository;
 use App\Repository\Admin\ConfigRepository;
 use App\Repository\Webapp\ArticleRepository;
 use App\Repository\Webapp\MessageRepository;
 use App\Repository\Webapp\RessourcesRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Elastica\Query;
+use Elastica\Query\BoolQuery;
+use Elastica\Query\MultiMatch;
+use Elastica\Query\Term;
+use FOS\ElasticaBundle\Finder\PaginatedFinderInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -30,6 +36,13 @@ use Symfony\Component\Filesystem\Path;
 
 class EtablissementController extends AbstractController
 {
+    private $finder;
+
+    public function __construct(PaginatedFinderInterface $finder)
+    {
+        $this->finder = $finder;
+    }
+
     #[Route(path: '/op_admin/etablissement', name: 'op_admin_etablissement_index', methods: ['GET'])]
     public function index(EtablissementRepository $etablissementRepository, PaginatorInterface $paginator, Request $request): Response
     {
@@ -549,19 +562,86 @@ class EtablissementController extends AbstractController
         ], 200);
     }
 
-    #[Route(path: '/section/{idsection}', name: '_etablissementsbysection', methods: ['GET'])]
-    public function listEtablissementsBySection($idsection, ConfigRepository $configRepository, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/section/{idsection}', name: 'op_admin_etablissement_bysection', methods: ['GET', 'POST'])]
+    public function listEtablissementsBySection(Request $request, $idsection, ConfigRepository $configRepository, EntityManagerInterface $entityManager): Response
     {
         $config = $configRepository->find(1);
         $etablissements = $entityManager->getRepository(Etablissement::class)->listEtablissementsBySection($idsection);
 
         $etablissementsByType = [];
-        foreach ($etablissements as $etablissement) {
-            $type = $etablissement['typeEtablissementLibelle'] ?? 'Autre';
-            $etablissementsByType[$type][] = $etablissement;
+        $etablissementsChoices = [];
+        foreach ($etablissements as $e) {
+            $type = $e['typeEtablissementLibelle'] ?? 'Autre';
+            $etablissementsChoices[$type] = $e['idTypeEtablissement'];
+            $etablissementsByType[$type][] = $e;
+        }
+
+        // Formulaire
+        $form = $this->createForm(EtablissementSearchType::class, null, [
+            'action' => $this->generateUrl('op_admin_etablissement_bysection', ['idsection' => $idsection]),
+            'method' => 'POST',
+            'attr' => [
+                'id' => 'Etablissement_searchForm',
+            ],
+            'etablissementsChoices' => $etablissementsChoices
+
+        ]);
+        $form->handleRequest($request);
+
+        // Construction de la requête Elasticsearch
+        $boolQuery = new BoolQuery();
+
+        //dd($form->isSubmitted());
+        // Filtres issus du formulaire
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            // Recherche texte
+            if (!empty($data['query'])) {
+                $multiMatch = new MultiMatch();
+                $multiMatch->setFields(['name', 'city', 'zipcode']);
+                $multiMatch->setQuery($data['query']);
+                $boolQuery->addMust($multiMatch);
+            }
+
+            // Filtre structure sélectionnée
+            if (!empty($data['etablissementChoice'])) {
+                $termQuery = new Term();
+                $termQuery->setTerm('typeEtablissement.id', $data['etablissementChoice']);
+                $boolQuery->addFilter($termQuery);
+            }
+
+            // Exécution de la requête
+            $query = new Query($boolQuery);
+            $query->setSize(50);
+
+            $results = $this->finder->find($query);
+
+            $etablissementsByType = [];
+            foreach ($results as $r) {
+                $type = $r->getTypeEtablissement()?->getLibelle() ?? 'Autre';
+                $etablissementsByType[$type][] = [
+                    'id' => $r->getId(),
+                    'name' => $r->getName(),
+                    'city' => $r->getCity(),
+                    'isActive' => $r->getIsActive(),
+                    'logoName' => $r->getLogoName(),
+                    'idTypeEtablissement' => $r->getTypeEtablissement()?->getId(),
+                    'typeEtablissementLibelle' => $type,
+                ];
+            }
+
+            return $this->json([
+                'code' => 200,
+                'liste' => $this->renderView('admin/etablissement/include/_listesearch.html.twig',[
+                    'etablissementsByType' => $etablissementsByType,
+                    'config' => $config,
+                ]),
+            ],200);
         }
 
         return $this->render('admin/etablissement/listetablissementsbysection.html.twig',[
+            'form' => $form->createView(),
             'etablissementsByType' => $etablissementsByType,
             'config' => $config
         ]);

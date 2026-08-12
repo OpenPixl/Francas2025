@@ -103,8 +103,7 @@ class SectionController extends AbstractController
     #[Route(path: '/listallsections/{page}', name: 'op_webapp_section_listallsections')]
     public function ListAllSections($page, EntityManagerInterface $entityManager): \Symfony\Component\HttpFoundation\Response
     {
-        $sections = $entityManager->getRepository(Section::class)->ListAllSections($page)
-        ;
+        $sections = $entityManager->getRepository(Section::class)->ListAllSections($page);
 
         return $this->render('webapp/section/listsections.html.twig',[
             'sections' => $sections,

@@ -142,7 +142,7 @@ class PageController extends AbstractController
     /**
      * affiche la page en front office selon le slug
      */
-    #[Route(path: '/webapp/page/{slug}', name: 'op_webapp_page_slug', methods: ['GET'])]
+    #[Route(path: '/webapp/page/{slug}', name: 'op_webapp_page_display', methods: ['GET'])]
     public function page($slug, EntityManagerInterface $entityManager) : response
     {
         $config = $entityManager->getRepository(Config::class)->find(1);
@@ -151,7 +151,9 @@ class PageController extends AbstractController
         };
         $page = $entityManager->getRepository(Page::class)->findbyslug($slug);
 
-        return $this->render('webapp/page/page.html.twig');
+        return $this->render('webapp/page/page.html.twig', [
+            'page' => $page,
+        ]);
     }
 
     #[Route(path: '/webapp/page/{id}', name: 'op_webapp_page_show', methods: ['GET'])]
