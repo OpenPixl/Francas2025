@@ -27,6 +27,15 @@
                     'array':btns.new.array
                 }) }}
             {% endif %}
+            {% if btns.save is defined and btns.save is not null %}
+                {{ include('composants/buttons/button_utils.html.twig', {
+                    'id': btns.save.id,
+                    'icon': btns.save.icon,
+                    'href': btns.save.href,
+                    'text': btns.save.text,
+                    'array':btns.save.array
+                }) }}
+            {% endif %}
             {% if btns.edit is defined and btns.edit is not null %}
             {{ include('composants/buttons/button_utils.html.twig', {
                 'id': btns.edit.id,

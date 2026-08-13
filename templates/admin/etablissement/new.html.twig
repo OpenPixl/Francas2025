@@ -17,6 +17,13 @@
                 'text' : 'Créer un nouvel établissement',
                 'array':null
             },
+            'save': {
+                'id' : 'btn-header-save',
+                'href' : '#',
+                'icon' : '<i class="fa-duotone fa-solid fa-floppy-disk"></i>',
+                'text' : 'Enregistrer',
+                'array':null
+            },
             'return': {
                 'id' : null,
                 'href' : path('op_admin_etablissement_index'),
@@ -34,7 +41,7 @@
         <h2 class="font-normal uppercase text-xl text-sky-700">Ajouter un nouvel établissement</h2>
 
         <div class="mt-3">
-            {{ include('admin/etablissement/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+            {{ include('admin/etablissement/_form.html.twig', {'button_label': 'Enregistrer', 'hide_submit_button': true}) }}
         </div>
 
 

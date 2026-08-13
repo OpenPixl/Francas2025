@@ -52,6 +52,22 @@ export function useTomSelect(selector, option) {
     }
 }
 
+/**
+ * Le bouton "Enregistrer"/"Mettre à jour" du header (sous la navbar) est en dehors du <form> :
+ * il ne peut donc pas déclencher nativement la soumission. On le relie ici au <form> de la page.
+ */
+export function bindHeaderSaveButton() {
+    const saveBtn = document.getElementById('btn-header-save');
+    const form = document.querySelector('#content form');
+
+    if (!saveBtn || !form) return;
+
+    saveBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        form.requestSubmit();
+    });
+}
+
 export function removeOptions(selectElement) {
     for (let i = selectElement.options.length - 1; i >= 0; i -= 1) {
         selectElement.remove(i);

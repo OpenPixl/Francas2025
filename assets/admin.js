@@ -18,6 +18,8 @@ import { initIndexEtablissement } from "./js/admin/admin/IndexEtablissement";
 import { initNewEditUser } from "./js/admin/admin/NewEditUser";
 import { initIndexUser } from "./js/admin/admin/IndexUser";
 import { initIndexArticle } from "./js/admin/webapp/IndexArticles";
+import { initNewEditRessources } from "./js/admin/admin/NewEditRessources";
+import { initNewEditSection } from "./js/admin/admin/NewEditSection";
 
 document.addEventListener('turbo:load', () => {
     // Select all dropdown toggle buttons
@@ -42,7 +44,7 @@ document.addEventListener('turbo:load', () => {
         case 'op_admin_user_edit':
             initNewEditUser();
             break
-        case 'op_webapp_articles_new_admin':
+        case 'op_webapp_articles_newadmin':
         case 'op_webapp_articles_edit_admin':
             initNewEditArticle();
             break;
@@ -55,6 +57,13 @@ document.addEventListener('turbo:load', () => {
             break;
         case 'op_webapp_articles_index':
             initIndexArticle();
+            break;
+        case 'op_webapp_ressources_new':
+        case 'op_webapp_ressources_edit':
+            initNewEditRessources();
+            break;
+        case 'op_webapp_section_edit':
+            initNewEditSection();
             break;
         default:
             console.log('Page non reconnue ou pas de JS spécifique');

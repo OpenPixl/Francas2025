@@ -18,6 +18,13 @@
                 'text' : 'Créer un nouvel article',
                 'array':null
             },
+            'save': {
+                'id' : 'btn-header-save',
+                'href' : '#',
+                'icon' : '<i class="fa-duotone fa-solid fa-floppy-disk"></i>',
+                'text' : 'Mettre à jour',
+                'array':null
+            },
             'return': {
                 'id' : null,
                 'href' : path('op_webapp_articles_index'),
@@ -37,7 +44,7 @@
 
 
         <div class="mt-3">
-            {{ include('webapp/articles/_form2.html.twig', {'button_label': 'Mettre à jour'}) }}
+            {{ include('webapp/articles/_form2.html.twig', {'button_label': 'Mettre à jour', 'hide_submit_button': true}) }}
         </div>
 
 

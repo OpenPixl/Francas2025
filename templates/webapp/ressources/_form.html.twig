@@ -83,6 +83,7 @@
         } %}
     </div>
 
+    {% if hide_submit_button is not defined or not hide_submit_button %}
     <div id="bouton_form">
         {% include 'composants/buttons/button_submit.html.twig' with {
             'id': null,
@@ -91,4 +92,5 @@
             'text': button_label|default('Enregistrer')
         } %}
     </div>
+    {% endif %}
 {{ form_end(form) }}

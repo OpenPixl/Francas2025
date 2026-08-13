@@ -1,9 +1,11 @@
 import axios from 'axios';
 import {showNotification, showDialog, hideDialog} from "../../composants/tailwind";
-import {zipcode, change_selectcity} from "../../composants/fonctions";
+import {zipcode, change_selectcity, bindHeaderSaveButton} from "../../composants/fonctions";
 
 export function initNewEditEtablissement(){
     console.log('Bienvenu sur la page d\'edition d\'un établissement.');
+
+    bindHeaderSaveButton();
     const Textarea = document.getElementById('etablissement_GroupDescription');
     ClassicEditor
         .create(Textarea, {

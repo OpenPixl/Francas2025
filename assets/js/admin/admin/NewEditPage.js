@@ -1,4 +1,8 @@
+import {bindHeaderSaveButton} from "../../composants/fonctions";
+
 export function initNewEditPage(){
+    bindHeaderSaveButton();
+
     ClassicEditor
         .create(document.querySelector('#page_intro'), {
             toolbar: [ 'heading','bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment' ],

@@ -120,6 +120,7 @@
     </div>
     {% endif %}
 
+    {% if hide_submit_button is not defined or not hide_submit_button %}
     <div class="flex flex-row">
         <div class="flex-1">
             <div id="bouton_form">
@@ -132,6 +133,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
 
 {{ form_end(form) }}

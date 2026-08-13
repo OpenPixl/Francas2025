@@ -63,6 +63,13 @@
                 'text' : 'Créer une nouvelle ressource',
                 'array':null
             },
+            'save': {
+                'id' : 'btn-header-save',
+                'href' : '#',
+                'icon' : '<i class="fa-duotone fa-solid fa-floppy-disk"></i>',
+                'text' : 'Mettre à jour',
+                'array':null
+            },
             'return': {
                 'id' : null,
                 'href' : path('op_webapp_ressources_index'),
@@ -79,7 +86,7 @@
     <section id="op_admin_content_body">
     <h3>Modifier la ressource</h3>
 
-    {{ include('webapp/ressources/_form.html.twig') }}
+    {{ include('webapp/ressources/_form.html.twig', {'hide_submit_button': true}) }}
     </section>
 </div>
 

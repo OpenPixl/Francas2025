@@ -1,4 +1,8 @@
+import {bindHeaderSaveButton} from "../../composants/fonctions";
+
 export function initNewEditArticle(){
+    bindHeaderSaveButton();
+
     ClassicEditor
         .create(document.querySelector('#articles_content'), {
             toolbar: [ 'heading','bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment' ],

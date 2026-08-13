@@ -4,17 +4,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script>
-        window.onload = function() {
-            ClassicEditor
-                .create(document.querySelector('#articles_content'), {
-                    height: 50
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-        }
-    </script>
 {% endblock %}
 
 {% block header %}
@@ -26,6 +15,13 @@
                 'href' : path('op_webapp_articles_newadmin'),
                 'icon' : '<i class="fa-duotone fa-solid fa-square-plus"></i>',
                 'text' : 'Créer un nouvel article',
+                'array':null
+            },
+            'save': {
+                'id' : 'btn-header-save',
+                'href' : '#',
+                'icon' : '<i class="fa-duotone fa-solid fa-floppy-disk"></i>',
+                'text' : 'Enregistrer',
                 'array':null
             },
             'return': {
@@ -46,7 +42,7 @@
 
 
         <div class="mt-3">
-            {{ include('webapp/articles/_form2.html.twig', {'button_label': 'Mettre à jour'}) }}
+            {{ include('webapp/articles/_form2.html.twig', {'button_label': 'Mettre à jour', 'hide_submit_button': true}) }}
         </div>
 
 

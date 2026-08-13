@@ -1,7 +1,9 @@
-import {zipcode, change_selectcity} from "../../composants/fonctions";
+import {zipcode, change_selectcity, bindHeaderSaveButton} from "../../composants/fonctions";
 
 export function initNewEditUser(){
     console.log('Bienvenu sur la page d\'édition d\'un utilisateur.');
+
+    bindHeaderSaveButton();
 
     const zipcode_input = document.getElementById('user_zipcode');
     const commune_input = document.getElementById('user_city');
