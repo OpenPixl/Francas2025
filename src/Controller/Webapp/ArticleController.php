@@ -689,6 +689,8 @@ class ArticleController extends AbstractController
     #[Route(path: '/webapp/articles/etablissement2/{idetablissement}', name: 'op_webapp_articles_pagebyetablissement', methods: ['GET'])]
     public function listArticlesByPageEtablissement($idetablissement, Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
     {
+        $config = $entityManager->getRepository(Config::class)->find(1);
+
         $data = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($idetablissement);
         $data = array_map($this->mediaPathResolver->withArticleMediaUrls(...), $data);
 
@@ -700,6 +702,7 @@ class ArticleController extends AbstractController
 
         return $this->render('webapp/articles/listarticlesbypageetablissement.html.twig',[
             'articles' => $articles,
+            'config' => $config,
         ]);
     }
 

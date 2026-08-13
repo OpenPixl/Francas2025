@@ -3,7 +3,7 @@
 {% block title %}{{ article.title }}{% endblock %}
 
 {% block main %}
-    <section class="mx-auto max-w-4xl px-2 py-2 sm:px-6 lg:px-8" id="article_page">
+    <section class="mx-auto max-w-7xl px-2 py-2 sm:px-6 lg:px-8" id="article_page">
 
         {% include 'composants/modules/breadcrumb.html.twig' with {
             'level_1': {
@@ -45,6 +45,8 @@
                     <h1 class="mt-2 text-2xl font-bold text-white drop-shadow-sm sm:text-3xl">{{ article.title }}</h1>
                 {% endif %}
             </div>
+
+
         </section>
 
         <div class="mt-4 flex items-center gap-x-4 text-xs">
@@ -55,7 +57,72 @@
 
         <article class="prose max-w-none py-4">
             {{ article.content|raw }}
+
+            {% if article.support.id == 1 %}
+                <h4 class="font-normal text-xl text-gray-700 mt-6 mb-3">Ecouter l'émission radio</h4>
+                <div class="flex items-center gap-4 bg-white/90 border border-slate-200 rounded-3xl shadow-sm p-4 max-w-xl">
+
+                    <!-- Bouton Play -->
+                    <button id="playBtn" class="size-12 rounded-full bg-[#d84519] text-white grid place-content-center text-xl shadow-md hover:bg-[#F26438] transition">
+                        ►
+                    </button>
+
+                    <!-- Bloc central -->
+                    <div class="flex-1 min-w-0">
+
+                        <!-- TITRE -->
+                        <div class="mb-2">
+                            <div id="mp3Title" class="text-slate-900 font-semibold truncate">
+                                {{ article.doc }}
+                            </div>
+                            <!-- Sous-titre optionnel -->
+                            <div id="mp3Artist" class="text-slate-500 text-xs truncate hidden">
+                                Source / Auteur
+                            </div>
+                        </div>
+
+                        <!-- Infos temps -->
+                        <div class="flex justify-between text-sm text-slate-600 mb-1">
+                            <span id="currentTime">0:00</span>
+                            <span id="duration">0:00</span>
+                        </div>
+
+                        <!-- Barre de progression -->
+                        <div id="rail" class="relative h-2 bg-slate-200 rounded-full cursor-pointer">
+                            <div id="played" class="absolute h-2 bg-[#d84519] rounded-full left-0 top-0 w-[0%]"></div>
+                            <div id="thumb"
+                                 class="absolute -top-1.5 size-4 bg-white border border-[#d84519] rounded-full shadow -translate-x-1/2 cursor-pointer"
+                                 style="left: 0%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Volume -->
+                    <input id="volume" type="range" min="0" max="1" step="0.01"
+                           class="w-24 accent-[#d84519]" value="1">
+                </div>
+
+                <audio id="audio" src="{{ asset(article_doc_url(article)) }}" preload="metadata"></audio>
+
+            {% elseif article.support.id == 2 %}
+                <h4 class="font-normal text-xl text-gray-700 mt-6 mb-3">Visionner la vidéo</h4>
+                <div class="shadow shadow-slate-300 m-2" id="content_support">
+                    <video controls class="mx-auto block w-3/4">
+                        <source src="{{ asset(article_doc_url(article)) }}" type="video/mp4">
+                        <p>Votre navigateur ne prend pas en charge les vidéos HTML5.
+                            Voici <a href="{{ asset(article_doc_url(article)) }}">un lien pour télécharger la vidéo sur votre ordinateur</a>.</p>
+                    </video>
+                </div>
+            {% elseif article.support.id == 3 %}
+                <div id="content_support">
+                    <p>
+                        En cliquant sur le lien suivant, vous pourrez télécharger notre document au format "Pdf" au "Doc" : <a href="{{ asset(article_doc_url(article)) }}"><i class="fa-duotone fa-file-pdf fa-2x"></i> Télécharger le fichier</a>
+                    </p>
+                </div>
+            {% endif %}
         </article>
+
+
 
         {% if article.etablissement %}
             <div class="mt-8 flex items-center gap-x-4 border-t border-gray-900/5 pt-6">

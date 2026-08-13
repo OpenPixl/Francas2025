@@ -138,6 +138,51 @@ La page dédiée `listarticlesbytype.html.twig` (point 5) affichait jusqu'à 200
   automatiquement les paramètres de la requête HTTP en cours pour générer les liens (`?theme=2&page=2`), aucune
   logique supplémentaire nécessaire.
 
+## 8. Page de détail d'un article (`show.html.twig`) : bloc support + largeur
+
+Demandes complémentaires sur la page individuelle d'un article (`webapp/articles/show.html.twig`, route
+`op_webapp_articles_show`, entité réelle passée au template — contrairement aux pages de ce document qui
+manipulent des tableaux issus d'Elastica/DQL) :
+
+- Largeur de la page passée de `max-w-4xl` à `max-w-7xl`, pour être cohérente avec le reste du site (listes,
+  recherche, pages établissement, toutes déjà en `max-w-7xl`).
+- Ajout du bloc « support chargé » (radio/audio, vidéo, document à télécharger), qui existait déjà sur
+  `articleEtablissementSlug.html.twig` mais pas ici. Repris à l'identique (mêmes trois cas
+  `idsupport`/`support.id` 1/2/3, même lecteur audio personnalisé, même rendu vidéo/document) et inséré dans la
+  balise `<article>`, juste après `{{ article.content|raw }}`. Adapté à l'accès **entité** plutôt que tableau :
+  `article.support.id` (relation Doctrine) au lieu de `article.idsupport` (alias DQL), et la fonction Twig
+  `article_doc_url(article)` (voir `NOTES_REORGANISATION_MEDIAS.md`, §1) au lieu du champ `article.docUrl`
+  précalculé côté contrôleur pour les listings.
+- Le lecteur audio (`#playBtn`, `#rail`, `#audio`, etc.) est piloté par `initArticleIndex()`
+  (`assets/js/app/etablissement/article.js`), jusqu'ici uniquement câblée sur la route
+  `op_webapp_articles_articleSlug` (`assets/app.js`) — ajout de la route `op_webapp_articles_show` au même
+  `case`. Bug latent corrigé au passage : `initArticleIndex()` appelait `player_audio()` sans vérifier que
+  `#audio` existe réellement dans la page — cassait (exception JS silencieuse, lecteur audio non fonctionnel
+  sans message d'erreur visible) sur **tout** article n'ayant pas de support audio, ce qui devient nettement
+  plus fréquent en branchant cette fonction sur la page `show` (grand public) plutôt que sur la seule page
+  `articleEtablissementSlug`. Corrigé par un simple retour anticipé (`if (!audio) return;`).
+
+## 9. Bug corrigé : listing établissement (`_blocarticle.html.twig`) plantait en 500
+
+`templates/webapp/articles/include/_blocarticle.html.twig` (utilisé par
+`listarticlesbypageetablissement.html.twig`, route `op_webapp_articles_pagebyetablissement`) appelait
+`asset(article.logoUrl)` sans vérifier que `logoUrl` n'était pas `null` — ce qui arrive dès que l'établissement
+de l'article n'a pas de logo uploadé (`etablissementImageUrl()` du `MediaPathResolver` renvoie `null` dans ce
+cas, voir `NOTES_REORGANISATION_MEDIAS.md`). `asset()` de Symfony n'accepte pas `null` en argument → `TypeError`
+→ page entière en erreur 500, dès qu'un seul établissement de la liste n'a pas de logo. Deux occurrences
+touchées par le même bug (lignes 8 et 28 du template) :
+
+- Ligne 8 (vignette de remplacement quand l'article lui-même n'a pas d'image) : fallback désormais sur
+  `config.headerName` (bandeau par défaut du site) plutôt que sur le logo de l'établissement, en reprenant le
+  même principe que `show.html.twig` (§8) pour une grande image plutôt qu'un petit avatar.
+- Ligne 28 (logo de l'établissement dans le bloc « posté par ») : ajout d'un `{% if article.logoNameEtablissement %}`
+  (champ brut, déjà sélectionné par `ArticleRepository::listArticlesByEtablissement()`) avec fallback sur
+  `config.vignetteName` (avatar par défaut du site) — même convention déjà en place dans
+  `_listesearch.html.twig` (§6).
+- `ArticleController::listArticlesByPageEtablissement()` ne transmettait pas `config` à la vue (nécessaire pour
+  les deux fallbacks ci-dessus) — ajouté, sur le même modèle que les autres actions du contrôleur qui en ont
+  besoin.
+
 ---
 
 ## Fichiers créés
@@ -153,6 +198,10 @@ La page dédiée `listarticlesbytype.html.twig` (point 5) affichait jusqu'à 200
 - `src/Repository/Webapp/ArticleRepository.php`
 - `templates/webapp/articles/listallarticles.html.twig`
 - `templates/webapp/articles/include/_listesearch.html.twig`
+- `templates/webapp/articles/show.html.twig` (§8 : largeur 7xl, bloc support)
+- `templates/webapp/articles/include/_blocarticle.html.twig` (§9 : fallback logo/image, bug 500 corrigé)
+- `assets/app.js` (§8 : route `op_webapp_articles_show` ajoutée au câblage du lecteur audio)
+- `assets/js/app/etablissement/article.js` (§8 : garde-fou `if (!audio) return;`)
 
 ## Vérifications effectuées
 
@@ -167,3 +216,8 @@ La page dédiée `listarticlesbytype.html.twig` (point 5) affichait jusqu'à 200
   dédiée (`/webapp/articles/type/2?theme=2`) affiche exactement 13 vignettes.
 - Pagination : page 1 → 12 articles + lien `?theme=2&page=2` (filtre conservé) ; page 2 → 1 article restant
   (12 + 1 = 13, cohérent avec le total).
+- §8 : rendu testé sur un article de chaque support (audio, vidéo, document, aucun) — bloc correct dans chaque
+  cas, aucune erreur JS pour les articles sans support.
+- §9 : `/webapp/articles/etablissement2/11` (établissement sans logo, 15 articles) passait de 500 à 200 après
+  correctif ; établissement avec logo réel (id 1) toujours affiché correctement (pas de bascule intempestive
+  sur le fallback).

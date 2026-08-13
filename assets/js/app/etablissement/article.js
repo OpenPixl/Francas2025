@@ -3,6 +3,8 @@ import {player_audio} from '../../composants/fonctions';
 export function initArticleIndex() {
 
     const audio = document.getElementById("audio");
+    if (!audio) return;
+
     const playBtn = document.getElementById("playBtn");
     const played = document.getElementById("played");
     const rail = document.getElementById("rail");

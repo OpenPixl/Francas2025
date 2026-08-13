@@ -24,6 +24,7 @@ document.addEventListener('turbo:load', () => {
     const page = document.body.dataset.page;
     switch (page) {
         case 'op_webapp_articles_articleSlug':
+        case 'op_webapp_articles_show':
             initArticleIndex();
             break;
         case 'op_webapp_ressources_ressourceshow':

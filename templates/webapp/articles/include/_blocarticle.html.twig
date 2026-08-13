@@ -5,7 +5,7 @@
                 {% if article.imageName is not null %}
                     <img src="{{ asset(article.imageUrl) | imagine_filter('thumb_img_article') }}" alt="" class="absolute inset-0 size-full rounded-2xl bg-gray-50 object-cover dark:bg-gray-800 shadow" />
                 {% else %}
-                    <img src="{{ asset(article.logoUrl) | imagine_filter('thumb_img_article') }}" alt="" class="absolute inset-0 size-full rounded-2xl bg-gray-50 object-cover dark:bg-gray-800 shadow" />
+                    <img src="{{ asset('/uploads/images/config/' ~ config.headerName) }}" alt="" class="absolute inset-0 size-full rounded-2xl bg-gray-50 object-cover dark:bg-gray-800 shadow" />
                 {% endif %}
                 <div class="absolute inset-0 rounded-2xl inset-ring inset-ring-gray-900/10 dark:inset-ring-white/10"></div>
             </div>
@@ -25,7 +25,11 @@
                 </div>
                 <div class="mt-6 flex border-t border-gray-900/5 pt-6 dark:border-white/10">
                     <div class="relative flex items-center gap-x-4">
-                        <img src="{{ asset(article.logoUrl) | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-10 rounded-full bg-gray-50 dark:bg-gray-800" />
+                        {% if article.logoNameEtablissement %}
+                            <img src="{{ asset(article.logoUrl) | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-10 rounded-full bg-gray-50 dark:bg-gray-800" />
+                        {% else %}
+                            <img src="{{ asset('/uploads/images/config/' ~ config.vignetteName) }}" alt="" class="size-10 rounded-full bg-gray-50 dark:bg-gray-800" />
+                        {% endif %}
                         <div class="text-sm/6">
                             <p class="font-semibold text-gray-900 dark:text-white">
                                 <a href="">
