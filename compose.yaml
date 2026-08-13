@@ -1,11 +1,17 @@
 services:
 
   php:
-    build: .
-    container_name: francascc25_php
+    build:
+      context: .
+      args:
+        - SYMFONY_VERSION=${SYMFONY_VERSION:-8.0.*}
+        - PHP_VERSION=${PHP_VERSION:-8.4}
+        - GIT_USER_EMAIL=${GIT_USER_EMAIL:-youremail@email.com}
+        - GIT_USER_NAME=${GIT_USER_NAME:-yourname}
+    container_name: cms_openpixl_php
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "90:80"
     #  - "443:443"
     #  - "443:443/udp"
     volumes:
@@ -15,44 +21,33 @@ services:
     depends_on:
       - db
     networks:
-      - francascc25
+      - cms_openpixl
 
-  # Base de données MariaDB
+  ###> doctrine/doctrine-bundle ###
   db:
-    image: mariadb:10.11.2
-    container_name: francascc25_db
-    restart: unless-stopped
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    container_name: cms_openpixl_db
     environment:
-      - MYSQL_DATABASE=francas2025_db
-      - MYSQL_USER=xavier
-      - MYSQL_PASSWORD=Corwin_40280
-      - MYSQL_ROOT_PASSWORD=Corwin_40280
-    ports:
-      - "3307:3306"
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - francascc25
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.16
-    container_name: francascc25_search
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms2g -Xmx2g
-    ports:
-      - "9202:9200"
-      - "9302:9300"
-    restart: always
-    networks:
-      - francascc25
+      - database_data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+  ###< doctrine/doctrine-bundle ###
 
 volumes:
-  db_data:
-  esdata:
+  ###> doctrine/doctrine-bundle ###
+  database_data:
+###< doctrine/doctrine-bundle ###
 
 networks:
-  francascc25:
+  cms_openpixl:
     external: true
