@@ -22,14 +22,16 @@ public/uploads/admins/{user_id}/audios|videos|docs/          ← idem, pièces j
 
 Nommage des fichiers, déterministe :
 - Établissement : `{slug du nom}_bandeau.{ext}` / `{slug du nom}_avatar.{ext}` (ex. `pays-des-luys_bandeau.jpg`)
-- Article : `{slug de l'article}-{id}_article.{ext}` pour l'image, `_audio`/`_video`/`_doc` selon le support
-  pour la pièce jointe. L'ID est nécessaire côté article (contrairement à l'établissement) car son dossier
-  est **partagé** entre tous les articles du même propriétaire — deux articles au titre identique auraient
-  sinon généré le même nom et l'un aurait écrasé l'autre.
+  — inchangé, conservé volontairement tel quel (voir §7bis).
+- Article : `{id}_article.{ext}` pour l'image, `{id}_audio`/`{id}_video`/`{id}_doc.{ext}` selon le support pour
+  la pièce jointe (ex. `69_article.jpg`, `69_doc.docx`). Pas de slug du titre : l'ID suffit à garantir
+  l'unicité dans le dossier partagé entre tous les articles du même propriétaire, et évite des noms de
+  fichiers à rallonge pour les titres longs (voir §7bis — ce point a changé après la migration initiale).
 
-Ce chantier s'est fait en deux temps : d'abord la réorganisation en dossiers imbriqués (structure ci-dessus,
+Ce chantier s'est fait en trois temps : d'abord la réorganisation en dossiers imbriqués (structure ci-dessus,
 noms de fichiers encore aléatoires), validée et déployée ; puis, sur demande explicite, le renommage des
-fichiers déjà migrés vers la convention lisible ci-dessus.
+fichiers déjà migrés vers une convention lisible incluant le slug du titre côté article ; enfin, toujours sur
+demande explicite, la simplification de cette convention côté article pour retirer le slug (§7bis).
 
 ---
 
@@ -150,6 +152,40 @@ Exécutée : **1046 fichiers renommés** (0 collision, 22 fichiers introuvables 
 base de données mise à jour en parallèle. Une seconde exécution en dry-run confirme l'idempotence
 (0 à renommer, 1046 déjà corrects).
 
+## 7bis. Simplification du nommage des articles (retrait du slug) + aperçu image formulaire admin article
+
+Deux demandes complémentaires, traitées ensemble :
+
+**Aperçu de l'image chargée, formulaire admin article** — `EtablissementController` (vue admin) affichait déjà
+un aperçu de l'image chargée sur `edit`, mais `templates/webapp/articles/_form2.html.twig` (utilisé par
+`newadmin.html.twig`/`edit_admin.html.twig`, partie admin d'`ArticleController`) ne passait pas `url_file` à
+l'inclusion de `bloc_insert_image.html.twig` pour le champ image — l'aperçu retombait donc sur une icône SVG
+générique au lieu de l'image réellement uploadée. Corrigé en ajoutant
+`'url_file': article.id ? article_image_url_prefix(article) : ''` (même principe que côté établissement),
+**uniquement sur le champ image** — le champ pièce jointe (doc/audio/vidéo), volontairement hors périmètre,
+n'a pas été touché. Petit ajustement visuel au passage dans le composant partagé
+`bloc_insert_image.html.twig` (`px-2` sur le conteneur du nom de fichier, pour l'alignement une fois l'aperçu
+image affiché à côté).
+
+**Retrait du slug dans le nom de fichier des articles** — demande explicite : les noms de fichiers d'articles
+générés en §7 (`{slug de l'article}-{id}_article.{ext}`) pouvaient devenir très longs pour un titre verbeux.
+`MediaPathResolver::articleMediaFilename()` simplifié pour ne garder que `{id}_{suffixe}.{ext}` (le slug de
+titre est retiré ; l'ID seul suffit à l'unicité, voir Contexte). **Le nommage établissement n'a volontairement
+pas été touché** (garde le slug du nom, `etablissementMediaFilename()` inchangée) — demande explicite de
+l'utilisateur.
+
+Comme `RenameMediaToSlugCommand` (§7) est entièrement piloté par ce que le resolver calcule, aucune nouvelle
+commande n'a été nécessaire : une seconde exécution a suffi pour aligner les fichiers déjà migrés sur la
+nouvelle convention. Exécutée en dry-run puis `--apply` : **997 fichiers renommés** (tous côté article), **49
+fichiers déjà corrects** (= exactement le nombre de logos + bandeaux d'établissements, confirmant qu'aucun
+fichier établissement n'a été touché), 22 fichiers introuvables ignorés (même écart préexistant que §6/§7),
+**0 collision** (attendu : des ID numériques purs ne peuvent pas entrer en collision). Vérifié : fichier
+physique renommé (ex. `129_article.jpg`, `69_doc.docx`), colonne DB de l'article #69 synchronisée
+(`image_name = 69_article.jpg`), établissement #1 confirmé inchangé (`pays-des-luys_avatar.png`), nouveau
+dry-run confirmant l'idempotence, page `/webapp/articles/69` re-testée (200, bon chemin dans le HTML rendu).
+Les futurs uploads suivent automatiquement cette même convention, le resolver étant la seule source de vérité
+du nommage.
+
 ## Bugs corrigés en cours de route (découverts en testant, hors du périmètre initial)
 
 - `EtablissementController::show2()` construisait sa propre liste d'articles indépendamment
@@ -184,7 +220,8 @@ base de données mise à jour en parallèle. Une seconde exécution en dry-run c
   `admin/etablissement/show.html.twig`, `admin/etablissement/include/_listesearch.html.twig`,
   `admin/etablissement/listetablissementsbytype.html.twig`, `composants/modules/carrousel.html.twig`,
   `espace_etablissement/dashboard/_header_etablissement.html.twig`, formulaires `_form.html.twig`
-  (établissement et article)
+  (établissement et article), `webapp/articles/_form2.html.twig` (aperçu image, formulaire admin article — §7bis),
+  `composants/forms/blocs/bloc_insert_image.html.twig` (ajustement visuel mineur — §7bis)
 
 ## Vérifications effectuées
 

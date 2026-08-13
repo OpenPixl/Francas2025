@@ -168,14 +168,14 @@ class MediaPathResolver
     }
 
     /**
-     * Nom de fichier déterministe pour un média d'article : "{slug de l'article}-{id}_{suffixe}.{extension}".
-     * Contrairement à un établissement, le dossier d'un article est partagé avec tous les autres
-     * articles du même propriétaire (établissement ou admin) — l'ID est donc nécessaire pour
-     * éviter qu'un article dont le titre produit le même slug qu'un autre écrase son fichier.
+     * Nom de fichier déterministe pour un média d'article : "{id}_{suffixe}.{extension}".
+     * Pas de slug (contrairement à l'établissement) : le titre d'un article peut être long,
+     * et l'ID suffit à garantir l'unicité dans le dossier partagé entre tous les articles
+     * du même propriétaire (établissement ou admin).
      */
     private function articleMediaFilename(Article $article, string $suffix, string $extension): string
     {
-        return $article->getSlug().'-'.$article->getId().'_'.$suffix.'.'.$extension;
+        return $article->getId().'_'.$suffix.'.'.$extension;
     }
 
     public function articleImageFilename(Article $article, string $extension): string

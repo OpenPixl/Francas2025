@@ -83,6 +83,7 @@
                 'label' : 'Image de l\'article',
                 'entity_id': article.id,
                 'entity_name': article.imageName,
+                'url_file': article.id ? article_image_url_prefix(article) : '',
                 form : form.imageFile,
                 suppr_file: null,
                 'input_width' : 'w-full',
