@@ -32,7 +32,7 @@
             {% else %}
                 <article class="prose max-w-none py-2">
                     <img
-                        src="{{ asset('/uploads/images/articles/'~ article.imageName) }}"
+                        src="{{ asset(article.imageUrl) }}"
                         alt="{{ article.imageName }}"
                         class="float-left mr-2 mb-2 w-120 h-auto rounded-lg"
                     >
@@ -87,21 +87,21 @@
                            class="w-24 accent-[#d84519]" value="1">
                 </div>
 
-                <audio id="audio" src="{{ asset('/uploads/images/articles/'~article.doc) }}" preload="metadata"></audio>
+                <audio id="audio" src="{{ asset(article.docUrl) }}" preload="metadata"></audio>
 
             {% elseif article.idsupport == 2 %}
                 <h4 class="font-normal text-xl text-gray-700 mt-6 mb-3">Visionner la vidéo</h4>
                 <div class="shadow shadow-slate-300 m-2" id="content_support">
                     <video controls class="mx-auto block w-3/4">
-                        <source src="{{ asset('uploads/images/articles/'~article.doc) }}" type="video/mp4">
+                        <source src="{{ asset(article.docUrl) }}" type="video/mp4">
                         <p>Votre navigateur ne prend pas en charge les vidéos HTML5.
-                            Voici <a href="{{ asset('uploads/images/articles/'~article.doc) }}">un lien pour télécharger la vidéo sur votre ordinateur</a>.</p>
+                            Voici <a href="{{ asset(article.docUrl) }}">un lien pour télécharger la vidéo sur votre ordinateur</a>.</p>
                     </video>
                 </div>
             {% elseif article.idsupport == 3 %}
                 <div class="col-12" id="content_support">
                     <p>
-                        En cliquant sur le lien suivant, vous pourrez télécharger notre document au format "Pdf" au "Doc" : <a href="{{ asset('/uploads/images/articles/'~article.doc) }}"><i class="fa-duotone fa-file-pdf fa-2x"></i> Télécharger le fichier</a>
+                        En cliquant sur le lien suivant, vous pourrez télécharger notre document au format "Pdf" au "Doc" : <a href="{{ asset(article.docUrl) }}"><i class="fa-duotone fa-file-pdf fa-2x"></i> Télécharger le fichier</a>
                     </p>
 
                 </div>

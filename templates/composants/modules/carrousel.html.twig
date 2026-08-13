@@ -6,7 +6,7 @@
         <!-- SLIDE {{ loop.index | capitalize }} -->
         <div class="relative w-full shrink-0 h-[400px]">
             {% if article.imageName is not null %}
-                <img src="{{ asset('uploads/images/articles/' ~ article.imageName) }}" class="w-full h-full object-cover" alt="{{ article.title }}">
+                <img src="{{ asset(article.imageUrl) }}" class="w-full h-full object-cover" alt="{{ article.title }}">
             {% else %}
                 <img src="{{ asset('uploads/images/fixes/img_article_none.png')}}" alt="..." class="w-full h-full object-cover">
             {% endif %}
@@ -16,7 +16,7 @@
             <div class="absolute inset-0 flex flex-col justify-end p-6 text-white">
                 <div class="flex flex-row items-center gap-4">
                     {% if article.logoName is not null %}
-                        <img src="{{ asset('/uploads/images/etablissements/'~ article.logoName) | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-20 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
+                        <img src="{{ asset(article.logoUrl) | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-20 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
                     {% else %}
                         <img src="{{ asset('/uploads/images/fixes/img_article_none.png') | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-20 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
                     {% endif %}

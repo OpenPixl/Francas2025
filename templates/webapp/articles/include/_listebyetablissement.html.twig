@@ -15,7 +15,7 @@
                 {% if article.imageName is null %}
                     <img src="{{ asset('uploads/images/fixes/img_article_none.png') }}" alt="avatar de l'image de l'article" class="h-8 object-cover rounded-sm">
                 {% else %}
-                    <img src="{{ asset('uploads/images/articles/' ~ article.imageName) }}" alt="avatar de l'image de l'article" class="h-8 object-cover rounded-sm">
+                    <img src="{{ asset(article.imageUrl is defined ? article.imageUrl : article_image_url(article)) }}" alt="avatar de l'image de l'article" class="h-8 object-cover rounded-sm">
                 {% endif %}
             </td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">

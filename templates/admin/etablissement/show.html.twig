@@ -12,7 +12,7 @@
             {% if etablissement.headerName is null %}
             {% elseif etablissement.logoName is null %}
                 <div class="col-12" id="content_header_img">
-                    <img id="etablissement_header" class="img-fluid" src="{{ asset('uploads/images/etablissements/'~ etablissement.headerName) }}" alt="{{ etablissement.headerName }}">
+                    <img id="etablissement_header" class="img-fluid" src="{{ asset(etablissement_header_url(etablissement)) }}" alt="{{ etablissement.headerName }}">
                     <div id="etablissement_logo">
                         <img class="img-fluid" src="/uploads/images/fixes/logo-radio-francas" alt="logo_cc">
                     </div>
@@ -26,9 +26,9 @@
                 </div>
             {% else %}
                 <div class="col-12" id="content_header_img">
-                    <img id="etablissement_header" class="img-fluid" src="{{ asset('uploads/images/etablissements/'~ etablissement.headerName) }}" alt="{{ etablissement.headerName }}">
+                    <img id="etablissement_header" class="img-fluid" src="{{ asset(etablissement_header_url(etablissement)) }}" alt="{{ etablissement.headerName }}">
                     <div id="etablissement_logo">
-                        <img class="img-fluid" src="{{ asset('uploads/images/etablissements/'~ etablissement.logoName) }}" alt="{{ etablissement.logoName }}">
+                        <img class="img-fluid" src="{{ asset(etablissement_logo_url(etablissement)) }}" alt="{{ etablissement.logoName }}">
                     </div>
                     <div id="etablissement_titre">
                         {% if etablissement.id == 29 %}

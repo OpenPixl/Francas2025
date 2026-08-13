@@ -16,6 +16,7 @@ use App\Repository\Admin\ConfigRepository;
 use App\Repository\Webapp\ArticleRepository;
 use App\Repository\Webapp\MessageRepository;
 use App\Repository\Webapp\RessourcesRepository;
+use App\Service\MediaPathResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Elastica\Query;
 use Elastica\Query\BoolQuery;
@@ -28,7 +29,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -38,7 +38,7 @@ class EtablissementController extends AbstractController
 {
     private $finder;
 
-    public function __construct(PaginatedFinderInterface $finder)
+    public function __construct(PaginatedFinderInterface $finder, private readonly MediaPathResolver $mediaPathResolver)
     {
         $this->finder = $finder;
     }
@@ -86,7 +86,7 @@ class EtablissementController extends AbstractController
     }
 
     #[Route(path: '/admin/etablissement/newetablissementAdmin/{iduser}', name: 'op_admin_etablissement_newetablissementadmin', methods: ['GET', 'POST'])]
-    public function newEtablissementAdmin(Request $request, $iduser, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
+    public function newEtablissementAdmin(Request $request, $iduser, EntityManagerInterface $entityManager): Response
     {
         $user = $entityManager->getRepository(User::class)->find($iduser);
 
@@ -96,20 +96,21 @@ class EtablissementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // l'établissement doit avoir un ID avant de pouvoir calculer son dossier de stockage
+            $entityManager->persist($etablissement);
+            $entityManager->flush();
+
             /** @var UploadedFile $headerFile */
             $headerFile = $form->get('headerFile')->getData();
             $logoFile = $form->get('logoFile')->getData();
 
             if ($headerFile) {
-                $originalHeaderFilename = pathinfo($headerFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeHeaderFilename = $slugger->slug($originalHeaderFilename);
-                $newHeaderFilename = $safeHeaderFilename . '-' . uniqid() . '.' . $headerFile->guessExtension();
+                $newHeaderFilename = $this->mediaPathResolver->etablissementHeaderFilename($etablissement, $headerFile->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $headerFile->move(
-                        $this->getParameter('etablissement_directory'),
+                        $this->mediaPathResolver->etablissementHeaderDir($etablissement),
                         $newHeaderFilename
                     );
                 } catch (FileException) {
@@ -122,14 +123,11 @@ class EtablissementController extends AbstractController
             }
 
             if ($logoFile) {
-                $originallogoFilename = pathinfo((string) $logoFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safelogoFilename = $slugger->slug($originallogoFilename);
-                $newlogoFilename = $safelogoFilename . '-' . uniqid() . '.' . $logoFile->guessExtension();
+                $newlogoFilename = $this->mediaPathResolver->etablissementLogoFilename($etablissement, $logoFile->guessExtension());
                 // Move the file to the directory where brochures are stored
                 try {
                     $logoFile->move(
-                        $this->getParameter('etablissement_directory'),
+                        $this->mediaPathResolver->etablissementLogoDir($etablissement),
                         $newlogoFilename
                     );
                 } catch (FileException) {
@@ -141,7 +139,6 @@ class EtablissementController extends AbstractController
                 $etablissement->setLogoName($newlogoFilename);
             }
 
-            $entityManager->persist($etablissement);
             $entityManager->flush();
 
             return $this->redirectToRoute('op_admin_etablissement_index');
@@ -154,7 +151,7 @@ class EtablissementController extends AbstractController
     }
 
     #[Route(path: '/op_admin/etablissement/new', name: 'op_admin_etablissement_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         //dd($user);
@@ -164,20 +161,21 @@ class EtablissementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // l'établissement doit avoir un ID avant de pouvoir calculer son dossier de stockage
+            $entityManager->persist($etablissement);
+            $entityManager->flush();
+
             /** @var UploadedFile $banniereFile */
             $headerFileName = $form->get('headerFile')->getData();
             $logoFileName = $form->get('logoFile')->getData();
 
             if ($headerFileName) {
-                $originalheaderFilename = pathinfo((string) $headerFileName->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeheaderFileename = $slugger->slug($originalheaderFilename);
-                $newheaderFilename = $safeheaderFileename . '-' . uniqid() . '.' . $headerFileName->guessExtension();
+                $newheaderFilename = $this->mediaPathResolver->etablissementHeaderFilename($etablissement, $headerFileName->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $headerFileName->move(
-                        $this->getParameter('etablissement_directory'),
+                        $this->mediaPathResolver->etablissementHeaderDir($etablissement),
                         $newheaderFilename
                     );
                 } catch (FileException) {
@@ -190,14 +188,11 @@ class EtablissementController extends AbstractController
             }
 
             if ($logoFileName) {
-                $originallogoFilename = pathinfo((string) $logoFileName->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safelogoFilename = $slugger->slug($originallogoFilename);
-                $newlogoFilename = $safelogoFilename . '-' . uniqid() . '.' . $logoFileName->guessExtension();
+                $newlogoFilename = $this->mediaPathResolver->etablissementLogoFilename($etablissement, $logoFileName->guessExtension());
                 // Move the file to the directory where brochures are stored
                 try {
                     $logoFileName->move(
-                        $this->getParameter('etablissement_directory'),
+                        $this->mediaPathResolver->etablissementLogoDir($etablissement),
                         $newlogoFilename
                     );
                 } catch (FileException) {
@@ -209,7 +204,6 @@ class EtablissementController extends AbstractController
                 $etablissement->setLogoName($newlogoFilename);
             }
 
-            $entityManager->persist($etablissement);
             $entityManager->flush();
 
             return $this->redirectToRoute('op_admin_etablissement_index');
@@ -237,6 +231,7 @@ class EtablissementController extends AbstractController
     public function show2(Etablissement $etablissement,Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
     {
         $data = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($etablissement->getId());
+        $data = array_map($this->mediaPathResolver->withArticleMediaUrls(...), $data);
         $config = $entityManager->getRepository(Config::class)->find(1);
 
         $articles = $paginator->paginate(
@@ -265,7 +260,7 @@ class EtablissementController extends AbstractController
     }
 
     #[Route(path: '/espetab/etablissement/{id}/edit', name: 'op_espetab_etablissement_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Etablissement $etablissement, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Etablissement $etablissement, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
@@ -284,22 +279,19 @@ class EtablissementController extends AbstractController
                 // suppression du Fichier
                 if($headerName){
 
-                    $pathheader = $this->getParameter('etablissement_directory').'/'.$headerName;
+                    $pathheader = $this->mediaPathResolver->etablissementHeaderDir($etablissement).'/'.$headerName;
                     // On vérifie si l'image existe
                     if(file_exists($pathheader)){
                         unlink($pathheader);
                     }
                 }
                 // Ajout de la nouvelle bannière
-                $originalheaderFilename = pathinfo((string) $headerFileInput->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeheaderFilename = $slugger->slug($originalheaderFilename);
-                $newheaderFilename = $safeheaderFilename . '-' . uniqid() . '.' . $headerFileInput->guessExtension();
+                $newheaderFilename = $this->mediaPathResolver->etablissementHeaderFilename($etablissement, $headerFileInput->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $headerFileInput->move(
-                        $this->getParameter('etablissement_directory'),
+                        $this->mediaPathResolver->etablissementHeaderDir($etablissement),
                         $newheaderFilename
                     );
                 } catch (FileException) {
@@ -317,21 +309,18 @@ class EtablissementController extends AbstractController
                 $logoName = $etablissement->getLogoName();
                 // suppression du Fichier
                 if($logoName){
-                    $pathlogo = $this->getParameter('etablissement_directory').'/'.$logoName;
+                    $pathlogo = $this->mediaPathResolver->etablissementLogoDir($etablissement).'/'.$logoName;
                     // On vérifie si l'image existe
                     if(file_exists($pathlogo)){
                         unlink($pathlogo);
                     }
                 }
 
-                $originallogoFilename = pathinfo((string) $logoFileInput->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safelogoFilename = $slugger->slug($originallogoFilename);
-                $newlogoFilename = $safelogoFilename . '-' . uniqid() . '.' . $logoFileInput->guessExtension();
+                $newlogoFilename = $this->mediaPathResolver->etablissementLogoFilename($etablissement, $logoFileInput->guessExtension());
                 // Move the file to the directory where brochures are stored
                 try {
                     $logoFileInput->move(
-                        $this->getParameter('etablissement_directory'),
+                        $this->mediaPathResolver->etablissementLogoDir($etablissement),
                         $newlogoFilename
                     );
                 } catch (FileException) {
@@ -358,7 +347,7 @@ class EtablissementController extends AbstractController
     }
 
     #[Route(path: '/admin/etablissement/{id}/editetablissement', name: 'op_admin_etablissement_edit', methods: ['GET', 'POST'])]
-    public function editEtablissementAdmin(Request $request, Etablissement $etablissement, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
+    public function editEtablissementAdmin(Request $request, Etablissement $etablissement, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
@@ -383,22 +372,19 @@ class EtablissementController extends AbstractController
                 $headerName = $etablissement->getHeaderName();
                 // suppression du Fichier
                 if($headerName){
-                    $pathheader = $this->getParameter('etablissement_directory').'/'.$headerName;
+                    $pathheader = $this->mediaPathResolver->etablissementHeaderDir($etablissement).'/'.$headerName;
                     // On vérifie si l'image existe
                     if(file_exists($pathheader)){
                         unlink($pathheader);
                     }
                 }
                 // Ajout de la nouvelle bannière
-                $originalheaderFilename = pathinfo((string) $headerFileInput->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeheaderFilename = $slugger->slug($originalheaderFilename);
-                $newheaderFilename = $safeheaderFilename . '-' . uniqid() . '.' . $headerFileInput->guessExtension();
+                $newheaderFilename = $this->mediaPathResolver->etablissementHeaderFilename($etablissement, $headerFileInput->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $headerFileInput->move(
-                        $this->getParameter('etablissement_directory'),
+                        $this->mediaPathResolver->etablissementHeaderDir($etablissement),
                         $newheaderFilename
                     );
                 } catch (FileException) {
@@ -416,21 +402,18 @@ class EtablissementController extends AbstractController
                 $logoName = $etablissement->getLogoName();
                 // suppression du Fichier
                 if($logoName){
-                    $pathlogo = $this->getParameter('etablissement_directory').'/'.$logoName;
+                    $pathlogo = $this->mediaPathResolver->etablissementLogoDir($etablissement).'/'.$logoName;
                     // On vérifie si l'image existe
                     if(file_exists($pathlogo)){
                         unlink($pathlogo);
                     }
                 }
 
-                $originallogoFilename = pathinfo((string) $logoFileInput->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safelogoFilename = $slugger->slug($originallogoFilename);
-                $newlogoFilename = $safelogoFilename . '-' . uniqid() . '.' . $logoFileInput->guessExtension();
+                $newlogoFilename = $this->mediaPathResolver->etablissementLogoFilename($etablissement, $logoFileInput->guessExtension());
                 // Move the file to the directory where brochures are stored
                 try {
                     $logoFileInput->move(
-                        $this->getParameter('etablissement_directory'),
+                        $this->mediaPathResolver->etablissementLogoDir($etablissement),
                         $newlogoFilename
                     );
                 } catch (FileException) {
@@ -469,7 +452,7 @@ class EtablissementController extends AbstractController
         if ($field === 'logo') {
             $fileName = $etablissement->getLogoName();
             if ($fileName) {
-                $path = $this->getParameter('etablissement_directory') . '/' . $fileName;
+                $path = $this->mediaPathResolver->etablissementLogoDir($etablissement) . '/' . $fileName;
                 if (file_exists($path)) {
                     unlink($path);
                 }
@@ -478,7 +461,7 @@ class EtablissementController extends AbstractController
         } else {
             $fileName = $etablissement->getHeaderName();
             if ($fileName) {
-                $path = $this->getParameter('etablissement_directory') . '/' . $fileName;
+                $path = $this->mediaPathResolver->etablissementHeaderDir($etablissement) . '/' . $fileName;
                 if (file_exists($path)) {
                     unlink($path);
                 }
@@ -520,7 +503,7 @@ class EtablissementController extends AbstractController
             $logoName = $etablissement->getLogoName();
             // Suppression de l'image physique liée à la bannière de l'établissement
             if($headerName){
-                $pathheader = $this->getParameter('etablissement_directory').'/'.$headerName;
+                $pathheader = $this->mediaPathResolver->etablissementHeaderDir($etablissement).'/'.$headerName;
                 // On vérifie si l'image existe
                 if(file_exists($pathheader)){
                     unlink($pathheader);
@@ -528,7 +511,7 @@ class EtablissementController extends AbstractController
             }
             // Suppression de l'image physique liée à l'image de profil de l'établissement
             if($logoName){
-                $pathlogo = $this->getParameter('etablissement_directory').'/'.$logoName;
+                $pathlogo = $this->mediaPathResolver->etablissementLogoDir($etablissement).'/'.$logoName;
                 // On vérifie si l'image existe
                 if(file_exists($pathlogo)){
                     unlink($pathlogo);
@@ -573,6 +556,7 @@ class EtablissementController extends AbstractController
         foreach ($etablissements as $e) {
             $type = $e['typeEtablissementLibelle'] ?? 'Autre';
             $etablissementsChoices[$type] = $e['idTypeEtablissement'];
+            $e['logoUrl'] = $this->mediaPathResolver->etablissementImageUrl($e['id'], $e['logoName']);
             $etablissementsByType[$type][] = $e;
         }
 
@@ -628,6 +612,7 @@ class EtablissementController extends AbstractController
                     'logoName' => $r->getLogoName(),
                     'idTypeEtablissement' => $r->getTypeEtablissement()?->getId(),
                     'typeEtablissementLibelle' => $type,
+                    'logoUrl' => $this->mediaPathResolver->etablissementLogoUrl($r),
                 ];
             }
 
@@ -655,6 +640,10 @@ class EtablissementController extends AbstractController
     {
         $config = $configRepository->find(1);
         $etablissements = $entityManager->getRepository(Etablissement::class)->listEtablissementsByType($idtype);
+        $etablissements = array_map(
+            fn (array $e) => $e + ['logoUrl' => $this->mediaPathResolver->etablissementImageUrl($e['id'], $e['logoName'])],
+            $etablissements
+        );
         $typeEtablissement = $entityManager->getRepository(TypeEtablissement::class)->find($idtype);
 
         return $this->render('admin/etablissement/listetablissementsbytype.html.twig', [

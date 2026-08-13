@@ -40,6 +40,13 @@ liip_imagine:
                     size: [ 314, 240 ]
                     mode: outbond
 
+        thumb_bandeau_article:
+            quality: 75
+            filters:
+                thumbnail:
+                    size: [ 1132, 400 ]
+                    mode: outbond
+
         thumb_img_article:
             quality: 75
             filters:

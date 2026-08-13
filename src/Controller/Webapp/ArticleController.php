@@ -15,6 +15,7 @@ use App\Form\Webapp\SearcharticleType;
 use App\Repository\Admin\ConfigRepository;
 use App\Repository\Admin\EtablissementRepository;
 use App\Repository\Webapp\ArticleRepository;
+use App\Service\MediaPathResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Elastica\Query;
 use Elastica\Query\BoolQuery;
@@ -28,16 +29,16 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ArticleController extends AbstractController
 {
     private $finder;
 
-    public function __construct(PaginatedFinderInterface $finder)
+    public function __construct(PaginatedFinderInterface $finder, private readonly MediaPathResolver $mediaPathResolver)
     {
         $this->finder = $finder;
     }
+
 
     /**
      * Liste dans l'admin tous les articles
@@ -74,6 +75,8 @@ class ArticleController extends AbstractController
             if (!empty($e['theme'])) {
                 $themesChoices[$e['theme']] = $e['idtheme'];
             }
+            $e['imageUrl'] = $this->mediaPathResolver->articleImageUrl($e['idEtablissement'], 0, $e['imageName']);
+            $e['logoUrl'] = $this->mediaPathResolver->etablissementImageUrl($e['idEtablissement'], $e['logoEtablissement']);
             $articlesByType[$type][] = $e;
         }
         //dd($articlesByType);
@@ -145,6 +148,8 @@ class ArticleController extends AbstractController
                     'logoEtablissement' => $r->getEtablissement()?->getLogoName(),
                     'typeEtablissementLibelle' => $type,
                     'updatedAt' => $r->getUpdatedAt(),
+                    'imageUrl' => $this->mediaPathResolver->articleImageUrlFor($r),
+                    'logoUrl' => $this->mediaPathResolver->etablissementLogoUrl($r->getEtablissement()),
                 ];
             }
 
@@ -214,6 +219,8 @@ class ArticleController extends AbstractController
                 'imageName' => $r->getImageName(),
                 'theme' => $r->getTheme(),
                 'nameEtablissement' => $r->getEtablissement()?->getName(),
+                'imageUrl' => $this->mediaPathResolver->articleImageUrlFor($r),
+                'logoUrl' => $this->mediaPathResolver->etablissementLogoUrl($r->getEtablissement()),
             ];
         }
 
@@ -262,7 +269,7 @@ class ArticleController extends AbstractController
      * Creation d'articles depuis l'espace Etablissement
      */
     #[Route(path: '/espetab/articles/new', name: 'op_webapp_articles_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
@@ -277,20 +284,21 @@ class ArticleController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            // l'article doit avoir un ID (et son support/établissement déjà en place) avant de pouvoir calculer son dossier de stockage
+            $entityManager->persist($article);
+            $entityManager->flush();
+
             // ---------------------------
-            // STEP 1 : insertion de l'image dans le dossier public/uploads/articles'
+            // STEP 1 : insertion de l'image de présentation de l'article
             // ---------------------------
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
-                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                $newFilename = $this->mediaPathResolver->articleImageFilename($article, $imageFile->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $imageFile->move(
-                        $this->getParameter('article_directory'),
+                        $this->mediaPathResolver->articleImageDirFor($article),
                         $newFilename
                     );
                 } catch (FileException) {
@@ -303,19 +311,16 @@ class ArticleController extends AbstractController
             }
 
             // ---------------------------
-            // STEP 2 : insertion du Document dans le dossier public/uploads/articles'
+            // STEP 2 : insertion de la pièce jointe (audio/vidéo/document) de l'article
             // ---------------------------
             $docFile = $form->get('docFile')->getData();
             if ($docFile) {
-                $originalFilename = pathinfo((string) $docFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $docFile->guessExtension();
+                $newFilename = $this->mediaPathResolver->articleDocFilename($article, $docFile->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $docFile->move(
-                        $this->getParameter('article_directory'),
+                        $this->mediaPathResolver->articleDocDirFor($article),
                         $newFilename
                     );
                 } catch (FileException) {
@@ -327,7 +332,6 @@ class ArticleController extends AbstractController
                 $article->setDoc($newFilename);
             }
 
-            $entityManager->persist($article);
             $entityManager->flush();
 
             return $this->redirectToRoute('op_webapp_espetab', [
@@ -347,7 +351,7 @@ class ArticleController extends AbstractController
      * Création d'article depuis l'espace admin
      */
     #[Route(path: '/webapp/articles/newadmin', name: 'op_webapp_articles_newadmin', methods: ['GET', 'POST'])]
-    public function newAdmin(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    public function newAdmin(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
@@ -362,20 +366,21 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // l'article doit avoir un ID (et son support/établissement déjà en place) avant de pouvoir calculer son dossier de stockage
+            $entityManager->persist($article);
+            $entityManager->flush();
+
             // ---------------------------
-            // STEP 1 : insertion de l'image dans le dossier public/uploads/articles'
+            // STEP 1 : insertion de l'image de présentation de l'article
             // ---------------------------
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
-                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                $newFilename = $this->mediaPathResolver->articleImageFilename($article, $imageFile->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $imageFile->move(
-                        $this->getParameter('article_directory'),
+                        $this->mediaPathResolver->articleImageDirFor($article),
                         $newFilename
                     );
                 } catch (FileException) {
@@ -388,19 +393,16 @@ class ArticleController extends AbstractController
             }
 
             // ---------------------------
-            // STEP 2 : insertion du Document dans le dossier public/uploads/articles'
+            // STEP 2 : insertion de la pièce jointe (audio/vidéo/document) de l'article
             // ---------------------------
             $docFile = $form->get('docFile')->getData();
             if ($docFile) {
-                $originalFilename = pathinfo((string) $docFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $docFile->guessExtension();
+                $newFilename = $this->mediaPathResolver->articleDocFilename($article, $docFile->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $docFile->move(
-                        $this->getParameter('article_directory'),
+                        $this->mediaPathResolver->articleDocDirFor($article),
                         $newFilename
                     );
                 } catch (FileException) {
@@ -412,7 +414,6 @@ class ArticleController extends AbstractController
                 $article->setDoc($newFilename);
             }
 
-            $entityManager->persist($article);
             $entityManager->flush();
 
             return $this->redirectToRoute('op_webapp_articles_index', [
@@ -428,15 +429,18 @@ class ArticleController extends AbstractController
     }
 
     #[Route(path: '/webapp/articles/{id}', name: 'op_webapp_articles_show', methods: ['GET'])]
-    public function show(Article $article): Response
+    public function show(Article $article, EntityManagerInterface $entityManager): Response
     {
+        $config = $entityManager->getRepository(Config::class)->find(1);
+
         return $this->render('webapp/articles/show.html.twig', [
             'article' => $article,
+            'config' => $config,
         ]);
     }
 
     #[Route(path: '/espetab/articles/{id}/edit', name: 'op_webapp_articles_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Article $article, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    public function edit(Request $request, Article $article, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
@@ -450,15 +454,12 @@ class ArticleController extends AbstractController
             // ---------------------------
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
-                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                $newFilename = $this->mediaPathResolver->articleImageFilename($article, $imageFile->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $imageFile->move(
-                        $this->getParameter('article_directory'),
+                        $this->mediaPathResolver->articleImageDirFor($article),
                         $newFilename
                     );
                 } catch (FileException) {
@@ -471,19 +472,16 @@ class ArticleController extends AbstractController
             }
 
             // ---------------------------
-            // STEP 4 : insertion du Document dans le dossier public/uploads/articles'
+            // STEP 4 : insertion de la pièce jointe (audio/vidéo/document) de l'article
             // ---------------------------
             $docFile = $form->get('docFile')->getData();
             if ($docFile) {
-                $originalFilename = pathinfo((string) $docFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $docFile->guessExtension();
+                $newFilename = $this->mediaPathResolver->articleDocFilename($article, $docFile->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $docFile->move(
-                        $this->getParameter('article_directory'),
+                        $this->mediaPathResolver->articleDocDirFor($article),
                         $newFilename
                     );
                 } catch (FileException) {
@@ -510,9 +508,14 @@ class ArticleController extends AbstractController
     }
 
     #[Route(path: '/webapp/articles/{id}/editAdmin', name: 'op_webapp_articles_edit_admin', methods: ['GET', 'POST'])]
-    public function editAdmin(Request $request, Article $article, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    public function editAdmin(Request $request, Article $article, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
+
+        // capturé avant handleRequest() : si le support est changé dans le même envoi que la case
+        // "supprimer le doc", il faut supprimer le fichier là où il est réellement (ancien support),
+        // pas là où le nouveau formulaire dit qu'il devrait être
+        $oldSupportId = $article->getSupport()?->getId();
 
         $form = $this->createForm(ArticlesType::class, $article);
         $form->handleRequest($request);
@@ -527,7 +530,7 @@ class ArticleController extends AbstractController
             if($supprvignettechkbx && $supprvignettechkbx == true){
                 // récupération du nom de l'image
                 $imageName = $article->getImageName();
-                $path = $this->getParameter('article_directory').'/'.$imageName;
+                $path = $this->mediaPathResolver->articleImageDirFor($article).'/'.$imageName;
                 // On vérifie si l'image existe
                 if(file_exists($path)){
                     unlink($path);
@@ -537,19 +540,16 @@ class ArticleController extends AbstractController
             }
 
             // ---------------------------
-            // STEP 2 : insertion de l'image dans le dossier public/uploads/articles'
+            // STEP 2 : insertion de l'image de présentation de l'article
             // ---------------------------
             $imageFile = $form->get('imageFile')->getData();
             if ($imageFile) {
-                $originalFilename = pathinfo((string) $imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                $newFilename = $this->mediaPathResolver->articleImageFilename($article, $imageFile->guessExtension());
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $imageFile->move(
-                        $this->getParameter('article_directory'),
+                        $this->mediaPathResolver->articleImageDirFor($article),
                         $newFilename
                     );
                 } catch (FileException) {
@@ -569,7 +569,12 @@ class ArticleController extends AbstractController
             if($supprDocChkbx && $supprDocChkbx == true){
                 // récupération du nom de l'image
                 $docName = $article->getdoc();
-                $path = $this->getParameter('article_directory').'/'.$docName;
+                $path = $this->mediaPathResolver->articleDocDir(
+                    $article->getEtablissement()?->getId(),
+                    $article->getAuthor()->getId(),
+                    $oldSupportId,
+                    $docName
+                ).'/'.$docName;
                 // On vérifie si l'image existe
                 if(file_exists($path)){
                     unlink($path);
@@ -579,21 +584,18 @@ class ArticleController extends AbstractController
             }
 
             // ---------------------------
-            // STEP 4 : insertion du Document dans le dossier public/uploads/articles'
+            // STEP 4 : insertion de la pièce jointe (audio/vidéo/document) de l'article
             // ---------------------------
             $docFile = $form->get('docFile')->getData();
             if ($docFile) {
-                $originalFilename = pathinfo((string) $docFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $docFile->guessExtension();
+                $newFilename = $this->mediaPathResolver->articleDocFilename($article, $docFile->guessExtension());
 
 
 
                 // Move the file to the directory where brochures are stored
                 try {
                     $docFile->move(
-                        $this->getParameter('article_directory'),
+                        $this->mediaPathResolver->articleDocDirFor($article),
                         $newFilename
                     );
                 } catch (FileException) {
@@ -632,6 +634,7 @@ class ArticleController extends AbstractController
     public function listArticlesBySection($idsection, EntityManagerInterface $entityManager): Response
     {
         $article = $entityManager->getRepository(Article::class)->listArticlesBySection($idsection);
+        $article = $this->mediaPathResolver->withArticleMediaUrls($article);
 
         //dd($article);
 
@@ -644,6 +647,7 @@ class ArticleController extends AbstractController
     public function ArticlesCompleteBySection($idsection, EntityManagerInterface $entityManager): Response
     {
         $article = $entityManager->getRepository(Article::class)->listArticlesBySection($idsection);
+        $article = $this->mediaPathResolver->withArticleMediaUrls($article);
 
         return $this->render('webapp/articles/listarticlecompletebysection.html.twig',[
             'article' => $article,
@@ -654,6 +658,7 @@ class ArticleController extends AbstractController
     public function listArticlesBySectionOther($idsection, EntityManagerInterface $entityManager): Response
     {
         $article = $entityManager->getRepository(Article::class)->listArticlesBySection($idsection);
+        $article = $this->mediaPathResolver->withArticleMediaUrls($article);
 
         return $this->render('webapp/articles/listarticlesbysectionother.html.twig',[
             'article' => $article,
@@ -667,6 +672,7 @@ class ArticleController extends AbstractController
     public function listArticlesByEtablissement($idetablissement, Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
     {
         $data = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($idetablissement);
+        $data = array_map($this->mediaPathResolver->withArticleMediaUrls(...), $data);
 
         $articles = $paginator->paginate(
             $data,
@@ -681,10 +687,16 @@ class ArticleController extends AbstractController
     }
 
     #[Route(path: '/webapp/articles/etablissement2/{idetablissement}', name: 'op_webapp_articles_pagebyetablissement', methods: ['GET'])]
-    public function listArticlesByPageEtablissement($idetablissement, EntityManagerInterface $entityManager): Response
+    public function listArticlesByPageEtablissement($idetablissement, Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
     {
-        $articles = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($idetablissement)
-        ;
+        $data = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($idetablissement);
+        $data = array_map($this->mediaPathResolver->withArticleMediaUrls(...), $data);
+
+        $articles = $paginator->paginate(
+            $data,
+            $request->query->getInt('page', 1),
+            10
+        );
 
         return $this->render('webapp/articles/listarticlesbypageetablissement.html.twig',[
             'articles' => $articles,
@@ -695,6 +707,7 @@ class ArticleController extends AbstractController
     public function listFiveArticles($category, EntityManagerInterface $entityManager): Response
     {
         $articles = $entityManager->getRepository(Article::class)->listFiveArticles($category);
+        $articles = array_map($this->mediaPathResolver->withArticleMediaUrls(...), $articles);
 
         return $this->render('webapp/articles/listFiveArticles.html.twig',[
             'articles' => $articles,
@@ -710,6 +723,7 @@ class ArticleController extends AbstractController
         $etablissement = $entityManager->getRepository(Etablissement::class)->find($idetablissement);
         // Code pour afficher l'article depuis le slug'
         $article = $entityManager->getRepository(Article::class)->articleEtablissementSlug($id);
+        $article = $this->mediaPathResolver->withArticleMediaUrls($article);
         $config = $entityManager->getRepository(Config::class)->find(1);
 
         return $this->render('webapp/articles/articleEtablissementSlug.html.twig',[
@@ -729,7 +743,7 @@ class ArticleController extends AbstractController
         if ($field === 'image') {
             $fileName = $article->getImageName();
             if ($fileName) {
-                $path = $this->getParameter('article_directory') . '/' . $fileName;
+                $path = $this->mediaPathResolver->articleImageDirFor($article) . '/' . $fileName;
                 if (file_exists($path)) {
                     unlink($path);
                 }
@@ -738,7 +752,7 @@ class ArticleController extends AbstractController
         } else {
             $fileName = $article->getDoc();
             if ($fileName) {
-                $path = $this->getParameter('article_directory') . '/' . $fileName;
+                $path = $this->mediaPathResolver->articleDocDirFor($article) . '/' . $fileName;
                 if (file_exists($path)) {
                     unlink($path);
                 }

@@ -1,61 +1,95 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Articles{% endblock %}
+{% block title %}{{ article.title }}{% endblock %}
 
 {% block main %}
-    <section class="container" id="page_content">
-        <div class="row" id="content">
-            <div class="col-12" id="content_title">
-                <h3>{{ article.title }}</h3>
-            </div>
-            {% if article.imageName is null %}
-            {% if article.isShowIntro == 1 and article.isShowReadMore == 1 %}
-                <div class="col-12" id="content_text">
-                    <p>{{ article.intro|raw }}</p>
-                    <a href="{{ path('op_webapp_articles_articleSlug', {'slug': article.slug}) }}">Lire la suite</a>
-                </div>
-                <div class="col-12" id="content_code">
-                    <div>
-                        {{ article.content|raw }}
-                    </div>
-                </div>
-            {% elseif article.isShowIntro == 1 and article.isShowReadMore == 0 %}
-                <div class="col-12" id="content_text">
-                    <p>{{ article.intro|raw }}</p>
-                    <a href="{{ path('op_webapp_articles_articleSlug', {'slug': article.slug}) }}">Lire la suite</a>
-                </div>
-                <div class="col-12" id="content_code">
-                    <div>
-                        {{ article.content|raw }}
-                    </div>
-                </div>
-            {% else %}
-                <div class="col-12" id="content_code">
-                    <div>
-                        {{ article.content|raw }}
-                    </div>
-                </div>
-            {% endif%}
-            {% else %}
-            <div class="col-3">
-                <img class="img-fluid" src="{{ asset('/uploads/images/articles/'~article.imageName) | imagine_filter('thumb_img_article') }}" alt="{{ article.imageName }}">
-            </div>
-            <div class="col-9" id="content_text">
-                {{ article.content|raw }}
-            </div>
-            {% endif %}
-            {% if article.support is not null %}
-            <div class="col-12" id="content_support">
+    <section class="mx-auto max-w-4xl px-2 py-2 sm:px-6 lg:px-8" id="article_page">
 
+        {% include 'composants/modules/breadcrumb.html.twig' with {
+            'level_1': {
+                'title': article.etablissement ? article.etablissement.name : 'Articles',
+                'href': article.etablissement
+                    ? path('op_webapp_etablissement_show2', {'id': article.etablissement.id})
+                    : path('op_webapp_article_all_by_etablissement')
+            },
+            'level_2': {
+                'title': article.title,
+                'href': '#'
+            }
+        } %}
+
+        <section class="relative mt-4 overflow-hidden rounded-2xl bg-gray-200 shadow-sm" id="article_hero">
+            {% if article.imageName %}
+                <img
+                    src="{{ asset(article_image_url(article)) | imagine_filter('thumb_bandeau_article') }}"
+                    alt="{{ article.title }}"
+                    class="h-64 w-full object-cover sm:h-80"
+                />
+            {% else %}
+                <img
+                    src="{{ asset('/uploads/images/config/' ~ config.headerName) }}"
+                    alt="{{ article.title }}"
+                    class="h-64 w-full object-cover sm:h-80"
+                />
+            {% endif %}
+
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+
+            <div class="absolute inset-x-0 bottom-0 p-4 sm:p-6 lg:px-8">
+                {% if article.theme %}
+                    <span class="inline-block rounded-full bg-[#ffd100] px-3 py-1 text-xs font-semibold text-gray-900">
+                        {{ article.theme.name }}
+                    </span>
+                {% endif %}
+                {% if article.isTitleShow is not same as(false) %}
+                    <h1 class="mt-2 text-2xl font-bold text-white drop-shadow-sm sm:text-3xl">{{ article.title }}</h1>
+                {% endif %}
             </div>
+        </section>
+
+        <div class="mt-4 flex items-center gap-x-4 text-xs">
+            {% if article.updatedAt %}
+                <time datetime="{{ article.updatedAt|date('Y-m-d') }}" class="text-gray-500">{{ article.updatedAt|date('d/m/Y') }}</time>
             {% endif %}
         </div>
+
+        <article class="prose max-w-none py-4">
+            {{ article.content|raw }}
+        </article>
+
+        {% if article.etablissement %}
+            <div class="mt-8 flex items-center gap-x-4 border-t border-gray-900/5 pt-6">
+                {% if article.etablissement.logoName %}
+                    <img
+                        src="{{ asset(etablissement_logo_url(article.etablissement)) | imagine_filter('thumb_logo_etablissement') }}"
+                        alt="Logo de {{ article.etablissement.name }}"
+                        class="size-12 rounded-full bg-gray-50 object-cover"
+                    />
+                {% else %}
+                    <img
+                        src="{{ asset('/uploads/images/config/' ~ config.vignetteName) }}"
+                        alt="Logo de {{ article.etablissement.name }}"
+                        class="size-12 rounded-full bg-gray-50 object-cover"
+                    />
+                {% endif %}
+                <div class="text-sm/6">
+                    {% if article.etablissement.animateur %}
+                        <p class="font-semibold text-gray-900">{{ article.etablissement.animateur }}</p>
+                    {% endif %}
+                    <p class="text-gray-600">
+                        <a href="{{ path('op_webapp_etablissement_show2', {'id': article.etablissement.id}) }}" class="hover:text-[#d84519]">
+                            Établissement {{ article.etablissement.name }}
+                        </a>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
         {% if is_granted('ROLE_USER') %}
-        <div class="row" id="Article_comments">
-            <div class="col-12">
+            <div class="mt-8 border-t border-gray-900/5 pt-6" id="Article_comments">
                 {{ render(controller('App\\Controller\\Webapp\\CommentController::new')) }}
             </div>
-        </div>
         {% endif %}
+
     </section>
 {% endblock %}

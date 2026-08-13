@@ -1,10 +1,10 @@
 {% set bannerImage = etablissement.headerName is not null
-    ? asset('/uploads/images/etablissements/' ~ etablissement.headerName) | imagine_filter('thumb_bandeau_etablissement')
+    ? asset(etablissement_header_url(etablissement)) | imagine_filter('thumb_bandeau_etablissement')
     : asset('/uploads/images/config/' ~ config.headerName)
 %}
 
 {% set avatarImage = etablissement.logoName is not null
-    ? asset('/uploads/images/etablissements/' ~ etablissement.logoName) | imagine_filter('thumb_logo_etablissement')
+    ? asset(etablissement_logo_url(etablissement)) | imagine_filter('thumb_logo_etablissement')
     : asset('/uploads/images/config/' ~ config.vignetteName) | imagine_filter('thumb_logo_etablissement')
 %}
 

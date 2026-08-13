@@ -17,7 +17,7 @@
         </div>
     {% else %}
         <div class="col-3">
-            <img id="img_article" class="img-fluid" src="{{ asset('uploads/images/articles/'~article.imageName ) | imagine_filter('thumb_img_article') }}" alt="{{ article.imageName }}">
+            <img id="img_article" class="img-fluid" src="{{ asset(article.imageUrl) | imagine_filter('thumb_img_article') }}" alt="{{ article.imageName }}">
         </div>
         <div class="col-9" id="content_text">
             {% if article.isTitleShow == 1 %}

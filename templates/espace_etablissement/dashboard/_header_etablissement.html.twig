@@ -5,11 +5,11 @@
 {% elseif etablissement.headerName is null %}
 {% else %}
     <div class="col-12" id="content_header_img">
-        <img id="etablissement_header" class="img-fluid" src="{{ asset('uploads/images/etablissements/' ~ etablissement.headerName)|imagine_filter('thumb_bandeau_etablissement') }}" alt="{{ etablissement.headerName }}">
+        <img id="etablissement_header" class="img-fluid" src="{{ asset(etablissement_header_url(etablissement))|imagine_filter('thumb_bandeau_etablissement') }}" alt="{{ etablissement.headerName }}">
         {% if etablissement.logoName is null %}
         {% else %}
         <div id="etablissement_logo">
-            <img class="img-fluid" src="{{ asset('uploads/images/etablissements/' ~ etablissement.logoName)|imagine_filter('thumb_logo_etablissement') }}" alt="{{ etablissement.logoName }}">
+            <img class="img-fluid" src="{{ asset(etablissement_logo_url(etablissement))|imagine_filter('thumb_logo_etablissement') }}" alt="{{ etablissement.logoName }}">
         </div>
         {% endif %}
     </div>

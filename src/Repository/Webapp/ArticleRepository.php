@@ -61,6 +61,7 @@ class ArticleRepository extends ServiceEntityRepository
             ->leftJoin('a.etablissement', 'e')
             ->leftJoin('a.theme', 't')
             ->leftJoin('a.support' , 'su')
+            ->leftJoin('a.author', 'au')
             ->addSelect('
                 a.id as id,
                 a.slug as slug,
@@ -77,7 +78,8 @@ class ArticleRepository extends ServiceEntityRepository
                 a.doc as doc,
                 su.id as idsupport,
                 su.name as support,
-                e.id AS idetablissement
+                e.id AS idetablissement,
+                au.id as idauthor
                 '
             )
             ->andWhere('s.id = :idsection')
@@ -152,6 +154,7 @@ class ArticleRepository extends ServiceEntityRepository
                 e.id AS idetablissement,
                 e.logoName AS logoName,
                 u.typeuser as typeuser,
+                u.id as idauthor,
                 t.name as theme
                  ')
             ->where('u.typeuser = :typeuser')
@@ -193,12 +196,14 @@ class ArticleRepository extends ServiceEntityRepository
                 e.GroupDescription,
                 a.isShowReadMore,
                 s.id as idsupport,
-                s.name as support
+                s.name as support,
+                au.id as idauthor
                  ')
             ->leftJoin('a.etablissement', 'e')
             ->leftJoin('a.theme', 't')
             ->leftJoin('a.support' , 's')
             ->leftJoin('a.category', 'ca')
+            ->leftJoin('a.author', 'au')
             ->andWhere('a.isArchived = :isArchived')
             ->setParameter('isArchived', 0)
             ->andWhere('a.id = :id')
