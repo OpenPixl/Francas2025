@@ -6,7 +6,7 @@ ARG SYMFONY_VERSION
 ARG GIT_USER_EMAIL
 ARG GIT_USER_NAME
 
-RUN install-php-extensions intl opcache gd zip pdo_mysql curl xml mbstring json
+RUN install-php-extensions intl opcache gd zip pdo_pgsql pgsql curl xml mbstring json
 
 # Installe Node.js et npm (via Alpine)
 RUN apk add --no-cache nodejs npm nano git
