@@ -1,6 +1,7 @@
 import TomSelect from "tom-select";
 import 'tom-select/dist/css/tom-select.css';
 import axios from 'axios';
+import {showDialog, showNotification} from "./tailwind";
 
 
 export function useTomSelect(selector, option) {
@@ -65,6 +66,44 @@ export function bindHeaderSaveButton() {
     saveBtn.addEventListener('click', function (e) {
         e.preventDefault();
         form.requestSubmit();
+    });
+}
+
+/**
+ * Le bouton "Supprimer" du header (sous la navbar) déclenche la modale de confirmation
+ * existante puis, une fois validée, appelle l'action de suppression de l'entité avec le
+ * bon verbe HTTP et le token CSRF, avant de rediriger vers la page indiquée.
+ */
+export function bindHeaderDeleteButton() {
+    const delBtn = document.getElementById('btn-header-delete');
+    if (!delBtn) return;
+
+    const url = delBtn.dataset.deleteUrl;
+    const method = (delBtn.dataset.deleteMethod || 'DELETE').toUpperCase();
+    const token = delBtn.dataset.csrfToken;
+    const redirectUrl = delBtn.dataset.redirectUrl;
+    const message = delBtn.dataset.confirmMessage || 'Voulez-vous vraiment supprimer cet élément ? Cette action est irréversible.';
+
+    if (!url) return;
+
+    delBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        showDialog(url, 'Suppression', message, function (confirmedUrl) {
+            axios
+                .request({
+                    url: confirmedUrl,
+                    method: method,
+                    data: new URLSearchParams({ _token: token || '' }),
+                })
+                .then(function () {
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                    }
+                })
+                .catch(function () {
+                    showNotification('warning', 'Erreur lors de la suppression.');
+                });
+        });
     });
 }
 

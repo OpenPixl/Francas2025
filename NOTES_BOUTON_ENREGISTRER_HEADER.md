@@ -1,4 +1,4 @@
-# Bouton "Enregistrer" / "Mettre à jour" dans le header des vues d'édition
+# Boutons "Enregistrer" / "Mettre à jour" / "Supprimer" dans le header des vues d'édition
 
 ## Contexte
 
@@ -135,6 +135,119 @@ Par défaut (paramètre absent), le bouton reste affiché — comportement incha
   `admin/config/edit.html.twig` ; `admin/config/new.html.twig` inclut un chemin `admin_config/_form.html.twig`
   différent et déjà inexistant, bug préexistant hors périmètre)
 
+## 4. Bouton "Supprimer" (`btns.del`) — rouge, avec confirmation
+
+Demande complémentaire : ajouter un bouton « Supprimer » dans le même header, en rouge, qui ouvre la
+**modale de confirmation existante** (`composants/modules/dialog.html.twig` + `showDialog()`/`hideDialog()`)
+avant d'agir — jamais de suppression directe au clic.
+
+### Portée
+
+Uniquement les 6 vues d'**édition** d'une entité déjà persistée (rien à supprimer sur une vue de création) :
+établissement, utilisateur, page, ressource, section, article (admin). **Exclu explicitement** :
+`admin/config/edit.html.twig` — singleton de paramètres globaux dont la suppression risquerait de casser
+l'affichage du site (dépendance dans de nombreux templates) ; décision validée avec l'utilisateur plutôt que
+supposée.
+
+### `btns.del` existait déjà dans le header (jamais utilisé)
+
+`admin/dashboard/include/header.html.twig` gérait déjà une clé `btns.del`, mais aucune vue ne l'alimentait.
+Réutilisée telle quelle, avec deux ajouts pour couvrir le besoin :
+- `variant: 'danger'` → transmis à `button_utils.html.twig`, qui accepte désormais ce paramètre optionnel et
+  bascule ses classes Tailwind sur un style rouge (`border-red-700 text-red-700 hover:bg-red-700
+  hover:text-white`) au lieu du gris par défaut — composant inchangé pour tous les autres appels (`return`,
+  `new`, `save`, `edit`), qui ne passent pas `variant` et gardent leur style habituel.
+- `data: { ... }` → `button_utils.html.twig` accepte aussi un dictionnaire optionnel d'attributs `data-*`
+  supplémentaires (rendus tels quels), utilisé ici pour transmettre au JS tout ce qu'il faut sans toucher au
+  composant partagé pour un seul cas d'usage : `delete-url`, `delete-method` (`DELETE` ou `POST` selon la
+  route réelle de chaque contrôleur), `csrf-token` (`csrf_token('delete' ~ entity.id)`, même convention que
+  les anciens formulaires de suppression), `redirect-url` (voir §4bis — toujours la même destination que le
+  bouton « Retour »), et `confirm-message` (texte affiché dans la modale).
+
+### JS : `bindHeaderDeleteButton()`
+
+Nouvelle fonction partagée dans `fonctions.js`, câblée en tête de chaque `init*()` déjà utilisé pour le
+bouton save (no-op silencieux si `#btn-header-delete` est absent de la page — même principe que
+`bindHeaderSaveButton()`). Au clic : ouvre `showDialog()` avec le message de confirmation ; seulement après
+validation dans la modale, exécute la requête (`axios.request({ url, method, data })`, verbe HTTP et body
+`_token` conformes à ce qu'attend chaque contrôleur), puis redirige (`window.location.href`) vers
+`redirect-url`. En cas d'échec réseau, notification d'erreur, la page ne bouge pas.
+
+### Bug latent évité : deux confirmations sur la même modale
+
+`composants/modules/dialog.html.twig` expose une seule modale globale (`#validModal`) réutilisée par toutes
+les actions de confirmation de la page. Or `NewEditEtablissement.js` avait déjà sa propre confirmation
+(suppression du logo/bandeau) qui attachait directement un `addEventListener('click', ...)` sur
+`#validModal`. Ajouter une deuxième confirmation (suppression de l'établissement) de la même façon aurait fait
+tourner **les deux** actions à chaque clic sur « Valider », quelle que soit la modale ouverte (double requête,
+verbe HTTP erroné sur l'une des deux, toast d'erreur trompeur).
+
+Corrigé à la racine : `showDialog()` accepte désormais un 4ᵉ paramètre optionnel `onConfirm` et gère
+elle-même **un seul** écouteur délégué sur `#validModal` (bindé une fois, `dialogConfirmBound`), qui appelle
+systématiquement le callback du dernier appel à `showDialog()` (`dialogConfirmHandler`). Le flux de
+suppression de média dans `NewEditEtablissement.js` a été migré vers cette même API (son
+`axios.post(...).then(...)` est passé en callback de `showDialog()` au lieu d'un `addEventListener` séparé).
+Rétrocompatible : les appels existants à 3 arguments (sans `onConfirm`, dans `IndexArticles.js`,
+`IndexUser.js`, `ShowPage.js`, etc.) continuent de gérer leur propre écouteur sur `.submitModal` exactement
+comme avant, sans changement de comportement.
+
+### Vues concernées
+
+| Entité | Route de suppression | Verbe | Redirection (= `return_url`, voir §4bis) |
+|---|---|---|---|
+| Établissement | `op_admin_etablissement_delete` | DELETE | `op_admin_etablissement_index` |
+| Utilisateur | `op_admin_user_delete` | DELETE | `op_admin_user_index` |
+| Page | `op_webapp_page_delete` | POST | `op_webapp_page_index` |
+| Ressource | `op_webapp_ressources_delete` | POST | `op_webapp_ressources_index` |
+| Section | `op_webapp_section_delete` | DELETE | `op_admin_page_show` (page parente) |
+| Article (admin) | `op_webapp_articles_delete` | DELETE | `op_webapp_articles_index` |
+
+À noter : `op_admin_user_delete` n'était jusqu'ici relié à **aucune** vue (`admin/user/_delete_form.html.twig`
+existe mais n'est inclus nulle part) — le bouton d'entête est donc le premier point d'entrée UI fonctionnel
+pour supprimer un utilisateur.
+
+## 4bis. Redirection après suppression : toujours la même destination que « Retour »
+
+Pour que l'expérience reste fluide, une fois la suppression validée, l'utilisateur ne doit pas atterrir sur
+une page qui n'existe plus (celle qu'il vient de supprimer) ni sur une destination différente de celle vers
+laquelle « Retour » l'aurait de toute façon ramené. Plutôt que de calculer deux fois la même URL (une fois
+pour `btns.return.href`, une fois pour `btns.del.data.redirect-url` — avec le risque qu'elles divergent si
+l'une des deux est modifiée sans l'autre), chaque vue calcule l'URL de retour **une seule fois** dans une
+variable Twig et la réutilise aux deux endroits :
+
+```twig
+{% block header %}
+    {% set return_url = path('op_webapp_page_index') %}
+    {{ include('admin/dashboard/include/header.html.twig', {
+        'btns' : {
+            'return': {
+                'href' : return_url,
+                ...
+            },
+            'del': {
+                'data': {
+                    'redirect-url': return_url,
+                    ...
+                }
+            }
+        }
+    }) }}
+{% endblock %}
+```
+
+`bindHeaderDeleteButton()` (§4, JS) fait ensuite `window.location.href = redirectUrl` une fois la suppression
+confirmée côté serveur — l'utilisateur repart donc exactement là où « Retour » l'aurait emmené, garanti par
+construction plutôt que par duplication.
+
+Cas particulier : sur `webapp/section/edit.html.twig`, `return_url` pointe vers `op_admin_page_show` (la page
+parente de la section, pas un index générique) — déjà le comportement du bouton « Retour » avant l'ajout du
+bouton Supprimer ; la redirection après suppression suit donc naturellement la même règle, sans code
+spécifique à écrire.
+
+Appliqué aux 6 vues concernées : `admin/etablissement/edit.html.twig`, `admin/user/edit.html.twig`,
+`webapp/page/edit.html.twig`, `webapp/ressources/edit.html.twig`, `webapp/section/edit.html.twig`,
+`webapp/articles/edit_admin.html.twig`.
+
 ## Fichiers créés
 
 - `NOTES_BOUTON_ENREGISTRER_HEADER.md`
@@ -144,6 +257,7 @@ Par défaut (paramètre absent), le bouton reste affiché — comportement incha
 ## Fichiers modifiés
 
 - `templates/admin/dashboard/include/header.html.twig`
+- `templates/composants/buttons/button_utils.html.twig`
 - `templates/admin/etablissement/{new,edit,_form}.html.twig`
 - `templates/admin/user/{new,edit,_form}.html.twig`
 - `templates/webapp/page/{new,edit,_form}.html.twig`
@@ -153,6 +267,7 @@ Par défaut (paramètre absent), le bouton reste affiché — comportement incha
 - `templates/admin/config/{edit,_form}.html.twig`
 - `assets/admin.js`
 - `assets/js/composants/fonctions.js`
+- `assets/js/composants/tailwind.js` (`showDialog()` : paramètre `onConfirm` optionnel)
 - `assets/js/admin/admin/NewEditEtablissement.js`
 - `assets/js/admin/admin/NewEditUser.js`
 - `assets/js/admin/admin/NewEditPage.js`
@@ -161,13 +276,15 @@ Par défaut (paramètre absent), le bouton reste affiché — comportement incha
 
 ## Vérifications effectuées
 
-- `yarn encore dev` : build réussi, code présent dans `public/build/admin.js` (vérifié par recherche des
-  chaînes `btn-header-save`/`bindHeaderSaveButton`/`requestSubmit`).
+- `yarn encore dev` : build réussi (deux fois, avant et après l'ajout du bouton Supprimer), code présent dans
+  `public/build/admin.js` (vérifié par recherche des chaînes `btn-header-save`/`btn-header-delete`/
+  `bindHeaderSaveButton`/`bindHeaderDeleteButton`/`requestSubmit`/`dialogConfirmHandler`).
 - `php bin/console lint:twig templates/` : les 6 erreurs restantes sont préexistantes et hors périmètre
   (`vich_uploader_asset` non enregistré, fichiers non touchés par ce chantier).
-- Rendu testé sur plusieurs routes (`webapp/page/new`, `webapp/articles/newadmin`, page d'édition
-  établissement) : bouton d'entête présent avec le bon `id`/`href`, bouton de formulaire disparu sur les
-  pages concernées.
+- Rendu testé sur plusieurs routes (`webapp/page/new`, `webapp/articles/newadmin`,
+  `webapp/articles/{id}/editAdmin`, page d'édition établissement) : bouton d'entête présent avec le bon
+  `id`/`href`/classes rouges/attributs `data-*` (URL, verbe, token CSRF, redirection, message), bouton de
+  formulaire disparu sur les pages concernées.
 - Vérifié par grep que les vues non concernées (`webapp/section/new.html.twig`,
   `webapp/ressources/newressourcebyetablissement.html.twig`,
   `espace_etablissement/newressourcebyetablissement.html.twig`,

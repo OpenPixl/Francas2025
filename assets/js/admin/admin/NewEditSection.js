@@ -1,5 +1,6 @@
-import {bindHeaderSaveButton} from "../../composants/fonctions";
+import {bindHeaderSaveButton, bindHeaderDeleteButton} from "../../composants/fonctions";
 
 export function initNewEditSection(){
     bindHeaderSaveButton();
+    bindHeaderDeleteButton();
 }

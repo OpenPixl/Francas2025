@@ -3,6 +3,7 @@
 {% block title %}Edit Section{% endblock %}
 
 {% block header %}
+    {% set return_url = path('op_admin_page_show', {'id': page.id }) %}
     {{ include('admin/dashboard/include/header.html.twig', {
         'title' : 'Gestions des pages',
         'btns' : {
@@ -22,10 +23,25 @@
             },
             'return': {
                 'id' : null,
-                'href' : path('op_admin_page_show', {'id': page.id }),
+                'href' : return_url,
                 'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
                 'text' : 'Retour',
                 'array':null
+            },
+            'del': {
+                'id' : 'btn-header-delete',
+                'href' : '#',
+                'icon' : '<i class="fa-duotone fa-solid fa-trash"></i>',
+                'text' : 'Supprimer',
+                'array':null,
+                'variant': 'danger',
+                'data': {
+                    'delete-url': path('op_webapp_section_delete', {'id': section.id}),
+                    'delete-method': 'DELETE',
+                    'csrf-token': csrf_token('delete' ~ section.id),
+                    'redirect-url': return_url,
+                    'confirm-message': 'Voulez-vous vraiment supprimer cette section ? Cette action est irréversible.'
+                }
             }
         }
     }) }}

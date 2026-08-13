@@ -8,6 +8,7 @@
 {%  endblock %}
 
 {% block header %}
+    {% set return_url = path('op_webapp_articles_index') %}
     {{ include('admin/dashboard/include/header.html.twig', {
         'title' : 'Gestions des articles',
         'btns' : {
@@ -27,10 +28,25 @@
             },
             'return': {
                 'id' : null,
-                'href' : path('op_webapp_articles_index'),
+                'href' : return_url,
                 'icon' : '<i class="fa-duotone fa-solid fa-chevrons-left"></i>',
                 'text' : 'Retour',
                 'array':null
+            },
+            'del': {
+                'id' : 'btn-header-delete',
+                'href' : '#',
+                'icon' : '<i class="fa-duotone fa-solid fa-trash"></i>',
+                'text' : 'Supprimer',
+                'array':null,
+                'variant': 'danger',
+                'data': {
+                    'delete-url': path('op_webapp_articles_delete', {'id': article.id}),
+                    'delete-method': 'DELETE',
+                    'csrf-token': csrf_token('delete' ~ article.id),
+                    'redirect-url': return_url,
+                    'confirm-message': 'Voulez-vous vraiment supprimer cet article ? Cette action est irréversible.'
+                }
             }
         }
     }) }}

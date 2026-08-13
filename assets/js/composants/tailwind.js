@@ -77,7 +77,11 @@ export function hideNotification() {
 
 // Module Dialog/Modal
 
-export function showDialog(href, title = null, message = null) {
+// Callback en cours pour le bouton "Valider" de la modale (voir showDialog, param onConfirm).
+let dialogConfirmHandler = null;
+let dialogConfirmBound = false;
+
+export function showDialog(href, title = null, message = null, onConfirm = null) {
     const dialog = document.getElementById("dialog");
     const backdrop = document.getElementById("dialog_backdrop");
     const modal = document.getElementById("modal");
@@ -108,6 +112,24 @@ export function showDialog(href, title = null, message = null) {
         modal_body_text.innerHTML = '<p class="text-sm font-normal text-slate-700">'+ message +'</p>';
     }
 
+    // Callback optionnel de confirmation : un seul écouteur délégué sur #validModal,
+    // toujours celui du dernier appel à showDialog(), pour éviter d'empiler plusieurs
+    // écouteurs (et donc plusieurs actions déclenchées) si plusieurs boutons de la
+    // même page ouvrent chacun une confirmation différente.
+    if (onConfirm) {
+        dialogConfirmHandler = onConfirm;
+        if (validModal && !dialogConfirmBound) {
+            dialogConfirmBound = true;
+            validModal.addEventListener('click', function (e) {
+                e.preventDefault();
+                const url = this.href;
+                hideDialog();
+                if (typeof dialogConfirmHandler === 'function') {
+                    dialogConfirmHandler(url);
+                }
+            });
+        }
+    }
 }
 
 export function hideDialog() {

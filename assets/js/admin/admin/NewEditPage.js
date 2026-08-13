@@ -1,7 +1,8 @@
-import {bindHeaderSaveButton} from "../../composants/fonctions";
+import {bindHeaderSaveButton, bindHeaderDeleteButton} from "../../composants/fonctions";
 
 export function initNewEditPage(){
     bindHeaderSaveButton();
+    bindHeaderDeleteButton();
 
     ClassicEditor
         .create(document.querySelector('#page_intro'), {
