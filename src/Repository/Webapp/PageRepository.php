@@ -19,9 +19,13 @@ class PageRepository extends ServiceEntityRepository
     public function ListMenu()
     {
         return $this->createQueryBuilder('p')
+            ->andWhere('p.state = :state')
             ->andWhere('p.isMenu = :isMenu')
+            ->andWhere('p.isPublish = :isPublish')
             ->andWhere("p.title != :home ")
+            ->setParameter('state', 'finished')
             ->setParameter('isMenu', 1)
+            ->setParameter('isPublish', 1)
             ->setParameter('home', 'accueil')
             ->orderBy('p.id', 'ASC')
             ->getQuery()

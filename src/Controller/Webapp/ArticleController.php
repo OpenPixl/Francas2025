@@ -4,14 +4,24 @@ namespace App\Controller\Webapp;
 
 use App\Entity\Admin\Etablissement;
 use App\Entity\Admin\Config;
+use App\Entity\Admin\TypeEtablissement;
+use App\Entity\Gestapp\Theme;
 use App\Entity\Webapp\Article;
 use App\Entity\Webapp\Section;
+use App\Form\Search\ArticleSearchType;
 use App\Form\Webapp\ArticlesType;
 use App\Form\Webapp\Articles2Type;
 use App\Form\Webapp\SearcharticleType;
+use App\Repository\Admin\ConfigRepository;
 use App\Repository\Admin\EtablissementRepository;
 use App\Repository\Webapp\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Elastica\Query;
+use Elastica\Query\BoolQuery;
+use Elastica\Query\Exists;
+use Elastica\Query\MultiMatch;
+use Elastica\Query\Term;
+use FOS\ElasticaBundle\Finder\PaginatedFinderInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -22,6 +32,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ArticleController extends AbstractController
 {
+    private $finder;
+
+    public function __construct(PaginatedFinderInterface $finder)
+    {
+        $this->finder = $finder;
+    }
+
     /**
      * Liste dans l'admin tous les articles
      */
@@ -38,6 +55,179 @@ class ArticleController extends AbstractController
         return $this->render('webapp/articles/index.html.twig', [
             'articles' => $articles,
             'page' => $request->query->getInt('page', 1),
+        ]);
+    }
+
+    #[Route(path: '/webapp/allArticles/', name: 'op_webapp_article_all_by_etablissement', methods: ['GET', 'POST'])]
+    public function listAllArticles(Request $request, ConfigRepository $configRepository, ArticleRepository $articleRepository): Response
+    {
+        $config = $configRepository->find(1);
+        $articles = $articleRepository->allArticles();
+
+        $articlesByType = [];
+        $etablissementsChoices = [];
+        $themesChoices = [];
+        foreach ($articles as $e) {
+            //dd($e);
+            $type = $e['libelleEtablissement'] ?? 'Autre';
+            $etablissementsChoices[$type] = $e['idTypeEtablissement'];
+            if (!empty($e['theme'])) {
+                $themesChoices[$e['theme']] = $e['idtheme'];
+            }
+            $articlesByType[$type][] = $e;
+        }
+        //dd($articlesByType);
+
+        // Formulaire
+        $form = $this->createForm(articleSearchType::class, null, [
+            'action' => $this->generateUrl('op_webapp_article_all_by_etablissement'),
+            'method' => 'POST',
+            'attr' => [
+                'id' => 'Article_searchForm',
+            ],
+            'etablissementsChoices' => $etablissementsChoices,
+            'themesChoices' => $themesChoices,
+
+        ]);
+        $form->handleRequest($request);
+
+        // Construction de la requête Elasticsearch
+        $boolQuery = new BoolQuery();
+        // Ne garder que les articles rattachés à un établissement (ex: articles rédigés par les administrateurs)
+        $boolQuery->addFilter(new Exists('etablissement'));
+
+        //dd($form->isSubmitted());
+        // Filtres issus du formulaire
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+
+            // Recherche texte
+            if (!empty($data['query'])) {
+                $multiMatch = new MultiMatch();
+                $multiMatch->setFields(['title']);
+                $multiMatch->setQuery($data['query']);
+                $boolQuery->addMust($multiMatch);
+            }
+
+            // Filtre structure sélectionnée
+            if (!empty($data['etablissementChoice'])) {
+                $termQuery = new Term();
+                $termQuery->setTerm('typeEtablissement', $data['etablissementChoice']);
+                $boolQuery->addFilter($termQuery);
+            }
+
+            // Filtre thème sélectionné
+            if (!empty($data['theme'])) {
+                $themeTermQuery = new Term();
+                $themeTermQuery->setTerm('theme.id', $data['theme']);
+                $boolQuery->addFilter($themeTermQuery);
+            }
+
+            // Exécution de la requête
+            $query = new Query($boolQuery);
+            $query->setSize(100);
+            $query->setSort(['updatedAt' => ['order' => 'desc']]);
+
+            $results = $this->finder->find($query);
+
+            //dd($results);
+
+            $articlesByType = [];
+            foreach ($results as $r) {
+                $type = $r->getEtablissement()?->getTypeEtablissement()?->getLibelle() ?? 'Autre';
+                $articlesByType[$type][] = [
+                    'id' => $r->getId(),
+                    'title' => $r->getTitle(),
+                    'imageName' => $r->getImageName(),
+                    'theme' => $r->getTheme(),
+                    'nameEtablissement' => $r->getEtablissement()?->getName(),
+                    'idTypeEtablissement' => $r->getEtablissement()?->getTypeEtablissement()?->getId(),
+                    'logoEtablissement' => $r->getEtablissement()?->getLogoName(),
+                    'typeEtablissementLibelle' => $type,
+                    'updatedAt' => $r->getUpdatedAt(),
+                ];
+            }
+
+            return $this->json([
+                'code' => 200,
+                'liste' => $this->renderView('webapp/articles/include/_listesearch.html.twig',[
+                    'articlesByType' => $articlesByType,
+                    'config' => $config,
+                    'currentQuery' => $data['query'] ?? null,
+                    'currentTheme' => $data['theme'] ?? null,
+                ]),
+            ],200);
+        }
+
+        return $this->render('webapp/articles/listallarticles.html.twig',[
+            'form' => $form->createView(),
+            'articlesByType' => $articlesByType,
+            'config' => $config
+        ]);
+    }
+
+    /**
+     * Affiche tous les articles d'un type d'établissement donné, en conservant
+     * les autres critères de recherche actifs (thème, texte)
+     */
+    #[Route(path: '/webapp/articles/type/{idtype}', name: 'op_webapp_articles_bytype', methods: ['GET'])]
+    public function listArticlesByType(Request $request, $idtype, ConfigRepository $configRepository, EntityManagerInterface $entityManager, PaginatorInterface $paginator): Response
+    {
+        $config = $configRepository->find(1);
+        $typeEtablissement = $entityManager->getRepository(TypeEtablissement::class)->find($idtype);
+
+        $idtheme = $request->query->get('theme');
+        $q = $request->query->get('query');
+        $theme = $idtheme ? $entityManager->getRepository(Theme::class)->find($idtheme) : null;
+
+        $boolQuery = new BoolQuery();
+        $boolQuery->addFilter(new Exists('etablissement'));
+
+        $typeTermQuery = new Term();
+        $typeTermQuery->setTerm('typeEtablissement', $idtype);
+        $boolQuery->addFilter($typeTermQuery);
+
+        if ($idtheme) {
+            $themeTermQuery = new Term();
+            $themeTermQuery->setTerm('theme.id', $idtheme);
+            $boolQuery->addFilter($themeTermQuery);
+        }
+
+        if ($q) {
+            $multiMatch = new MultiMatch();
+            $multiMatch->setFields(['title']);
+            $multiMatch->setQuery($q);
+            $boolQuery->addMust($multiMatch);
+        }
+
+        $query = new Query($boolQuery);
+        $query->setSize(200);
+        $query->setSort(['updatedAt' => ['order' => 'desc']]);
+
+        $results = $this->finder->find($query);
+
+        $data = [];
+        foreach ($results as $r) {
+            $data[] = [
+                'id' => $r->getId(),
+                'title' => $r->getTitle(),
+                'imageName' => $r->getImageName(),
+                'theme' => $r->getTheme(),
+                'nameEtablissement' => $r->getEtablissement()?->getName(),
+            ];
+        }
+
+        $articles = $paginator->paginate(
+            $data,
+            $request->query->getInt('page', 1),
+            12
+        );
+
+        return $this->render('webapp/articles/listarticlesbytype.html.twig', [
+            'articles' => $articles,
+            'typeEtablissement' => $typeEtablissement,
+            'theme' => $theme,
+            'config' => $config,
         ]);
     }
 

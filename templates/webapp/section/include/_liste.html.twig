@@ -45,14 +45,14 @@
             </td>
             <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
                 <a href="{{ path('op_webapp_section_edit', {'id': section.id}) }}"><i class="far fa-edit"></i></a>&nbsp;&nbsp;
-                <a href="#" class="js-modalSuppr text-danger" type="button" data-bs-toggle="modal" data-bs-target="#Suppr" data-bs-whatever="{{ section.id }}">
-                    <i class="bi bi-eraser text-danger"></i>
+                <a href="{{ path('op_admin_section_del', {'id': section.id}) }}" class="openModal text-danger">
+                    <i class="far fa-trash"></i>
                 </a>
             </td>
         </tr>
     {% else %}
         <tr>
-            <td colspan="9">no records found</td>
+            <td colspan="9">Pas de section actuellement sur cette page.</td>
         </tr>
     {% endfor %}
     </tbody>

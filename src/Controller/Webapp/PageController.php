@@ -83,7 +83,7 @@ class PageController extends AbstractController
             $section->setIntro('');
             $section->setContent('none');
             $section->setPosition(1);
-            $section->setIsActiv(0);
+            $section->setIsActiv(1);
             $section->setPage($page);
             $entityManager->persist($section);
             $entityManager->flush();
@@ -125,7 +125,7 @@ class PageController extends AbstractController
             $section->setIntro('');
             $section->setContent('none');
             $section->setPosition(1);
-            $section->setIsActiv(0);
+            $section->setIsActiv(1);
             $section->setPage($page);
            $entityManager->persist($section);
             $entityManager->flush();
@@ -143,20 +143,20 @@ class PageController extends AbstractController
      * affiche la page en front office selon le slug
      */
     #[Route(path: '/webapp/page/{slug}', name: 'op_webapp_page_display', methods: ['GET'])]
-    public function page($slug, EntityManagerInterface $entityManager) : response
+    public function page($slug, EntityManagerInterface $entityManager, PageRepository $pageRepository) : response
     {
         $config = $entityManager->getRepository(Config::class)->find(1);
         if($config->getIsOffline() == 1){
             return $this->render('webapp/page/offline.html.twig');
         };
-        $page = $entityManager->getRepository(Page::class)->findbyslug($slug);
+        $page = $pageRepository->findbyslug($slug);
 
         return $this->render('webapp/page/page.html.twig', [
             'page' => $page,
         ]);
     }
 
-    #[Route(path: '/webapp/page/{id}', name: 'op_webapp_page_show', methods: ['GET'])]
+    #[Route(path: '/admin/page/show/{id}', name: 'op_admin_page_show', methods: ['GET'])]
     public function show(Page $page): Response
     {
         return $this->render('webapp/page/show.html.twig', [

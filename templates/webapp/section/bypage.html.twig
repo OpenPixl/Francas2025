@@ -5,18 +5,20 @@
         <p>Dans cet espace, vous pouvez ajouter/supprimer les différentes sections composants cette dernière.</p>
     </div>
 </div>
-<div id="liste">
-    <div id="op_actions" class="flex justify-end">
-        {% include 'composants/buttons/button_utils.html.twig' with {
-            'id' : null,
-            'class': '',
-            'href' : null,
-            'array' : null,
-            'icon': null,
-            'text': 'Ajouter une section à la page'
-        } %}
 
-    </div>
+<div id="op_actions" class="flex justify-end">
+    {% include 'composants/buttons/button_utils.html.twig' with {
+        'id' : 'btnAddSection',
+        'class': '',
+        'href' : path('op_webapp_section_add', {'page': page.id}),
+        'array' : null,
+        'icon': null,
+        'text': 'Ajouter une section à la page'
+    } %}
+</div>
+<div id="liste">
     {{ include('webapp/section/include/_liste.html.twig') }}
 </div>
+
+
 

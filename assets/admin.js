@@ -1,3 +1,4 @@
+import './stimulus_bootstrap.js';
 /*
  * Welcome to your app's main JavaScript file!
  *
@@ -10,6 +11,7 @@ import { initDropdowns } from './js/composants/tailwind.js';
 import { initDashboardIndex } from './js/admin/dashboard/index';
 import { initNewEditArticle } from "./js/admin/webapp/NewEditArticles";
 import { initNewEditPage } from "./js/admin/admin/NewEditPage";
+import { initShowPage } from "./js/admin/admin/ShowPage";
 import { initNewEditEtablissement } from "./js/admin/admin/NewEditEtablissement";
 import { initEditConfig } from "./js/admin/admin/EditConfig";
 import { initIndexEtablissement } from "./js/admin/admin/IndexEtablissement";
@@ -17,7 +19,7 @@ import { initNewEditUser } from "./js/admin/admin/NewEditUser";
 import { initIndexUser } from "./js/admin/admin/IndexUser";
 import { initIndexArticle } from "./js/admin/webapp/IndexArticles";
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('turbo:load', () => {
     // Select all dropdown toggle buttons
     const dropdownToggles = document.querySelectorAll(".dropdown-toggle")
     const page = document.body.dataset.page;
@@ -47,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'op_webapp_page_new':
         case 'op_webapp_page_edit':
             initNewEditPage();
+            break;
+        case 'op_admin_page_show':
+            initShowPage();
             break;
         case 'op_webapp_articles_index':
             initIndexArticle();

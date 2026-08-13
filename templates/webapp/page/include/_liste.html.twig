@@ -24,7 +24,7 @@
                     <i class="fa-duotone fa-light fa-grip-dots-vertical"></i>
                 </td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><input id="pageId" type="checkbox" value="{{ page.id }}"></td>
-                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><a href="{{ path('op_webapp_page_show', {'id': page.id}) }}">{{ page.title }}</a> (<small class="text-dark">{{ page.slug }}</small>)</td>
+                <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><a href="{{ path('op_admin_page_show', {'id': page.id}) }}">{{ page.title }}</a> (<small class="text-dark">{{ page.slug }}</small>)</td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{% if page.state == 'finished' %}Finalisée{% else %}Brouillon{% endif %}</td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400"><span class="badge bg-info">{{ page.sections|length }}</span></td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
@@ -44,7 +44,7 @@
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ page.createdAt ? page.createdAt|format_datetime('medium', 'none', locale='fr') : '' }}</td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">{{ page.updatedAt ? page.updatedAt|format_datetime('medium', 'none', locale='fr') : '' }}</td>
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
-                    <a href="{{ path('op_webapp_page_show', {'id': page.id}) }}"><i class="far fa-eye"></i></a>
+                    <a href="{{ path('op_admin_page_show', {'id': page.id}) }}"><i class="far fa-eye"></i></a>
                     <a href="{{ path('op_webapp_page_edit', {'id': page.id}) }}"><i class="far fa-edit"></i></a>
                     <a href="#" class="js-modalSuppr text-danger" type="button" data-bs-toggle="modal" data-bs-target="#Suppr" data-bs-whatever="{{ page.id }}">
                         <i class="bi bi-eraser text-danger"></i>

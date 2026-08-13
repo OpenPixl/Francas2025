@@ -25,6 +25,7 @@ class SectionType extends AbstractType
                         'Un article complet' => 'ONE_ARTICLE_COMPLETE',
                         'Les 5 derniers articles' => 'FIVE_ARTICLES',
                         'Une categorie' => 'Category',
+                        'Tous les articles' => 'ALL_ARTICLES',
                     ],
                     'Ressources' =>[
                         'Toutes les ressources' => 'ALL_RESSOURCES',
@@ -42,6 +43,10 @@ class SectionType extends AbstractType
             ])
             ->add('favorites', CheckboxType::class, [
                 'label' => 'Metre en favori ?',
+                'required' => false,
+            ])
+            ->add('isActiv', CheckboxType::class, [
+                'label' => 'Activer la section ?',
                 'required' => false,
             ])
             ->add('fluid', CheckboxType::class, [

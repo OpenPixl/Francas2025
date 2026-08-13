@@ -29,3 +29,38 @@ fos_elastica:
                     type: object
                     properties :
                         id: ~
+        article :
+            persistence:
+                driver: orm
+                model: App\Entity\Webapp\Article
+                elastica_to_model_transformer:
+                    ignore_missing: true
+                listener:
+                    enabled: true
+                    defer: false   # false = update direct, true = différé
+                    insert: true   # indexe à la création
+                    update: true   # met à jour à la modification
+                    delete: true   # supprime à la suppression
+                provider: ~
+                finder: ~
+            properties:
+                title:
+                    type: text
+                content:
+                    type: text
+                theme:
+                    type: object
+                    properties:
+                        id: ~
+                support:
+                    type: object
+                    properties:
+                        id: ~
+                etablissement:
+                    type: object
+                    properties:
+                        id: ~
+                typeEtablissement:
+                    property_path: etablissement?.typeEtablissement?.id
+                updatedAt:
+                    type: date

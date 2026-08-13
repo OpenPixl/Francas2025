@@ -16,6 +16,44 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
+    public function allArticles(){
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.etablissement', 'e')
+            ->leftJoin('e.typeEtablissement', 'te')
+            ->leftJoin('a.theme', 't')
+            ->leftJoin('a.support' , 'su')
+            ->addSelect('
+                a.id as id,
+                a.slug as slug,
+                a.title as title,
+                a.isTitleShow,
+                a.isShowReadMore,
+                a.content as content,
+                a.isArchived as isArchived,
+                a.isShowCreated as isShowCreated,
+                a.updatedAt as updatedAt,
+                a.doc as doc,
+                t.id as idtheme,
+                t.name as theme,
+                a.imageName,
+                su.id as idSupport,
+                su.name as support,
+                e.id AS idEtablissement,
+                e.name as nameEtablissement,
+                e.logoName as logoEtablissement,
+                te.id as idTypeEtablissement,
+                te.libelle as libelleEtablissement
+                '
+            )
+            ->andWhere('a.isArchived = :isArchived')
+            ->andWhere('a.etablissement is not null')
+            ->setParameter('isArchived', 0)
+            ->orderBy('a.updatedAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
     public function listArticlesBySection($idsection)
     {
         return $this->createQueryBuilder('a')

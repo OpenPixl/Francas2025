@@ -6,6 +6,8 @@
             {% elseif section.content == 'ONE_CATEGORY' %}
             {% elseif section.content == 'FIVE_ARTICLES' %}
                 {{ render(controller('App\\Controller\\Webapp\\ArticleController::listFiveArticles', {'category': section.category})) }}
+            {% elseif section.content == 'ALL_ARTICLES' %}
+                {{ render(controller('App\\Controller\\Webapp\\ArticleController::listAllArticles', {'category': section.id})) }}
             {% elseif section.content == 'ONE_ETABLISSEMENT' %}
                 {{ render(controller('App\\Controller\\Admin\\EtablissementController::show', {'id': section.singleEtablissement})) }}
             {% elseif section.content == 'ALL_ETABLISSEMENTS' %}

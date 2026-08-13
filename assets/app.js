@@ -18,7 +18,7 @@ import { initNewEditArticle } from "./js/app/article/NewEditArticles";
 import { initIndexAdminArticle } from "./js/admin/webapp/IndexArticles";
 
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('turbo:load', () => {
 
     // Affectation du JS selon la page
     const page = document.body.dataset.page;

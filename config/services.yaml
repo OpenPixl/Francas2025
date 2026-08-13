@@ -25,6 +25,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Parametrage bunbdle Fos ELASTICA sur Etablissement
     FOS\ElasticaBundle\Finder\FinderInterface $etablissementFinder:
         alias: fos_elastica.finder.etablissement
     App\Controller\Admin\EtablissementController:
@@ -32,3 +34,12 @@ services:
         public: true
         arguments:
             - '@fos_elastica.finder.etablissement'
+
+    # Parametrage bunbdle Fos ELASTICA sur Article
+    FOS\ElasticaBundle\Finder\FinderInterface $articleFinder:
+        alias: fos_elastica.finder.article
+    App\Controller\Webapp\ArticleController:
+        tags: [ 'controller.service_arguments' ]
+        public: true
+        arguments:
+            - '@fos_elastica.finder.article'

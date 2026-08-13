@@ -66,7 +66,6 @@ class SectionController extends AbstractController
     public function edit(Request $request, Section $section, EntityManagerInterface $entityManager): Response
     {
         $page = $section->getPage();
-        $idpage = $page->getId();
 
         $form = $this->createForm(SectionType::class, $section);
         $form->handleRequest($request);
@@ -81,7 +80,7 @@ class SectionController extends AbstractController
 
         return $this->render('webapp/section/edit.html.twig', [
             'section' => $section,
-            'idpage'=> $idpage,
+            'page'=> $page,
             'form' => $form->createView(),
         ]);
     }
@@ -110,14 +109,14 @@ class SectionController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/webapp/section/webapp/section/bypage/{page}', name: 'op_webapp_section_bypage', methods: ['GET'])]
-    public function byPage(SectionRepository $sectionRepository, $page, EntityManagerInterface $entityManager): Response
+    #[Route(path: '/webapp/section/webapp/section/bypage/{idpage}', name: 'op_webapp_section_bypage', methods: ['GET'])]
+    public function byPage(SectionRepository $sectionRepository, $idpage, EntityManagerInterface $entityManager): Response
     {
-        $element = $entityManager->getRepository(Page::class)->find($page);
+        $page = $entityManager->getRepository(Page::class)->find($idpage);
 
         return $this->render('webapp/section/bypage.html.twig', [
-            'sections' => $sectionRepository->findbypage($page),
-            'element' => $element,
+            'sections' => $sectionRepository->findbypage($idpage),
+            'page' => $page,
         ]);
     }
 
@@ -231,18 +230,19 @@ class SectionController extends AbstractController
         }
     }
 
-    #[Route(path: '/webapp/section/addsection/{page}/{row}', name: 'op_webapp_section_add', methods: ['GET', 'POST'])]
-    public function addSection( $page, $row, EntityManagerInterface $em) : Response
+    #[Route(path: '/webapp/section/addsection/{page}', name: 'op_webapp_section_add', methods: ['GET', 'POST'])]
+    public function addSection( $page, EntityManagerInterface $em) : Response
     {
-        $element = $em->getRepository(Page::class)->find($page);
-        $position = $row +1;
+        $page = $em->getRepository(Page::class)->find($page);
+        $sectionsCount = $page->getSections()->count();
+        $position = $sectionsCount === 0 ? 1 : $sectionsCount + 1;
 
         $section = new Section;
         $section->setName('Nouvelle section');
         $section->setContent('none');
-        $section->setPage($element);
+        $section->setPage($page);
         $section->setPosition($position);
-        $section->setIsActiv(0);
+        $section->setIsActiv(1);
         $em->persist($section);
         $em->flush();
 
@@ -250,18 +250,17 @@ class SectionController extends AbstractController
 
         return $this->json([
             'code'          => 200,
-            'message'       => 'LA section à bien été ajoutée.',
+            'message'       => 'La section à bien été ajoutée.',
             'liste'         =>  $this->renderView('webapp/section/include/_liste.html.twig', [
                 'sections' => $sections
             ])
         ], 200);
     }
 
-    #[Route(path: '/webapp/section/del/{id}', name: 'op_webapp_section_del', methods: ['POST'])]
+    #[Route(path: '/admin/section/del/{id}', name: 'op_admin_section_del', methods: ['POST'])]
     public function DelEvent(Section $section, EntityManagerInterface $em) : Response
     {
-        // creation des éléement ncessaire à la méthode
-        $user = $this->getUser();
+        // creation des élément ncessaire à la méthode
         $page = $section->getPage();
 
         // Suppression de l'entité
