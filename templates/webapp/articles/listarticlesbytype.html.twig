@@ -20,7 +20,11 @@
                     <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/60"></div>
 
                     <div class="absolute inset-x-0 top-0 flex items-center gap-2 p-3">
-                        <img src="{{ asset(article.logoUrl) }}" alt="Logo de {{ article.nameEtablissement }}" class="h-6 w-6 flex-shrink-0 rounded-full bg-white object-cover" />
+                        {% if article.logoUrl %}
+                            <img src="{{ asset(article.logoUrl) }}" alt="Logo de {{ article.nameEtablissement }}" class="h-6 w-6 flex-shrink-0 rounded-full bg-white object-cover" />
+                        {% else %}
+                            <img src="{{ asset('/uploads/images/config/' ~ config.vignetteName)}}" alt="Logo de {{ article.nameEtablissement }}" class="h-6 w-6 flex-shrink-0 rounded-full bg-white object-cover" />
+                        {% endif %}
                         <h3 class="text-sm font-semibold text-white drop-shadow-sm">{{ article.nameEtablissement }}</h3>
                     </div>
 

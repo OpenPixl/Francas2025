@@ -183,6 +183,13 @@ touchées par le même bug (lignes 8 et 28 du template) :
   les deux fallbacks ci-dessus) — ajouté, sur le même modèle que les autres actions du contrôleur qui en ont
   besoin.
 
+## 10. Bug corrigé : page "voir tous" d'un type (`listarticlesbytype.html.twig`) plantait en 500 au clic depuis le chargement initial
+
+Même bug que §9, non répliqué dans ce template lors de sa création (§5) : `asset(article.logoUrl)` était appelé **sans garde**, alors que `MediaPathResolver::etablissementLogoUrl()` renvoie `null` dès qu'un établissement n'a pas de logo uploadé. `asset()` de Symfony n'accepte pas `null` → `TypeError` → page entière en erreur 500.
+
+- Repéré en testant le bouton "Voir tous les articles" **sans aucun filtre appliqué** (clic direct depuis le chargement initial de `listallarticles.html.twig`) : la page non filtrée regroupe jusqu'à 200 articles par type (`$query->setSize(200)` dans `listArticlesByType`), ce qui augmente fortement la probabilité de tomber sur un établissement sans logo. Les scénarios de test documentés en §"Vérifications effectuées" combinaient systématiquement un thème + une recherche texte, un sous-ensemble qui n'avait par chance touché que des établissements avec logo — ce cas limite n'avait donc pas été couvert.
+- Correctif : ajout de la garde `{% if article.logoUrl %}...{% else %}...{% endif %}` avec fallback sur `config.vignetteName` (avatar par défaut du site), sur le même modèle que `_listesearch.html.twig` (§6) et `_blocarticle.html.twig` (§9). Contrairement à `_listesearch.html.twig`, le tableau construit par `ArticleController::listArticlesByType()` n'expose pas de champ `logoEtablissement` (nom de fichier brut) — la garde porte donc directement sur `article.logoUrl` (URL déjà résolue, `null` si pas de logo) plutôt que sur le nom de fichier.
+
 ---
 
 ## Fichiers créés
@@ -200,6 +207,7 @@ touchées par le même bug (lignes 8 et 28 du template) :
 - `templates/webapp/articles/include/_listesearch.html.twig`
 - `templates/webapp/articles/show.html.twig` (§8 : largeur 7xl, bloc support)
 - `templates/webapp/articles/include/_blocarticle.html.twig` (§9 : fallback logo/image, bug 500 corrigé)
+- `templates/webapp/articles/listarticlesbytype.html.twig` (§10 : fallback logo établissement, bug 500 corrigé)
 - `assets/app.js` (§8 : route `op_webapp_articles_show` ajoutée au câblage du lecteur audio)
 - `assets/js/app/etablissement/article.js` (§8 : garde-fou `if (!audio) return;`)
 
