@@ -6,7 +6,7 @@ ARG SYMFONY_VERSION
 ARG GIT_USER_EMAIL
 ARG GIT_USER_NAME
 
-RUN install-php-extensions intl opcache gd zip pdo_pgsql pgsql curl xml mbstring json
+RUN install-php-extensions intl opcache gd zip pdo_mysql curl xml mbstring json
 
 # Autorise les uploads volumineux (voir docker/php/conf.d/uploads.ini)
 COPY docker/php/conf.d/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
