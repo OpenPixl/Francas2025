@@ -7,12 +7,7 @@ use App\Entity\Admin\User;
 use App\Repository\Webapp\RessourcesRepository;
 use Cocur\Slugify\Slugify;
 use Doctrine\ORM\Mapping as ORM;
-use Vich\UploaderBundle\Entity\File as EmbeddedFile;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-/**
- * @Vich\Uploadable()
- */
 #[ORM\Entity(repositoryClass: RessourcesRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class Ressources

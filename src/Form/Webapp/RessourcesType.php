@@ -11,8 +11,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
-use Vich\UploaderBundle\Form\Type\VichFileType;
-use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class RessourcesType extends AbstractType
 {
@@ -33,7 +31,7 @@ class RessourcesType extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '10000k',
+                        'maxSize' => '100000k',
                         'mimeTypes' => [
                             'image/png',
                             'image/jpeg',
@@ -49,7 +47,7 @@ class RessourcesType extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '10000k',
+                        'maxSize' => '100000k',
                         'mimeTypes' => [
                             'video/mp4',
                             'video/mpeg',

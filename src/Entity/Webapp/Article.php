@@ -13,9 +13,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 
-/**
- * @Vich\Uploadable()
- */
 #[ORM\Table(name: 'article')]
 #[ORM\Index(columns: ['title'], flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]

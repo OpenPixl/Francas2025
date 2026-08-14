@@ -40,7 +40,7 @@ class Articles2Type extends AbstractType
             ],
             3 => [ // document
                 new File([
-                    'maxSize' => '10000k',
+                    'maxSize' => '100000k',
                     'mimeTypes' => [
                         'application/pdf',
                         'application/msword',
@@ -83,7 +83,7 @@ class Articles2Type extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '10000k',
+                        'maxSize' => '100000k',
                         'mimeTypes' => [
                             'image/png',
                             'image/jpeg',
@@ -99,7 +99,7 @@ class Articles2Type extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '10000k',
+                        'maxSize' => '100000k',
                         'mimeTypes' => [
                             'video/mp4',
                             'video/mpeg',
