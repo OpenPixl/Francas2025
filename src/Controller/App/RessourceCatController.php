@@ -5,6 +5,7 @@ namespace App\Controller\App;
 use App\Entity\Gestapp\RessourceCat;
 use App\Form\Webapp\RessourceCatType;
 use App\Repository\Webapp\RessourceCatRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +24,7 @@ class RessourceCatController extends AbstractController
     }
 
     #[Route(path: '/admin/ressourcescat/new', name: 'op_webapp_ressource_cat_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $data = json_decode($request->getContent(), true);
         if(!$data) {
@@ -32,7 +33,6 @@ class RessourceCatController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->persist($ressourceCat);
                 $entityManager->flush();
 
@@ -53,7 +53,6 @@ class RessourceCatController extends AbstractController
             $ressourceCat = new RessourceCat();
             $ressourceCat->setName($name);
             $ressourceCat->setParent($parent);
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($ressourceCat);
             $entityManager->flush();
 
@@ -76,13 +75,13 @@ class RessourceCatController extends AbstractController
     }
 
     #[Route(path: '/admin/ressourcescat/{id}/edit', name: 'op_webapp_ressource_cat_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, RessourceCat $ressourceCat): Response
+    public function edit(Request $request, RessourceCat $ressourceCat, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(RessourceCatType::class, $ressourceCat);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute('op_webapp_ressource_cat_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -94,10 +93,9 @@ class RessourceCatController extends AbstractController
     }
 
     #[Route(path: '/admin/ressourcescat/{id}', name: 'op_webapp_ressource_cat_delete', methods: ['POST'])]
-    public function delete(Request $request, RessourceCat $ressourceCat): Response
+    public function delete(Request $request, RessourceCat $ressourceCat, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$ressourceCat->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($ressourceCat);
             $entityManager->flush();
         }

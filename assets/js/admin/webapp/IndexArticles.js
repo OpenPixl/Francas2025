@@ -37,4 +37,22 @@ export function initIndexArticle(){
     }
 
     reload();
+
+    // Formulaire de recherche instancié dans la navbar (NavbarSearchController)
+    const searchForm = document.getElementById('navbar_search_form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const params = new URLSearchParams(new FormData(searchForm));
+            axios
+                .get(searchForm.action + '?' + params.toString())
+                .then(function (response) {
+                    document.getElementById('liste').innerHTML = response.data.liste;
+                    reload();
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        });
+    }
 }

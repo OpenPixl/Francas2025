@@ -1,7 +1,6 @@
-
-services:
-###> doctrine/doctrine-bundle ###
-  db:
-    ports:
-      - "5432"
-###< doctrine/doctrine-bundle ###
+# Surcharges locales optionnelles, chargées automatiquement par `docker compose`.
+#
+# L'ancien bloc « db: ports: - 5432 » provenait d'une recette PostgreSQL non
+# utilisée : il ajoutait un mapping de port bidon sur le conteneur MariaDB.
+# Le port MariaDB est désormais publié dans compose.yaml (db: ports "3307:3306").
+services: {}

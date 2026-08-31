@@ -16,6 +16,49 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
+    /**
+     * Recharge en une seule requête des articles (avec les relations utilisées
+     * à l'affichage : établissement, type d'établissement, thème, support) à
+     * partir d'une liste d'IDs — typiquement ceux renvoyés par une recherche
+     * Elasticsearch. Évite le N+1 provoqué par l'itération sur les entités
+     * hydratées par le finder. L'ordre des IDs (pertinence ES) est conservé.
+     *
+     * @param int[] $ids
+     * @return Article[] indexé par id, dans l'ordre de $ids
+     */
+    public function findWithRelationsByIds(array $ids): array
+    {
+        $ids = array_values(array_unique(array_filter($ids)));
+        if (!$ids) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('a')
+            ->addSelect('e', 'te', 't', 'su')
+            ->leftJoin('a.etablissement', 'e')
+            ->leftJoin('e.typeEtablissement', 'te')
+            ->leftJoin('a.theme', 't')
+            ->leftJoin('a.support', 'su')
+            ->andWhere('a.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+
+        $byId = [];
+        foreach ($rows as $article) {
+            $byId[$article->getId()] = $article;
+        }
+
+        $ordered = [];
+        foreach ($ids as $id) {
+            if (isset($byId[$id])) {
+                $ordered[$id] = $byId[$id];
+            }
+        }
+
+        return $ordered;
+    }
+
     public function allArticles(){
         return $this->createQueryBuilder('a')
             ->leftJoin('a.etablissement', 'e')

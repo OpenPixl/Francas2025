@@ -190,6 +190,13 @@ Même bug que §9, non répliqué dans ce template lors de sa création (§5) : 
 - Repéré en testant le bouton "Voir tous les articles" **sans aucun filtre appliqué** (clic direct depuis le chargement initial de `listallarticles.html.twig`) : la page non filtrée regroupe jusqu'à 200 articles par type (`$query->setSize(200)` dans `listArticlesByType`), ce qui augmente fortement la probabilité de tomber sur un établissement sans logo. Les scénarios de test documentés en §"Vérifications effectuées" combinaient systématiquement un thème + une recherche texte, un sous-ensemble qui n'avait par chance touché que des établissements avec logo — ce cas limite n'avait donc pas été couvert.
 - Correctif : ajout de la garde `{% if article.logoUrl %}...{% else %}...{% endif %}` avec fallback sur `config.vignetteName` (avatar par défaut du site), sur le même modèle que `_listesearch.html.twig` (§6) et `_blocarticle.html.twig` (§9). Contrairement à `_listesearch.html.twig`, le tableau construit par `ArticleController::listArticlesByType()` n'expose pas de champ `logoEtablissement` (nom de fichier brut) — la garde porte donc directement sur `article.logoUrl` (URL déjà résolue, `null` si pas de logo) plutôt que sur le nom de fichier.
 
+## 11. Réinitialisation du formulaire après recherche (17/08/2026)
+
+`assets/js/app/page/show.js` (`initShowPage()`, code partagé avec la recherche établissements — voir
+`NOTES_VUE_ETABLISSEMENTS_PAR_SECTION.md`) : après réception de la réponse AJAX et réinjection du HTML dans
+`#form_results`, un appel à `form.reset()` a été ajouté pour vider les champs du formulaire (texte + selects)
+après chaque recherche réussie, plutôt que de laisser les valeurs saisies affichées.
+
 ---
 
 ## Fichiers créés
@@ -210,6 +217,7 @@ Même bug que §9, non répliqué dans ce template lors de sa création (§5) : 
 - `templates/webapp/articles/listarticlesbytype.html.twig` (§10 : fallback logo établissement, bug 500 corrigé)
 - `assets/app.js` (§8 : route `op_webapp_articles_show` ajoutée au câblage du lecteur audio)
 - `assets/js/app/etablissement/article.js` (§8 : garde-fou `if (!audio) return;`)
+- `assets/js/app/page/show.js` (§11 : `form.reset()` après recherche réussie)
 
 ## Vérifications effectuées
 

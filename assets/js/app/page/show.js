@@ -22,8 +22,9 @@ export function initShowPage()
                         const results = document.querySelector('#form_results');
                         if (results && response.data.liste) {
                             results.innerHTML = response.data.liste;
-                    }
-                }).catch(error => {
+                        }
+                        form.reset();
+                    }).catch(error => {
                     console.error('Erreur lors de la recherche', error);
                 });
             });

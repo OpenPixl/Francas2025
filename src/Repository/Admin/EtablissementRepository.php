@@ -16,6 +16,45 @@ class EtablissementRepository extends ServiceEntityRepository
         parent::__construct($registry, Etablissement::class);
     }
 
+    /**
+     * Recharge des établissements avec leur type en une seule requête, à partir
+     * d'une liste d'IDs (typiquement issus d'une recherche Elasticsearch).
+     * Évite le N+1 sur `getTypeEtablissement()` lors de l'itération. L'ordre des
+     * IDs est conservé.
+     *
+     * @param int[] $ids
+     * @return Etablissement[] indexé par id, dans l'ordre de $ids
+     */
+    public function findWithTypeByIds(array $ids): array
+    {
+        $ids = array_values(array_unique(array_filter($ids)));
+        if (!$ids) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('e')
+            ->addSelect('t')
+            ->leftJoin('e.typeEtablissement', 't')
+            ->andWhere('e.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+
+        $byId = [];
+        foreach ($rows as $etablissement) {
+            $byId[$etablissement->getId()] = $etablissement;
+        }
+
+        $ordered = [];
+        foreach ($ids as $id) {
+            if (isset($byId[$id])) {
+                $ordered[$id] = $byId[$id];
+            }
+        }
+
+        return $ordered;
+    }
+
     public function listEtablissementsBySection($idsection)
     {
         return $this->createQueryBuilder('e')

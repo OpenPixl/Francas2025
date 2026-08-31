@@ -203,6 +203,27 @@ montrait encore un index `articles` (44 docs) en plus du nouvel index `etablisse
 
 ---
 
+## Mise à jour du 17/08/2026 — Réinitialisation du formulaire après recherche
+
+`show.js` (§6) est partagé entre cette vue et la recherche d'articles (voir `NOTES_RECHERCHE_ARTICLES.md`) : les
+deux formulaires (`#form_search`) sont interceptés par le même gestionnaire `submit`. Après réception de la
+réponse AJAX et réinjection du HTML dans `#form_results`, un appel à `form.reset()` a été ajouté pour vider les
+champs du formulaire (texte + selects) après chaque recherche réussie, plutôt que de laisser les valeurs
+saisies affichées.
+
+```js
+.then(response => {
+    const results = document.querySelector('#form_results');
+    if (results && response.data.liste) {
+        results.innerHTML = response.data.liste;
+    }
+    form.reset();
+})
+```
+
+`form.reset()` revient aux valeurs par défaut du DOM au chargement de la page — comme ces formulaires ne sont
+jamais pré-remplis côté serveur au chargement initial, cela revient en pratique à des champs vides.
+
 ## Fichiers modifiés (session du 12/08/2026)
 
 - `assets/app.js`

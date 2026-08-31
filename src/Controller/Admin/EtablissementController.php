@@ -46,7 +46,8 @@ class EtablissementController extends AbstractController
     #[Route(path: '/op_admin/etablissement', name: 'op_admin_etablissement_index', methods: ['GET'])]
     public function index(EtablissementRepository $etablissementRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $data = $etablissementRepository->findAll();
+        // QueryBuilder : pagination SQL (LIMIT) plutôt que findAll() + découpe mémoire.
+        $data = $etablissementRepository->createQueryBuilder('e')->orderBy('e.id', 'ASC');
 
         $etablissements = $paginator->paginate(
             $data,
@@ -600,6 +601,10 @@ class EtablissementController extends AbstractController
             $query->setSize(50);
 
             $results = $this->finder->find($query);
+            // Rechargement groupé du type d'établissement pour éviter le N+1.
+            $results = $entityManager->getRepository(Etablissement::class)->findWithTypeByIds(
+                array_map(static fn ($r) => $r->getId(), $results)
+            );
 
             $etablissementsByType = [];
             foreach ($results as $r) {

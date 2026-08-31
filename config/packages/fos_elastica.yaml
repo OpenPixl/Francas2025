@@ -12,7 +12,7 @@ fos_elastica:
                     ignore_missing: true
                 listener:
                     enabled: true
-                    defer: false   # false = update direct, true = différé
+                    defer: true    # true = indexation groupée en fin de requête (kernel.terminate) au lieu d'un appel HTTP ES par flush
                     insert: true   # indexe à la création
                     update: true   # met à jour à la modification
                     delete: true   # supprime à la suppression
@@ -37,7 +37,7 @@ fos_elastica:
                     ignore_missing: true
                 listener:
                     enabled: true
-                    defer: false   # false = update direct, true = différé
+                    defer: true    # true = indexation groupée en fin de requête (kernel.terminate) au lieu d'un appel HTTP ES par flush
                     insert: true   # indexe à la création
                     update: true   # met à jour à la modification
                     delete: true   # supprime à la suppression

@@ -9,6 +9,7 @@ use App\Entity\Gestapp\Theme;
 use App\Entity\Webapp\Article;
 use App\Entity\Webapp\Section;
 use App\Form\Search\ArticleSearchType;
+use App\Form\Search\NavbarArticleSearchType;
 use App\Form\Webapp\ArticlesType;
 use App\Form\Webapp\Articles2Type;
 use App\Form\Webapp\SearcharticleType;
@@ -46,12 +47,43 @@ class ArticleController extends AbstractController
     #[Route(path: '/webapp/articles/', name: 'op_webapp_articles_index', methods: ['GET', 'POST'])]
     public function index(ArticleRepository $articleRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $data = $articleRepository->findBy([], ['id' => 'DESC']);
+        // Recherche Elastica issue du formulaire de la navbar admin (NavbarSearchController)
+        $searchForm = $this->createForm(NavbarArticleSearchType::class, null, [
+            'method' => 'GET',
+            'csrf_protection' => false,
+        ]);
+        $searchForm->handleRequest($request);
+
+        if ($searchForm->isSubmitted() && $searchForm->isValid() && !empty($searchForm->get('query')->getData())) {
+            $boolQuery = new BoolQuery();
+            $multiMatch = new MultiMatch();
+            $multiMatch->setFields(['title']);
+            $multiMatch->setQuery($searchForm->get('query')->getData());
+            $boolQuery->addMust($multiMatch);
+
+            $esQuery = new Query($boolQuery);
+            $esQuery->setSort(['updatedAt' => ['order' => 'desc']]);
+
+            $data = $this->finder->find($esQuery);
+        } else {
+            // QueryBuilder (et non un tableau d'entités) : la pagination se fait en
+            // SQL (LIMIT) au lieu de tout hydrater puis découper en mémoire.
+            $data = $articleRepository->createQueryBuilder('a')->orderBy('a.id', 'DESC');
+        }
+
         $articles = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
             15
         );
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'liste' => $this->renderView('webapp/articles/include/_liste.html.twig', [
+                    'articles' => $articles,
+                ]),
+            ]);
+        }
 
         return $this->render('webapp/articles/index.html.twig', [
             'articles' => $articles,
@@ -132,6 +164,11 @@ class ArticleController extends AbstractController
             $query->setSort(['updatedAt' => ['order' => 'desc']]);
 
             $results = $this->finder->find($query);
+            // Rechargement groupé (établissement/type/thème/support) pour éviter le
+            // N+1 sur les entités hydratées par le finder Elastica.
+            $results = $articleRepository->findWithRelationsByIds(
+                array_map(static fn ($r) => $r->getId(), $results)
+            );
 
             //dd($results);
 
@@ -210,6 +247,10 @@ class ArticleController extends AbstractController
         $query->setSort(['updatedAt' => ['order' => 'desc']]);
 
         $results = $this->finder->find($query);
+        // Rechargement groupé pour éviter le N+1 (établissement/type/thème/support).
+        $results = $entityManager->getRepository(Article::class)->findWithRelationsByIds(
+            array_map(static fn ($r) => $r->getId(), $results)
+        );
 
         $data = [];
         foreach ($results as $r) {
@@ -777,7 +818,7 @@ class ArticleController extends AbstractController
         $entityManager->remove($article);
         $entityManager->flush();
 
-        $data = $entityManager->getRepository(Article::class)->findBy([], ['id' => 'DESC']);
+        $data = $entityManager->getRepository(Article::class)->createQueryBuilder('a')->orderBy('a.id', 'DESC');
         $articles = $paginator->paginate(
             $data,
             $request->query->getInt('page', $page),

@@ -5,6 +5,7 @@ namespace App\Controller\App;
 use App\Entity\Gestapp\Support;
 use App\Form\Webapp\SupportType;
 use App\Repository\Webapp\SupportRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,14 +22,13 @@ class SupportController extends AbstractController
     }
 
     #[Route(path: '/webapp/support/new', name: 'webapp_support_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $support = new Support();
         $form = $this->createForm(SupportType::class, $support);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($support);
             $entityManager->flush();
 
@@ -50,13 +50,13 @@ class SupportController extends AbstractController
     }
 
     #[Route(path: '/webapp/support/{id}/edit', name: 'webapp_support_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Support $support): Response
+    public function edit(Request $request, Support $support, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(SupportType::class, $support);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute('webapp_support_index');
         }
@@ -68,10 +68,9 @@ class SupportController extends AbstractController
     }
 
     #[Route(path: '/webapp/support/{id}', name: 'webapp_support_delete', methods: ['DELETE'])]
-    public function delete(Request $request, Support $support): Response
+    public function delete(Request $request, Support $support, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$support->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($support);
             $entityManager->flush();
         }

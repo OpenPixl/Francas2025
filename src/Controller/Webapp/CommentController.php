@@ -5,6 +5,7 @@ namespace App\Controller\Webapp;
 use App\Entity\Webapp\Comment;
 use App\Form\Webapp\CommentType;
 use App\Repository\Webapp\CommentRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +22,7 @@ class CommentController extends AbstractController
     }
 
     #[Route(path: '/webapp/comment/new', name: 'webapp_comment_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
@@ -31,7 +32,6 @@ class CommentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($comment);
             $entityManager->flush();
 
@@ -53,13 +53,13 @@ class CommentController extends AbstractController
     }
 
     #[Route(path: '/webapp/comment/{id}/edit', name: 'webapp_comment_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Comment $comment): Response
+    public function edit(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(CommentType::class, $comment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute('webapp_comment_index');
         }
@@ -71,10 +71,9 @@ class CommentController extends AbstractController
     }
 
     #[Route(path: '/webapp/comment/{id}', name: 'webapp_comment_delete', methods: ['DELETE'])]
-    public function delete(Request $request, Comment $comment): Response
+    public function delete(Request $request, Comment $comment, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$comment->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($comment);
             $entityManager->flush();
         }

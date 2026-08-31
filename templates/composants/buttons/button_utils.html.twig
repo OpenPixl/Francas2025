@@ -1,6 +1,17 @@
+{% set primary = 'border-blue-700 text-blue-700 hover:bg-blue-700 hover:text-white' %}
+{% set danger = 'border-red-700 text-red-700 hover:bg-red-700 hover:text-white' %}
+
 <a
     id="{{ id }}"
-    class="border text-sm rounded px-1.5 py-1.5 me-1 {% if variant is defined and variant == 'danger' %}border-red-700 text-red-700 hover:bg-red-700 hover:text-white{% else %}border-slate-600 text-slate-700 hover:bg-gray-600 hover:text-white{% endif %}"
+    class="
+        border text-sm rounded px-1.5 py-1.5 me-1
+        {% if variant is defined and variant == 'primary' %}
+        {{ primary }}
+        {% elseif variant is defined and variant == 'danger' %}
+        {{ danger }}
+        {% else %}
+        border-slate-600 text-slate-700 hover:bg-gray-600 hover:text-white
+        {% endif %}"
     href="{{ href }}"
     data-array = "{{ array }}"
     {% if data is defined and data is not empty %}{% for key, value in data %}data-{{ key }}="{{ value }}" {% endfor %}{% endif %}

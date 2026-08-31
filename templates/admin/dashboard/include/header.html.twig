@@ -33,7 +33,8 @@
                     'icon': btns.save.icon,
                     'href': btns.save.href,
                     'text': btns.save.text,
-                    'array':btns.save.array
+                    'array':btns.save.array,
+                    'variant': btns.del.variant is defined ? btns.del.variant : null,
                 }) }}
             {% endif %}
             {% if btns.edit is defined and btns.edit is not null %}
@@ -42,7 +43,8 @@
                 'icon': btns.edit.icon,
                 'href': btns.edit.href,
                 'text': btns.edit.text,
-                'array':btns.edit.array
+                'array':btns.edit.array,
+                'variant': btns.del.variant is defined ? btns.del.variant : null,
             }) }}
             {% endif %}
             {% if btns.del is defined and btns.del is not null %}

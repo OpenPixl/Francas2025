@@ -5,6 +5,7 @@ namespace App\Controller\App;
 use App\Entity\Gestapp\Theme;
 use App\Form\Webapp\ThemeType;
 use App\Repository\Webapp\ThemeRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,14 +22,13 @@ class ThemeController extends AbstractController
     }
 
     #[Route(path: '/webapp/theme/new', name: 'webapp_theme_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $theme = new Theme();
         $form = $this->createForm(ThemeType::class, $theme);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($theme);
             $entityManager->flush();
 
@@ -50,13 +50,13 @@ class ThemeController extends AbstractController
     }
 
     #[Route(path: '/webapp/theme/{id}/edit', name: 'webapp_theme_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Theme $theme): Response
+    public function edit(Request $request, Theme $theme, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ThemeType::class, $theme);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             return $this->redirectToRoute('webapp_theme_index');
         }
@@ -68,10 +68,9 @@ class ThemeController extends AbstractController
     }
 
     #[Route(path: '/webapp/theme/{id}', name: 'webapp_theme_delete', methods: ['DELETE'])]
-    public function delete(Request $request, Theme $theme): Response
+    public function delete(Request $request, Theme $theme, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$theme->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($theme);
             $entityManager->flush();
         }

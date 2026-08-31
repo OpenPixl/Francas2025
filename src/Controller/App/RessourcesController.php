@@ -23,7 +23,7 @@ class RessourcesController extends AbstractController
     #[Route(path: '/admin/ressources', name: 'op_webapp_ressources_index', methods: ['GET'])]
     public function index(RessourcesRepository $ressourcesRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $data = $ressourcesRepository->findAll();
+        $data = $ressourcesRepository->createQueryBuilder('r')->orderBy('r.id', 'DESC');
 
         $ressources = $paginator->paginate(
             $data,
@@ -42,11 +42,13 @@ class RessourcesController extends AbstractController
     {
         $categories = $entityManager->getRepository(RessourceCat::class)->findAll();
 
-        $data = $entityManager->getRepository(Ressources::class)->findAll();
+        // QueryBuilder : la pagination applique un LIMIT en SQL au lieu de charger
+        // toutes les ressources en mémoire à chaque rendu de section.
+        $data = $entityManager->getRepository(Ressources::class)->createQueryBuilder('r')->orderBy('r.id', 'DESC');
         $ressources = $paginator->paginate(
-            $data, /* query NOT result */
-            $request->query->getInt('page', 1), /*page number*/
-            10 /*limit per page*/
+            $data,
+            $request->query->getInt('page', 1),
+            10
         );
 
         return $this->render('webapp/ressources/sectionlistall.html.twig', [
@@ -220,7 +222,7 @@ class RessourcesController extends AbstractController
         $entityManager->remove($ressource);
         $entityManager->flush();
 
-        $data = $entityManager->getRepository(Ressources::class)->findAll();
+        $data = $entityManager->getRepository(Ressources::class)->createQueryBuilder('r')->orderBy('r.id', 'DESC');
         $ressources = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),

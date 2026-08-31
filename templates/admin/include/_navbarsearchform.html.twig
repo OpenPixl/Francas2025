@@ -1,0 +1,8 @@
+{{ form_start(form, {attr: {id: 'navbar_search_form', class: 'grid w-full max-w-lg grid-cols-1 lg:max-w-xs'}}) }}
+    <input type="search" name="{{ field_name(form.query) }}" id="{{ form.query.vars.id }}" value="{{ field_value(form.query) }}"
+           class="col-start-1 row-start-1 block w-full rounded-md bg-gray-100 border border-gray-200 py-1.5 pr-3 pl-10 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6"
+           placeholder="Rechercher..." autocomplete="off"/>
+    <div class="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400">
+        <i class="fa-light fa-magnifying-glass"></i>
+    </div>
+{{ form_end(form) }}

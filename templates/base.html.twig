@@ -25,13 +25,13 @@
             <header>
                 {% block header %}
                     {% if app.request.attributes.get('_route') == 'op_webapp_public_homepage'%}
-                        {{ render(controller('App\\Controller\\Admin\\ConfigController::headerShow')) }}
+                        {% include 'admin/config/headershow.html.twig' with { config: site_config() } %}
                     {% endif %}
                 {% endblock %}
-                {% block mainnav %}
-                    {{ render(controller('App\\Controller\\Webapp\\PageController::listmenu')) }}
-                {% endblock %}
             </header>
+            {% block mainnav %}
+                {% include 'webapp/page/listmenu.html.twig' with { pages: menu_pages(), config: site_config() } %}
+            {% endblock %}
             <main>
                 {% block main %}
                 {% endblock %}

@@ -16,14 +16,14 @@
             <div class="absolute inset-0 flex flex-col justify-end p-6 text-white">
                 <div class="flex flex-row items-center gap-4">
                     {% if article.logoName is not null %}
-                        <img src="{{ asset(article.logoUrl) | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-20 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
+                        <img src="{{ asset(article.logoUrl) | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-12 shrink-0 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
                     {% else %}
-                        <img src="{{ asset('/uploads/images/fixes/img_article_none.png') | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-20 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
+                        <img src="{{ asset('/uploads/images/fixes/img_article_none.png') | imagine_filter('thumb_logo_etablissement') }}" alt="" class="size-12 shrink-0 rounded-full ring-2 ring-[#d84519] sm:size-32 dark:ring-gray-900 dark:outline dark:-outline-offset-1 dark:outline-white/10" />
                     {% endif %}
-                    <div>
+                    <div class="min-w-0">
                         <span class="bg-[#d84519] w-40 px-3 py-1 rounded-xl text-sm mb-2 flex justify-center">{{ article.theme }}</span>
-                        <h2 class="text-2xl font-bold">{{ article.title }}</h2>
-                        <p class="text-sm opacity-90">{{ article.content |u.truncate(200, ' ...') | raw }}</p>
+                        <h2 class="text-2xl font-bold truncate">{{ article.title }}</h2>
+                        <p class="text-sm opacity-90 truncate">{{ article.content | striptags | u.truncate(80, ' ...') }}</p>
                     </div>
                 </div>
 
@@ -35,9 +35,9 @@
     </div>
 
     <!-- BARRES DE NAVIGATION -->
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3">
+    <div class="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 flex gap-3">
         {% for article in articles %}
-        <button data-slide="{{ loop.index - 1 }}" class="bar w-10 h-2 bg-white/40 rounded-full"></button>
+        <button data-slide="{{ loop.index - 1 }}" class="bar w-10 h-3 bg-white/40 rounded-full"></button>
         {% endfor %}
     </div>
 </div>

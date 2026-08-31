@@ -18,6 +18,11 @@ services:
       - ./:/app
     environment:
       - SERVER_NAME=:80
+      # Force l'environnement de production : sans ça, .env / .env.local (APP_ENV)
+      # font tourner le kernel en mode dev+debug (profiler, logs debug, revalidation
+      # container/Twig à chaque requête ET chaque sous-requête render(controller())).
+      - APP_ENV=prod
+      - APP_DEBUG=0
     depends_on:
       - db
     networks:
@@ -33,10 +38,14 @@ services:
       - MYSQL_USER=${MYSQL_USER:-app}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-!ChangeMe!}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-!ChangeMe!}
+    # Port publié sur l'hôte pour la supervision depuis l'IDE (hôte 3307 -> conteneur 3306).
     ports:
       - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
+      # Configuration MariaDB versionnée dans le projet. Montée comme fichier isolé
+      # (et non le dossier entier) pour ne pas masquer le docker.cnf fourni par l'image.
+      - ./docker/mariadb/conf.d/francas2025.cnf:/etc/mysql/conf.d/francas2025.cnf:ro
     networks:
       - francascc2025
 
