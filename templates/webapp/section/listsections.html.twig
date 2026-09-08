@@ -1,8 +1,22 @@
 {% if sections %}
     {% for section in sections %}
         <section class="{% if section.fluid == 1 %}{% else %}mx-auto my-8 max-w-7xl px-2 sm:px-6 lg:px-8{% endif %}" id="page_content">
+
+            {% if section.isShowtitle == 1 %}
+                <div class="mb-2">
+                    <h2 class="font-semibold text-gray-700 text-xl border-b border-gray-700">{{ section.name|upper }}</h2>
+                </div>
+            {% endif %}
+            {% if section.isShowdescription == 1 %}
+                <div class="mb-3">
+                    <p>{{ section.descriptif|raw }}</p>
+                </div>
+            {% endif %}
+
             {% if section.content == 'ONE_ARTICLE' %}
                 {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesBySection', {'idsection': section.id})) }}
+            {% elseif section.content == 'ONE_ARTICLE_COMPLETE' %}
+                {{ render(controller('App\\Controller\\Webapp\\ArticleController::ArticlesCompleteBySection', {'idsection': section.id})) }}
             {% elseif section.content == 'ONE_CATEGORY' %}
             {% elseif section.content == 'FIVE_ARTICLES' %}
                 {{ render(controller('App\\Controller\\Webapp\\ArticleController::listFiveArticles', {'category': section.category})) }}
@@ -16,7 +30,7 @@
                 {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesBySectionOther', {'idsection': section.id})) }}
             {% elseif section.content == 'ALL_RESSOURCES' %}
                 {{ render(controller('App\\Controller\\App\\RessourcesController::sectionListAll')) }}
-            {% elseif section.content == 'ALL_RESSOURCES' %}
+            {% elseif section.content == 'ONE_RESSOURCES' %}
                 {{ render(controller('App\\Controller\\App\\RessourcesController::sectionlistOneCategory', {'category': section.ressourcescat})) }}
             {% endif %}
         </section>

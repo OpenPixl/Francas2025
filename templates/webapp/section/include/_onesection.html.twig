@@ -43,9 +43,9 @@
                 {% elseif section.content == 'OTHER_CONTENT' %}
                     {{ render(controller('App\\Controller\\Webapp\\ArticleController::listArticlesBySectionOther', {'idsection': section.id})) }}
                 {% elseif section.content == 'ALL_RESSOURCES' %}
-                    {{ render(controller('App\\Controller\\Webapp\\RessourcesController::sectionListAll')) }}
+                    {{ render(controller('App\\Controller\\App\\RessourcesController::sectionListAll')) }}
                 {% elseif section.content == 'ONE_RESSOURCES' %}
-                    {{ render(controller('App\\Controller\\Webapp\\RessourcesController::sectionlistOneCategory', {'category': section.ressourcescat})) }}
+                    {{ render(controller('App\\Controller\\App\\RessourcesController::sectionlistOneCategory', {'category': section.ressourcescat})) }}
                 {% endif %}
             </div>
         </div>
