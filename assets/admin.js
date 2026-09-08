@@ -20,6 +20,7 @@ import { initIndexUser } from "./js/admin/admin/IndexUser";
 import { initIndexArticle } from "./js/admin/webapp/IndexArticles";
 import { initNewEditRessources } from "./js/admin/admin/NewEditRessources";
 import { initNewEditSection } from "./js/admin/admin/NewEditSection";
+import { initIndexPage } from "./js/admin/admin/IndexPage";
 import { initSearchSelects } from "./js/composants/fonctions";
 
 /**
@@ -69,6 +70,9 @@ onReady(() => {
         case 'op_webapp_page_new':
         case 'op_webapp_page_edit':
             initNewEditPage();
+            break;
+        case 'op_webapp_page_index':
+            initIndexPage();
             break;
         case 'op_admin_page_show':
             initShowPage();
