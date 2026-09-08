@@ -20,8 +20,26 @@ import { initIndexUser } from "./js/admin/admin/IndexUser";
 import { initIndexArticle } from "./js/admin/webapp/IndexArticles";
 import { initNewEditRessources } from "./js/admin/admin/NewEditRessources";
 import { initNewEditSection } from "./js/admin/admin/NewEditSection";
+import { initSearchSelects } from "./js/composants/fonctions";
 
-document.addEventListener('turbo:load', () => {
+/**
+ * Exécute callback quand le DOM est prêt (ou tout de suite s'il l'est déjà).
+ * Remplace l'ancien écouteur `turbo:load` : Turbo Drive est désactivé, chaque
+ * navigation est un chargement de page complet.
+ */
+function onReady(callback) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', callback);
+    } else {
+        callback();
+    }
+}
+
+onReady(() => {
+    // Listes déroulantes « recherche + sélection » (data-search-select) :
+    // actif sur tous les formulaires d'admin, indépendamment de la page.
+    initSearchSelects();
+
     // Select all dropdown toggle buttons
     const dropdownToggles = document.querySelectorAll(".dropdown-toggle")
     const page = document.body.dataset.page;

@@ -54,6 +54,53 @@ export function useTomSelect(selector, option) {
 }
 
 /**
+ * Transforme en liste déroulante « recherche + sélection » (Tom Select) tous les
+ * <select> portant l'attribut data-search-select.
+ *
+ * Prévu pour les listes liées à une entité (choisir un article, une page, une
+ * catégorie…) : la frappe au clavier filtre les options, sans création de valeur.
+ * L'apparence est alignée sur les autres champs via les classes .ts-styled /
+ * .ts-styled-dropdown (cf. assets/styles/admin.css).
+ *
+ * Idempotent : les <select> déjà initialisés sont ignorés. Appelable sur
+ * n'importe quel formulaire d'édition ou de création.
+ *
+ * @param {ParentNode} root  Racine de recherche (document par défaut).
+ */
+export function initSearchSelects(root = document) {
+    root.querySelectorAll('select[data-search-select]').forEach((select) => {
+        if (select.tomselect || select.classList.contains('ts-hidden-accessible')) {
+            return;
+        }
+
+        const isRequired = select.hasAttribute('required') && !select.disabled;
+        const emptyOption = select.querySelector('option[value=""]');
+        const placeholder = select.dataset.placeholder
+            || (emptyOption ? emptyOption.textContent.trim() : '')
+            || 'Rechercher…';
+
+        try {
+            new TomSelect(select, {
+                create: false,
+                allowEmptyOption: !isRequired,
+                maxOptions: null,
+                placeholder: placeholder,
+                wrapperClass: 'ts-wrapper ts-styled',
+                dropdownClass: 'ts-dropdown ts-styled-dropdown',
+                // Le champ est souvent dans un conteneur overflow-hidden : on sort
+                // le menu du flux pour éviter qu'il soit rogné.
+                dropdownParent: 'body',
+                plugins: isRequired ? [] : ['clear_button'],
+                // Conserve l'ordre des <option> fourni par le serveur.
+                sortField: { field: '$order' },
+            });
+        } catch (e) {
+            console.error('[initSearchSelects] échec sur', select, e);
+        }
+    });
+}
+
+/**
  * Le bouton "Enregistrer"/"Mettre à jour" du header (sous la navbar) est en dehors du <form> :
  * il ne peut donc pas déclencher nativement la soumission. On le relie ici au <form> de la page.
  */

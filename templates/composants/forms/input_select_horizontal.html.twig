@@ -1,0 +1,53 @@
+{#
+   Liste déroulante horizontale (label à gauche, champ à droite).
+
+   Même principe que composants/forms/input_text_horizontal.html.twig, mais
+   dédiée aux <select> simples. Par défaut le champ est en mode « recherche +
+   sélection » (Tom Select via data-search-select, cf. assets/js/composants/fonctions.js).
+
+   Les selects multiples / à comportement particulier auront leur propre composant.
+
+   Paramètres :
+     form            : la vue de champ Symfony (obligatoire)
+     label           : libellé affiché (obligatoire)
+     legend_width    : classe de largeur de la colonne label  (défaut 'w-3/12')
+     col_width       : classe de largeur de la colonne champ   (défaut 'w-9/12')
+     input_width     : classe de largeur du <select>           (défaut 'w-full')
+     search          : active la recherche Tom Select          (défaut true)
+     placeholder     : texte d'invite Tom Select               (défaut '')
+     onchange        : JS inline sur l'évènement change         (défaut '')
+#}
+{% set search = search|default(true) %}
+{% set legend_width = legend_width|default('w-3/12') %}
+{% set col_width = col_width|default('w-9/12') %}
+{% set input_width = input_width|default('w-full') %}
+
+<div class="w-full inline-flex bg-white items-center">
+    <div class="{{ legend_width }}">
+        <label class="text-sm text-slate-700 font-normal" for="{{ form.vars.id }}">
+            {{ label }}
+        </label>
+    </div>
+    <div class="{{ col_width }} inline-flex justify-start overflow-hidden">
+        {% set widget_attr = {
+            class: input_width ~ ' border text-gray-900 text-sm px-2 py-1 rounded focus:outline-none focus:bg-white ' ~ (form_errors(form) ? 'border-orange-300 bg-white' : 'border-gray-300 bg-gray-100/70'),
+            'onchange': onchange|default('')
+        } %}
+        {% if search %}
+            {% set widget_attr = widget_attr|merge({ 'data-search-select': 'data-search-select' }) %}
+        {% endif %}
+        {% if placeholder|default('') is not empty %}
+            {% set widget_attr = widget_attr|merge({ 'data-placeholder': placeholder }) %}
+        {% endif %}
+        {{ form_widget(form, { attr: widget_attr }) }}
+    </div>
+</div>
+{% if form.vars.help is not empty %}
+<div class="w-full inline-flex bg-white items-center">
+    <div class="inline-flex justify-start text-justify overflow-hidden">
+            <small class="form-text text-xs text-slate-500">
+                {{ form_help(form) }}
+            </small>
+    </div>
+</div>
+{% endif %}

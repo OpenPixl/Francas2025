@@ -15,14 +15,13 @@
             } %}
         </div>
         <div class="mb-1">
-            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            {% include 'composants/forms/input_select_horizontal.html.twig' with {
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
                 'label' : 'Choix de la page ou afficher la section',
                 form : form.page,
-                'placeholder': 'inscrire le nom de la section',
-                'input_width' : 'w-60',
-                'oninput': ''
+                'placeholder': 'Rechercher une page',
+                'input_width' : 'w-60'
             } %}
         </div>
         <div class="mb-1">
@@ -39,47 +38,43 @@
         </div>
 
         <div class="mt-3 mb-1">
-            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            {% include 'composants/forms/input_select_horizontal.html.twig' with {
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
                 'label' : 'Type de contenu',
                 form : form.content,
-                'placeholder': 'inscrire le nom de la section',
-                'input_width' : 'w-100',
-                'oninput': ''
+                'placeholder': 'Rechercher un type de contenu',
+                'input_width' : 'w-100'
             } %}
         </div>
         <div class="mt-3 mb-1">
-            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            {% include 'composants/forms/input_select_horizontal.html.twig' with {
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
                 'label' : 'Choix de la catégorie',
                 form : form.category,
-                'placeholder': 'inscrire le nom de la section',
-                'input_width' : 'w-100',
-                'oninput': ''
+                'placeholder': 'Rechercher une catégorie',
+                'input_width' : 'w-100'
             } %}
         </div>
         <div class="mt-3 mb-1">
-            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            {% include 'composants/forms/input_select_horizontal.html.twig' with {
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
                 'label' : 'Choix de l\'article',
                 form : form.oneArticle,
-                'placeholder': 'inscrire le nom de la section',
-                'input_width' : 'w-100',
-                'oninput': ''
+                'placeholder': 'Rechercher un article',
+                'input_width' : 'w-100'
             } %}
         </div>
         <div class="mt-3 mb-1">
-            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            {% include 'composants/forms/input_select_horizontal.html.twig' with {
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
                 'label' : 'Choix de la ressource',
                 form : form.ressourcesCat,
-                'placeholder': 'inscrire le nom de la section',
-                'input_width' : 'w-100',
-                'oninput': ''
+                'placeholder': 'Rechercher une ressource',
+                'input_width' : 'w-100'
             } %}
         </div>
 

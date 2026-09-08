@@ -16,9 +16,26 @@ import { initNewEditEtablissement } from "./js/app/etablissement/newEditEtabliss
 import { initNewEditMessage } from "./js/admin/webapp/NewEditMessage";
 import { initNewEditArticle } from "./js/app/article/NewEditArticles";
 import { initIndexAdminArticle } from "./js/admin/webapp/IndexArticles";
+import { initSearchSelects } from "./js/composants/fonctions";
 
 
-document.addEventListener('turbo:load', () => {
+/**
+ * Exécute callback quand le DOM est prêt (ou tout de suite s'il l'est déjà).
+ * Remplace l'ancien écouteur `turbo:load` : Turbo Drive est désactivé, chaque
+ * navigation est un chargement de page complet.
+ */
+function onReady(callback) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', callback);
+    } else {
+        callback();
+    }
+}
+
+onReady(() => {
+
+    // Listes déroulantes « recherche + sélection » (data-search-select).
+    initSearchSelects();
 
     // Affectation du JS selon la page
     const page = document.body.dataset.page;

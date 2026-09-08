@@ -131,3 +131,98 @@ body {
 main .ck-editor{
     width: 100% !important;
 }
+
+/* ---------------------------------------------------------------------------
+   Tom Select — listes « recherche + sélection » (initSearchSelects)
+   Aligne l'apparence sur les autres champs de l'admin
+   (cf. templates/composants/forms/input_text_horizontal.html.twig).
+   Les classes .ts-styled / .ts-styled-dropdown ajoutent de la spécificité pour
+   passer devant le CSS de base de Tom Select, chargé après cette feuille.
+   --------------------------------------------------------------------------- */
+
+/* Le wrapper hérite des classes du <select> d'origine (border, padding, bg…) :
+   on les neutralise, le style visible est porté par .ts-control. */
+.ts-wrapper.ts-styled {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    min-width: 12rem;
+}
+
+.ts-wrapper.ts-styled .ts-control {
+    min-height: 1.875rem;
+    padding: 0.25rem 0.5rem;                    /* px-2 py-1 */
+    font-size: 0.875rem;                        /* text-sm */
+    line-height: 1.25rem;
+    color: #111827;                             /* text-gray-900 */
+    background-color: rgb(243 244 246 / 0.7);   /* bg-gray-100/70 */
+    border: 1px solid #d1d5db;                  /* border-gray-300 */
+    border-radius: 0.25rem;                     /* rounded */
+    box-shadow: none;
+}
+
+.ts-wrapper.ts-styled.focus .ts-control {
+    background-color: #fff;                     /* focus:bg-white */
+    border-color: #7dd3fc;                      /* sky-300 */
+    outline: none;
+    box-shadow: none;
+}
+
+.ts-wrapper.ts-styled.disabled {
+    opacity: 0.6;
+}
+
+.ts-wrapper.ts-styled .ts-control,
+.ts-wrapper.ts-styled .ts-control input {
+    font-size: 0.875rem;
+    color: #111827;
+}
+
+.ts-wrapper.ts-styled .ts-control input::placeholder {
+    color: #9ca3af;                            /* text-gray-400 */
+}
+
+.ts-wrapper.ts-styled.single .ts-control:after {
+    border-color: #6b7280 transparent transparent;  /* caret gris */
+}
+
+/* Menu déroulant (rendu dans <body> via dropdownParent) */
+.ts-dropdown.ts-styled-dropdown {
+    margin-top: 0.25rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    font-size: 0.875rem;
+    z-index: 60;
+}
+
+.ts-dropdown.ts-styled-dropdown .option {
+    padding: 0.375rem 0.5rem;
+    color: #374151;                            /* text-gray-700 */
+}
+
+.ts-dropdown.ts-styled-dropdown .option.active {
+    background-color: #e0f2fe;                 /* sky-100 */
+    color: #0c4a6e;                            /* sky-900 */
+}
+
+.ts-dropdown.ts-styled-dropdown .optgroup-header {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #64748b;                            /* slate-500 */
+}
+
+.ts-dropdown.ts-styled-dropdown .no-results {
+    padding: 0.375rem 0.5rem;
+    color: #9ca3af;
+}
+
+/* Bouton d'effacement (plugin clear_button) */
+.ts-wrapper.ts-styled .clear-button {
+    opacity: 0.45;
+}
+.ts-wrapper.ts-styled .clear-button:hover {
+    opacity: 1;
+}
