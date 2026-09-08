@@ -566,7 +566,7 @@ class ArticleController extends AbstractController
             // ---------------------------
             // STEP 1 : Suppression de l'image lors du click Checkbox
             // ---------------------------
-            $supprvignettechkbx = $form->get('isSupprImage')->getData();
+            $supprvignettechkbx = $form->has('isSupprImage') ? $form->get('isSupprImage')->getData() : null;
 
             if($supprvignettechkbx && $supprvignettechkbx == true){
                 // récupération du nom de l'image
@@ -605,7 +605,7 @@ class ArticleController extends AbstractController
             // ---------------------------
             // STEP 3 : Suppression du support lors du click Checkbox
             // ---------------------------
-            $supprDocChkbx = $form->get('isSupprDoc')->getData();
+            $supprDocChkbx = $form->has('isSupprDoc') ? $form->get('isSupprDoc')->getData() : null;
 
             if($supprDocChkbx && $supprDocChkbx == true){
                 // récupération du nom de l'image
