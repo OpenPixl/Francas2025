@@ -28,7 +28,7 @@
                         <!-- Current: "bg-gray-900 dark:bg-gray-950/50 text-white", Default: "text-gray-300 hover:bg-white/5 hover:text-white" -->
                         <a href="{{ path('op_webapp_page', {slug: page.slug}) }}" {% if app.request.attributes.get('_route') == 'op_webapp_page' %}aria-current="page"{% endif %} class="rounded-md px-3 py-2 text-sm font-medium text-[#d84519] uppercase hover:bg-white/25 hover:text-white">{{ page.title }}</a>
                         {% endfor %}
-                        <a href="{{ path('op_webapp_public_contactpage') }}" {% if app.request.attributes.get('_route') == 'op_webapp_public_contactpage' %}aria-current="page"{% endif %} class="rounded-md px-3 py-2 text-sm font-medium text-[#d84519] uppercase hover:bg-white/25 active:text-sky-950 hover:text-white">CONTACT</a>
+                        <a href="{{ path('op_webapp_public_contactpage') }}" {% if app.request.attributes.get('_route') == 'op_webapp_public_contactpage' %}aria-current="page"{% endif %} class="rounded-md px-3 py-2 text-sm font-medium text-[#d84519] uppercase hover:bg-white/25 active:text-sky-950 hover:text-white">NOUS REJOINDRE</a>
                     </div>
                 </div>
             </div>
