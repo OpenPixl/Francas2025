@@ -48,8 +48,6 @@ class PageController extends AbstractController
             ->getRepository(Page::class)
             ->ListMenu();
 
-        //dd($config);
-
         return $this->render('webapp/page/listmenu.html.twig',[
             'pages' => $pages,
             'config'=> $config,
