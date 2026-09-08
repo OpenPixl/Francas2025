@@ -98,14 +98,21 @@ class Page implements \Stringable
     /**
      * Permet d'initialiser le slug !
      * Utilisation de slugify pour transformer une chaine de caractères en slug
+     *
+     * PreFlush (et non PreUpdate) : ce callback s'exécute avant le calcul du
+     * changeset Doctrine, donc l'écriture directe de $this->slug est bien
+     * répercutée en base, y compris lors d'une modification.
+     *
+     * Le slug est toujours dérivé du titre : à chaque flush il est recalculé.
+     * L'opération est idempotente (titre identique => même slug => pas de
+     * changeset, donc pas de requête SQL) ; il n'y a écriture que si le titre
+     * a changé. Attention : renommer une page change donc son URL.
      */
     #[ORM\PrePersist]
-    #[ORM\PreUpdate]
+    #[ORM\PreFlush]
     public function initializeSlug() {
-        if(empty($this->slug)) {
-            $slugify = new Slugify();
-            $this->slug = $slugify->slugify($this->title);
-        }
+        $slugify = new Slugify();
+        $this->slug = $slugify->slugify((string) $this->title);
     }
 
     public function getSlug(): ?string
