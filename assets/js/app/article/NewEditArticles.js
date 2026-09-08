@@ -1,11 +1,12 @@
 import axios from 'axios';
 import {showNotification, showDialog, hideDialog} from "../../composants/tailwind";
+import {richTextConfig} from "../../composants/ckeditor";
 
 export function initNewEditArticle(){
     console.log('Bienvenue sur la page d\'ajout ou d\'édition d\'un article par les collèges');
     ClassicEditor
         .create(document.querySelector('#articles2_content'), {
-            toolbar: [ 'heading','bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment' ],
+            ...richTextConfig,
             height: 50
         })
         .catch(error => {

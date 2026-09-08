@@ -1,4 +1,5 @@
 import {bindHeaderSaveButton, bindHeaderDeleteButton} from "../../composants/fonctions";
+import {richTextConfig} from "../../composants/ckeditor";
 
 export function initNewEditPage(){
     bindHeaderSaveButton();
@@ -6,7 +7,7 @@ export function initNewEditPage(){
 
     ClassicEditor
         .create(document.querySelector('#page_intro'), {
-            toolbar: [ 'heading','bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'indent', 'alignment' ],
+            ...richTextConfig,
             height: 50
         })
         .catch(error => {
