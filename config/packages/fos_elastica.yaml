@@ -52,6 +52,8 @@ fos_elastica:
                     type: object
                     properties:
                         id: ~
+                        name:
+                            type: text
                 support:
                     type: object
                     properties:
@@ -60,6 +62,8 @@ fos_elastica:
                     type: object
                     properties:
                         id: ~
+                        name:
+                            type: text
                 typeEtablissement:
                     property_path: etablissement?.typeEtablissement?.id
                 updatedAt:

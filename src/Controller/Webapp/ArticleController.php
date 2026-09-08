@@ -57,12 +57,14 @@ class ArticleController extends AbstractController
         if ($searchForm->isSubmitted() && $searchForm->isValid() && !empty($searchForm->get('query')->getData())) {
             $boolQuery = new BoolQuery();
             $multiMatch = new MultiMatch();
-            $multiMatch->setFields(['title']);
+            $multiMatch->setFields(['title^3', 'theme.name^2', 'etablissement.name^2', 'content']);
+            $multiMatch->setType(MultiMatch::TYPE_BEST_FIELDS);
+            $multiMatch->setFuzziness(MultiMatch::FUZZINESS_AUTO);
             $multiMatch->setQuery($searchForm->get('query')->getData());
             $boolQuery->addMust($multiMatch);
 
             $esQuery = new Query($boolQuery);
-            $esQuery->setSort(['updatedAt' => ['order' => 'desc']]);
+            $esQuery->setSort(['_score' => ['order' => 'desc'], 'updatedAt' => ['order' => 'desc']]);
 
             $data = $this->finder->find($esQuery);
         } else {
@@ -88,6 +90,54 @@ class ArticleController extends AbstractController
         return $this->render('webapp/articles/index.html.twig', [
             'articles' => $articles,
             'page' => $request->query->getInt('page', 1),
+        ]);
+    }
+
+    /**
+     * Suggestions de recherche instantanée (moteur Elasticsearch) affichées sous
+     * le champ de la navbar sur la liste des articles.
+     *
+     * Déclenchée par le JS à partir de MIN_CHARS caractères (cf. IndexArticles.js).
+     * Recherche sur le titre de l'article, le nom du thème et le nom de
+     * l'établissement. Doit être déclarée avant la route "{id}" ci-dessous.
+     */
+    public const SEARCH_LIVE_MIN_CHARS = 5;
+
+    #[Route(path: '/webapp/articles/search-live', name: 'op_webapp_articles_search_live', methods: ['GET'])]
+    public function searchLive(Request $request): Response
+    {
+        $q = trim((string) $request->query->get('q', ''));
+
+        if (mb_strlen($q) < self::SEARCH_LIVE_MIN_CHARS) {
+            return $this->json(['html' => '', 'count' => 0]);
+        }
+
+        $multiMatch = new MultiMatch();
+        $multiMatch->setQuery($q);
+        $multiMatch->setFields(['title^3', 'theme.name^2', 'etablissement.name^2', 'content']);
+        $multiMatch->setType(MultiMatch::TYPE_BEST_FIELDS);
+        $multiMatch->setFuzziness(MultiMatch::FUZZINESS_AUTO);
+
+        $boolQuery = new BoolQuery();
+        $boolQuery->addMust($multiMatch);
+
+        $esQuery = new Query($boolQuery);
+        $esQuery->setSize(10);
+        $esQuery->setSort(['_score' => ['order' => 'desc'], 'updatedAt' => ['order' => 'desc']]);
+
+        try {
+            $results = $this->finder->find($esQuery);
+        } catch (\Throwable $e) {
+            // Elasticsearch indisponible : on ne casse pas la saisie, panneau vide.
+            return $this->json(['html' => '', 'count' => 0]);
+        }
+
+        return $this->json([
+            'html' => $this->renderView('webapp/articles/include/_search_suggestions.html.twig', [
+                'articles' => $results,
+                'query' => $q,
+            ]),
+            'count' => \count($results),
         ]);
     }
 

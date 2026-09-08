@@ -1,0 +1,22 @@
+{# Suggestions de recherche instantanée (Elasticsearch) — injecté dans #navbar_search_results #}
+{% if articles is empty %}
+    <p class="px-3 py-2 text-sm text-gray-500">Aucun résultat pour «&nbsp;{{ query }}&nbsp;».</p>
+{% else %}
+    <ul class="divide-y divide-gray-100">
+        {% for a in articles %}
+            <li>
+                <a href="{{ path('op_webapp_articles_edit_admin', {'id': a.id}) }}"
+                   class="block px-3 py-2 hover:bg-sky-50">
+                    <span class="block text-sm font-medium text-gray-800">{{ a.title }}</span>
+                    <span class="block text-xs text-gray-500">
+                        {%- if a.theme %}{{ a.theme.name }}{% endif -%}
+                        {%- if a.theme and a.etablissement %} · {% endif -%}
+                        {%- if a.etablissement %}{{ a.etablissement.name }}{% endif -%}
+                        {%- if (a.theme or a.etablissement) and a.updatedAt %} · {% endif -%}
+                        {%- if a.updatedAt %}{{ a.updatedAt|date('d/m/Y') }}{% endif -%}
+                    </span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
