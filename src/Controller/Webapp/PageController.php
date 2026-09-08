@@ -171,6 +171,8 @@ class PageController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+
+
             return $this->redirectToRoute('op_webapp_page_index');
         }
 
