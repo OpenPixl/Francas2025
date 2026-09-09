@@ -122,6 +122,13 @@ Deux gabarits rendent les sections d'une page :
 - `templates/webapp/page/listmenu.html.twig` : libellé du lien de navigation « CONTACT » →
   « NOUS REJOINDRE » (route `op_webapp_public_contactpage` inchangée).
 
+## 6bis. Bouton « Éditer cette page » sur la vue *show* (09/09/2026)
+
+`templates/webapp/page/show.html.twig` (route `op_admin_page_show`) : ajout de la clé `btns.edit` dans
+l'entête, juste après « Créer une nouvelle page », vers `op_webapp_page_edit` (`{id: page.id}`, icône
+`fa-edit`). `admin/dashboard/include/header.html.twig` gère déjà `btns.edit` (rendu entre `new` et
+`del`) — aucun autre changement.
+
 ## 6. Nettoyage debug (accueil)
 
 - `src/Controller/Webapp/PageController.php` : suppression d'un `//dd($config)` commenté dans
