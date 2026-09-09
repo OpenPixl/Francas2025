@@ -95,6 +95,16 @@ cherchait le fichier à écraser dans `etablissement_directory` au lieu de `conf
   onConfirm)` (API 4 args, un seul écouteur délégué sur `#validModal`, cf.
   `NOTES_BOUTON_ENREGISTRER_HEADER.md` §4) puis `axios.post` + `location.reload()`.
 
+### Correctif complémentaire — bandeau de la page d'accueil
+
+Après upload d'un nouveau bandeau, celui-ci n'apparaissait plus sur la home : `headershow.html.twig`
+lisait l'image dans `uploads/images/collections/` alors que tous les autres consommateurs de
+`config.headerName` (aperçu de `_form.html.twig`, `webapp/articles/show.html.twig`,
+`_blocarticle.html.twig`) et le `config_directory` où les fichiers sont écrits pointent vers
+`uploads/images/config/`. L'ancien bandeau existait par hasard dans `collections/` (fichiers hérités),
+d'où l'effet « masqué » jusqu'au premier vrai changement d'image. `headershow.html.twig` corrigé vers
+`uploads/images/config/`.
+
 ---
 
 ## Fichiers modifiés
@@ -106,6 +116,7 @@ cherchait le fichier à écraser dans `etablissement_directory` au lieu de `conf
 - `src/Entity/Admin/Config.php` (§4 : `vignetteName` nullable)
 - `src/Form/Admin/ConfigType.php` (§4 : retrait de `isSupprVignette`)
 - `templates/admin/config/_form.html.twig` (§4 : `delete_url`)
+- `templates/admin/config/headershow.html.twig` (§4 : dossier `collections/` → `config/`)
 - `assets/js/admin/admin/EditConfig.js` (§4 : handler `delete-media`)
 
 ## Fichiers créés
