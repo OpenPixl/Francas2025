@@ -4,14 +4,12 @@
 
 {% block main %}
     {% if homePage is defined and homePage and homePage.isIntroShow == 1 %}
-        {% set site_logo = site_logo_path() ? asset(site_logo_path()) : null %}
         {% set home_image = homePage.image ? asset('uploads/images/pages/' ~ homePage.image) : null %}
         <twig:HeroIntro
             :title="homePage.isTitleShow == 1 ? homePage.title : null"
             :intro="homePage.intro"
             :image="home_image"
-            :logo="site_logo"
-            :media_alt="home_image ? homePage.title : config.name" />
+            :media_alt="homePage.title" />
     {% endif %}
 
     {% if not sections %}

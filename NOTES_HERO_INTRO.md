@@ -83,15 +83,17 @@ return $this->render('webapp/public/index.html.twig', [..., 'homePage' => $homeP
 
   ```twig
   {% if homePage is defined and homePage and homePage.isIntroShow == 1 %}
-      {% set site_logo = site_logo_path() ? asset(site_logo_path()) : null %}
       {% set home_image = homePage.image ? asset('uploads/images/pages/' ~ homePage.image) : null %}
       <twig:HeroIntro :title="homePage.isTitleShow == 1 ? homePage.title : null"
-                      :intro="homePage.intro" :image="home_image" :logo="site_logo"
-                      :media_alt="home_image ? homePage.title : config.name" />
+                      :intro="homePage.intro" :image="home_image"
+                      :media_alt="homePage.title" />
   {% endif %}
   ```
 
 - Si la page est absente / dépubliée → `homePage` null → hero absent, pas d'erreur.
+- Le visuel de droite du hero **home** s'appuie uniquement sur le champ `image` de la page (pas de
+  repli sur le logo du site, contrairement aux pages classiques) : pas d'image sur la page `accueil`
+  → hero titre + intro pleine largeur.
 
 > **Historique** : la constante valait `'accueil'` (convention `PageRepository::ListMenu()` qui exclut
 > `title = 'accueil'` du menu), mais aucune page n'ayant ce slug le hero de la home ne s'affichait
