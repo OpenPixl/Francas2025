@@ -53,7 +53,6 @@ class ConfigType extends AbstractType
                     ])
                 ],
             ])
-            ->add('isSupprVignette')
         ;
     }
 

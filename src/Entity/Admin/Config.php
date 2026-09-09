@@ -42,7 +42,7 @@ class Config
     #[ORM\Column(type: 'boolean')]
     private $isShowTitleSiteHome = false;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $vignetteName;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -167,7 +167,7 @@ class Config
         return $this->vignetteName;
     }
 
-    public function setVignetteName(string $vignetteName): self
+    public function setVignetteName(?string $vignetteName): self
     {
         $this->vignetteName = $vignetteName;
 

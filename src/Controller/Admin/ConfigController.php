@@ -8,6 +8,7 @@ use App\Repository\Admin\ConfigRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -83,59 +84,20 @@ class ConfigController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // ---------------------------
-            // STEP 1 : Suppression de la vignette lors du click Checkbox
-            // ---------------------------
-            $supprvignettechkbx = $form->get('isSupprVignette')->getData();
-
-            if($supprvignettechkbx && $supprvignettechkbx == true){
-                // récupération du nom de l'image
-                $vignetteName = $config->getVignetteName();
-                $pathvignette = $this->getParameter('config_directory').'/'.$vignetteName;
-                // On vérifie si l'image existe
-                if(file_exists($pathvignette)){
-                    unlink($pathvignette);
-                }
-                $config->setHeaderName(null);
-                $config->setIsSupprVignette(0);
+            // Bandeau du site : remplacement si un fichier est renseigné.
+            $headerFile = $form->get('headerFile')->getData();
+            if ($headerFile) {
+                $this->deleteConfigFile($config->getHeaderName());
+                $config->setHeaderName($this->storeConfigFile($headerFile, $slugger));
             }
 
-            // ---------------------------
-            // STEP 2 : Ajout ou modif de la vignette si "FileType" renseigné
-            // ---------------------------
+            // Vignette (support d'article par défaut) : idem.
             $vignetteFile = $form->get('vignetteFile')->getData();
             if ($vignetteFile) {
-                // Effacement du fichier vignetteFileName si il est présent en BDD
-                // ---------------------------
-                // Récupération du nom de l'image
-                $vignetteName = $config->getVignetteName();
-
-                // suppression du Fichier
-                if($vignetteName){
-                    $pathvignette = $this->getParameter('etablissement_directory').'/'.$vignetteName;
-                    // On vérifie si l'image existe
-                    if(file_exists($pathvignette)){
-                        unlink($pathvignette);
-                    }
-                }
-
-                // Renommage du fichier source
-                $originalVignetteFilename = pathinfo((string) $vignetteFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeVignetteFilename = $slugger->slug($originalVignetteFilename);
-                $newVignetteFilename = $safeVignetteFilename . '-' . uniqid() . '.' . $vignetteFile->guessExtension();
-
-                // Déplacement du fichier dans le répertoire adéquat
-                try {
-                    $vignetteFile->move(
-                        $this->getParameter('config_directory'),
-                        $newVignetteFilename
-                    );
-                } catch (FileException) {
-                    $config->setHeaderName($newVignetteFilename);
-                }
-                // Hydration de l'entité
-                $config->setVignetteName($newVignetteFilename);
+                $this->deleteConfigFile($config->getVignetteName());
+                $config->setVignetteName($this->storeConfigFile($vignetteFile, $slugger));
             }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('op_admin_config_edit', [
@@ -158,6 +120,59 @@ class ConfigController extends AbstractController
         }
 
         return $this->redirectToRoute('op_admin_config_index');
+    }
+
+    /**
+     * Suppression AJAX d'un média du site (bandeau ou vignette) depuis la page
+     * Paramètres — même principe que op_admin_etablissement_delete_media.
+     */
+    #[Route(path: '/opadmin/config/{id}/delete-media/{field}', name: 'op_admin_config_delete_media', methods: ['POST'])]
+    public function deleteMedia(Config $config, string $field, EntityManagerInterface $entityManager): Response
+    {
+        if (!in_array($field, ['header', 'vignette'], true)) {
+            return $this->json(['code' => 400, 'message' => 'Champ invalide'], 400);
+        }
+
+        if ($field === 'header') {
+            $this->deleteConfigFile($config->getHeaderName());
+            $config->setHeaderName(null);
+        } else {
+            $this->deleteConfigFile($config->getVignetteName());
+            $config->setVignetteName(null);
+        }
+
+        $entityManager->flush();
+
+        return $this->json(['code' => 200, 'message' => 'Fichier supprimé avec succès'], 200);
+    }
+
+    /**
+     * Supprime du disque un fichier du répertoire des médias du site, s'il existe.
+     */
+    private function deleteConfigFile(?string $fileName): void
+    {
+        if (!$fileName) {
+            return;
+        }
+
+        $path = $this->getParameter('config_directory').'/'.$fileName;
+        if (is_file($path)) {
+            unlink($path);
+        }
+    }
+
+    /**
+     * Range un fichier uploadé dans le répertoire des médias du site et renvoie
+     * son nom généré.
+     */
+    private function storeConfigFile(UploadedFile $file, SluggerInterface $slugger): string
+    {
+        $safeName = $slugger->slug(pathinfo((string) $file->getClientOriginalName(), PATHINFO_FILENAME));
+        $newName = $safeName.'-'.uniqid().'.'.$file->guessExtension();
+
+        $file->move($this->getParameter('config_directory'), $newName);
+
+        return $newName;
     }
 
     public function headerShow(EntityManagerInterface $entityManager){

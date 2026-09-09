@@ -57,6 +57,44 @@ Masqué jusque-là par Turbo Drive, qui gardait un écouteur `submit` global per
 l'autre : la régression n'est apparue qu'avec la désactivation de Turbo
 (`NOTES_TOMSELECT_ET_TURBO.md`, §4).
 
+## 4. Suppression des médias sur la page Paramètres du site
+
+Symptôme : sur `admin/config/edit.html.twig`, les boutons « supprimer » du bandeau et de la vignette ne
+font rien, et le JS dédié (`EditConfig.js`) ne contient que `bindHeaderSaveButton()` + CKEditor.
+
+Cause (cumul de trois trous, jamais complété depuis le passage du composant `bloc_insert_image` à un
+bouton AJAX `data-action="delete-media"`) :
+
+1. **`EditConfig.js`** n'avait aucun gestionnaire pour `[data-action="delete-media"]`.
+2. **`admin/config/_form.html.twig`** ne passait pas `delete_url` au composant (il passait un
+   `routename` bidon `op_webapp_message_new`, ignoré) → `data-delete-url=""` vide, donc le handler
+   sortirait de toute façon sur `if (!url) return`.
+3. **`ConfigController`** n'avait aucune route de suppression de média (contrairement à
+   `op_admin_etablissement_delete_media`).
+
+Le mécanisme historique (case `isSupprVignette` traitée au submit dans `edit()`) était en plus
+**buggé** : `STEP 1` faisait `setHeaderName(null)` au lieu de `setVignetteName(null)`, `STEP 2`
+cherchait le fichier à écraser dans `etablissement_directory` au lieu de `config_directory`, et le
+`headerFile` (bandeau) n'était jamais traité à l'édition.
+
+### Correctif — calqué sur la page établissement
+
+- **`ConfigController::deleteMedia()`** : nouvelle route
+  `POST /opadmin/config/{id}/delete-media/{field}` (`op_admin_config_delete_media`), `field ∈
+  {header, vignette}` → `unlink` dans `config_directory` + `set*Name(null)` + `flush`, réponse JSON
+  `{code, message}`. Deux helpers privés `deleteConfigFile()` / `storeConfigFile()`.
+- **`ConfigController::edit()`** réécrit : traitement **symétrique** de `headerFile` et `vignetteFile`
+  (remplacement = suppression de l'ancien fichier puis `storeConfigFile()`) ; suppression du bloc
+  `STEP 1` mort et du champ `isSupprVignette` (retiré de `ConfigType`).
+- **`Config::$vignetteName`** rendu nullable (colonne `config.vignette_name` était `NOT NULL`) —
+  migration `Version20260909130000` (`ALTER TABLE config CHANGE vignette_name … DEFAULT NULL`).
+  `header_name` était déjà nullable.
+- **`admin/config/_form.html.twig`** : `delete_url` = `path('op_admin_config_delete_media', {id, field})`
+  sur les deux blocs `bloc_insert_image`.
+- **`EditConfig.js`** : ajout du handler `[data-action="delete-media"]` — `showDialog(url, …,
+  onConfirm)` (API 4 args, un seul écouteur délégué sur `#validModal`, cf.
+  `NOTES_BOUTON_ENREGISTRER_HEADER.md` §4) puis `axios.post` + `location.reload()`.
+
 ---
 
 ## Fichiers modifiés
@@ -64,12 +102,21 @@ l'autre : la régression n'est apparue qu'avec la désactivation de Turbo
 - `templates/admin.html.twig` (retrait du `meta refresh`)
 - `src/Controller/Webapp/ArticleController.php` (`editAdmin()` : `$form->has()` avant `$form->get()`)
 - `templates/admin/security/login.html.twig` (`data-controller="csrf-protection"`)
+- `src/Controller/Admin/ConfigController.php` (§4 : `deleteMedia()`, `edit()` réécrit, helpers)
+- `src/Entity/Admin/Config.php` (§4 : `vignetteName` nullable)
+- `src/Form/Admin/ConfigType.php` (§4 : retrait de `isSupprVignette`)
+- `templates/admin/config/_form.html.twig` (§4 : `delete_url`)
+- `assets/js/admin/admin/EditConfig.js` (§4 : handler `delete-media`)
 
 ## Fichiers créés
 
 - `NOTES_CORRECTIFS_2026-09.md`
+- `migrations/Version20260909130000.php` (§4)
 
 ## Déploiement
 
-- Rebuild des assets pour §3 (dépend du contrôleur Stimulus `csrf-protection`, déjà présent).
-- Rien côté base ni Elasticsearch.
+- Rebuild des assets pour §3 et §4.
+- **§4 : `php bin/console doctrine:migrations:migrate`** (colonne `vignette_name` nullable) — sans
+  cette migration, la suppression de la vignette renvoie une 500 sur `flush` (la suppression du bandeau
+  fonctionne sans, `header_name` étant déjà nullable).
+- Rien côté Elasticsearch.
