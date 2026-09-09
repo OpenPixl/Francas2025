@@ -12,6 +12,11 @@ qu'un groupe dépasse 8 résultats.
 
 ## 1. Indexation Elasticsearch de l'entité `Article`
 
+> **Mise à jour 08–09/09/2026** — le mapping ci-dessous a évolué depuis : ajout de `theme.name` /
+> `etablissement.name` en `text` (§12, recherche instantanée), puis passage de `theme` (objet unique) à
+> `themes` (objets multiples, `themes.id` / `themes.name`) suite au ManyToMany (§13). Toute
+> modification de mapping impose un `fos:elastica:reset` + `populate` au déploiement.
+
 `config/packages/fos_elastica.yaml` — index `article` (modèle `App\Entity\Webapp\Article`) :
 
 ```yaml
@@ -197,11 +202,165 @@ Même bug que §9, non répliqué dans ce template lors de sa création (§5) : 
 `#form_results`, un appel à `form.reset()` a été ajouté pour vider les champs du formulaire (texte + selects)
 après chaque recherche réussie, plutôt que de laisser les valeurs saisies affichées.
 
+## 12. Recherche instantanée dans la navbar admin (08/09/2026)
+
+Sur la liste d'administration des articles (`_navbarsearchform.html.twig`, alimenté par
+`NavbarSearchController`), les suggestions s'affichent désormais **au fil de la frappe** sous le champ,
+sans recharger la liste principale — la recherche « Entrée » (rechargement complet du listing) est
+conservée à l'identique.
+
+### Mapping — noms indexés en plus des ids
+
+`config/packages/fos_elastica.yaml` : les objets imbriqués `theme` et `etablissement` indexent aussi
+`name` (`type: text`), pour pouvoir chercher « radio », « collège X »… et pas seulement filtrer par id.
+
+```yaml
+theme:
+    type: object
+    properties:
+        id: ~
+        name:
+            type: text
+etablissement:
+    type: object
+    properties:
+        id: ~
+        name:
+            type: text
+```
+
+### `ArticleController::searchLive()`
+
+```php
+public const SEARCH_LIVE_MIN_CHARS = 5;
+
+#[Route(path: '/webapp/articles/search-live', name: 'op_webapp_articles_search_live', methods: ['GET'])]
+public function searchLive(Request $request): Response
+```
+
+- **À déclarer avant la route `/{id}`** du même contrôleur, sinon `search-live` est capté comme un id.
+- En dessous de `SEARCH_LIVE_MIN_CHARS` (5) caractères : renvoie `{'html' => '', 'count' => 0}` sans
+  interroger ES.
+- `MultiMatch` sur `title^3`, `themes.name^2`, `etablissement.name^2`, `content` —
+  `TYPE_BEST_FIELDS`, `FUZZINESS_AUTO` ; `setSize(10)` ; tri `_score` desc puis `updatedAt` desc.
+- **Tolérante à un Elasticsearch injoignable** : `try { $this->finder->find(...) } catch (\Throwable)`
+  → panneau vide plutôt qu'une 500 pendant la saisie.
+- Réponse JSON `{'html' => <rendu de _search_suggestions>, 'count' => N}`.
+
+Le même jeu de champs (`title^3` / `themes.name^2` / `etablissement.name^2` / `content`, best_fields,
+fuzziness AUTO) a été appliqué à la recherche « Entrée » de l'index (`indexAdmin()`), qui ne cherchait
+que sur `title` ; son tri passe aussi à `_score` puis `updatedAt`.
+
+### Front — `_navbarsearchform.html.twig` + `IndexArticles.js`
+
+- Le `<form>` reçoit `class: 'relative …'` et `data-live-url: path('op_webapp_articles_search_live')`.
+- Nouveau conteneur `#navbar_search_results` (`absolute top-full`, `hidden` par défaut,
+  `max-h-96 overflow-y-auto`, `role="listbox"`).
+- `initLiveSearch(form)` dans `IndexArticles.js` (appelée depuis `initIndexArticle()` après le
+  câblage du `submit`) :
+  - `input` **debouncé 250 ms** ;
+  - **anti-course** : un `requestId` incrémental, les réponses obsolètes sont ignorées ;
+  - masquage sous `MIN_CHARS` (5), à la touche `Échap` (+ `blur`), et au clic **hors** du formulaire ;
+  - injecte `response.data.html` dans le panneau.
+
+### Template `templates/webapp/articles/include/_search_suggestions.html.twig` (nouveau)
+
+Liste compacte : titre de l'article en gras, puis `thème · établissement · date` en petit. Chaque
+ligne est un lien vers l'**édition** de l'article (`op_webapp_articles_edit_admin`). Message
+« Aucun résultat pour "…" » si vide.
+
+### Déploiement
+
+Reindex obligatoire (mapping modifié) :
+
+```
+php bin/console fos:elastica:reset && php bin/console fos:elastica:populate
+```
+
+## 13. Thème d'article : passage en ManyToMany — impact sur la recherche (09/09/2026)
+
+`Article.theme` (relation unique `ManyToOne`) devient `Article.themes` (`ManyToMany`, table de
+jointure `article_theme`). Détail entité / formulaires / Tom Select multi dans le commit ; ci-dessous
+uniquement ce qui touche les listings et la recherche décrits par ce document.
+
+### Migration `Version20260909120000`
+
+Crée `article_theme`, **reprend les affectations existantes**
+(`INSERT INTO article_theme (article_id, theme_id) SELECT id, theme_id FROM article WHERE theme_id IS NOT NULL`),
+puis supprime la FK et la colonne `article.theme_id`. `down()` ne peut restaurer qu'un thème par
+article (`MIN(theme_id)`).
+
+### `Article::getTheme()` — conservé, mais renvoie une **chaîne**
+
+Les templates historiques lisaient `article.theme` (objet) : `{% if article.theme %}` /
+`{{ article.theme.name }}`. La méthode est conservée pour compat mais renvoie désormais les libellés
+concaténés :
+
+```php
+public function getTheme(): string
+{
+    return implode(', ', array_map(
+        static fn (Theme $t): string => (string) $t->getName(),
+        $this->themes->toArray()
+    ));
+}
+```
+
+Chaîne vide = *falsy*, donc `{% if article.theme %}` continue de fonctionner. Les accès `.name` sur
+le résultat ont été retirés :
+
+- `templates/webapp/articles/show.html.twig` : `{{ article.theme.name }}` → `{{ article.theme }}`
+  (badge du §6).
+- `templates/webapp/articles/include/_search_suggestions.html.twig` (§12) : idem.
+
+### `ArticleRepository::withThemeLabels()` (nouveau, privé)
+
+Les requêtes à **hydratation scalaire** ne peuvent plus faire `->leftJoin('a.theme','t')` +
+`t.name as theme` : un `ManyToMany` multiplierait les lignes par thème, et `getOneOrNullResult()`
+lèverait une exception. `withThemeLabels(array $rows)` prend des lignes identifiées par `id`, fait
+**une** requête d'agrégation (`join a.themes`, `IN (:ids)`, `getScalarResult()`) et injecte dans
+chaque ligne une clé `theme` = « Thème A, Thème B » (ou `null`).
+
+Appliqué à : `allArticles()`, `listArticlesBySection()`, `listArticlesByEtablissement()`,
+`listFiveArticles()`, `articleEtablissementSlug()`. Les `leftJoin('a.theme', 't')` et les
+`t.id as idtheme` / `t.name as theme` correspondants ont été supprimés de ces méthodes.
+
+La méthode morte `searchArticles()` (`MATCH_AGAINST`, plus appelée) est supprimée au passage.
+
+### Contrôleur & mapping
+
+- `config/packages/fos_elastica.yaml` : bloc `theme` → `themes` (mêmes sous-propriétés `id` + `name`).
+- `ArticleController` : `theme.id` → `themes.id` et `theme.name` → `themes.name` partout
+  (`searchLive()`, filtre thème de `listAllArticles()`, `listArticlesByType()`).
+- `listAllArticles()` : `themesChoices` ne peut plus être déduit ligne à ligne (un article a
+  potentiellement plusieurs thèmes). Il est reconstruit depuis **tous** les `Theme`
+  (`findBy([], ['name' => 'ASC'])`, libellé en clé / id en valeur) → injection de
+  `EntityManagerInterface` dans l'action. Le champ `theme` du `ArticleSearchType` (filtre §2) reste
+  **mono-valué** : on filtre sur « au moins ce thème ».
+
+### Formulaires (`ArticlesType`, `Articles2Type`)
+
+Champ `theme` → `themes` : `EntityType`, `multiple => true`, `expanded => false`,
+`by_reference => false`, label « Thèmes du projet ». Rendu via le composant
+`input_selectMulti_horizontale.html.twig` + Tom Select multi (voir
+`NOTES_TOMSELECT_ET_TURBO.md`, §1–2).
+
+### Déploiement
+
+```
+php bin/console doctrine:migrations:migrate
+php bin/console fos:elastica:reset && php bin/console fos:elastica:populate
+```
+
+(cf. mémoire projet « Article : thèmes multiples »).
+
 ---
 
 ## Fichiers créés
 
 - `templates/webapp/articles/listarticlesbytype.html.twig`
+- `templates/webapp/articles/include/_search_suggestions.html.twig` (§12)
+- `migrations/Version20260909120000.php` (§13)
 - `NOTES_RECHERCHE_ARTICLES.md`
 
 ## Fichiers modifiés
@@ -218,6 +377,16 @@ après chaque recherche réussie, plutôt que de laisser les valeurs saisies aff
 - `assets/app.js` (§8 : route `op_webapp_articles_show` ajoutée au câblage du lecteur audio)
 - `assets/js/app/etablissement/article.js` (§8 : garde-fou `if (!audio) return;`)
 - `assets/js/app/page/show.js` (§11 : `form.reset()` après recherche réussie)
+- `config/packages/fos_elastica.yaml` (§12 : `theme.name`/`etablissement.name` ; §13 : `theme` → `themes`)
+- `src/Entity/Webapp/Article.php` (§13 : `themes` ManyToMany, `getTheme()` renvoie une chaîne)
+- `src/Entity/Gestapp/Theme.php` (§13 : côté inverse `ManyToMany mappedBy: 'themes'`)
+- `src/Repository/Webapp/ArticleRepository.php` (§13 : `withThemeLabels()`, retrait des jointures `a.theme`, suppression de `searchArticles()`)
+- `src/Form/Webapp/ArticlesType.php`, `src/Form/Webapp/Articles2Type.php` (§13 : champ `themes` multiple)
+- `src/Controller/Webapp/ArticleController.php` (§12 : `searchLive()`, MultiMatch enrichi ; §13 : `themes.*`, `themesChoices` global)
+- `templates/admin/include/_navbarsearchform.html.twig` (§12 : `data-live-url`, panneau `#navbar_search_results`)
+- `assets/js/admin/webapp/IndexArticles.js` (§12 : `initLiveSearch()`)
+- `templates/webapp/articles/show.html.twig` (§13 : `{{ article.theme.name }}` → `{{ article.theme }}`)
+- `templates/webapp/articles/_form.html.twig`, `_form2.html.twig` (§13 : composant select multi « Thèmes »)
 
 ## Vérifications effectuées
 

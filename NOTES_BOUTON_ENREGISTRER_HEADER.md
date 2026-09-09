@@ -248,6 +248,26 @@ Appliqué aux 6 vues concernées : `admin/etablissement/edit.html.twig`, `admin/
 `webapp/page/edit.html.twig`, `webapp/ressources/edit.html.twig`, `webapp/section/edit.html.twig`,
 `webapp/articles/edit_admin.html.twig`.
 
+## 5. Variante `primary` (bleu) + application au bouton d'édition de page (09/09/2026)
+
+`templates/composants/buttons/button_utils.html.twig` a été refactoré : les classes de chaque variante
+sont extraites en tête de fichier et une variante **`primary`** est ajoutée à côté de `danger` :
+
+```twig
+{% set primary = 'border-blue-700 text-blue-700 hover:bg-blue-700 hover:text-white' %}
+{% set danger  = 'border-red-700 text-red-700 hover:bg-red-700 hover:text-white' %}
+...
+{% if variant is defined and variant == 'primary' %}{{ primary }}
+{% elseif variant is defined and variant == 'danger' %}{{ danger }}
+{% else %}border-slate-600 text-slate-700 hover:bg-gray-600 hover:text-white{% endif %}
+```
+
+Comportement inchangé pour tout appel sans `variant` (gris neutre) et pour `variant: 'danger'` (§4).
+
+Premier usage de `primary` : `templates/webapp/page/edit.html.twig`, bloc `btns.edit` (bouton
+« Mettre à jour » de l'entête) reçoit `'variant': 'primary'` — le bouton passe du gris au bleu, pour le
+distinguer comme action principale de la page. Voir aussi `NOTES_GESTION_PAGES.md`, §3.
+
 ## Fichiers créés
 
 - `NOTES_BOUTON_ENREGISTRER_HEADER.md`
@@ -257,7 +277,8 @@ Appliqué aux 6 vues concernées : `admin/etablissement/edit.html.twig`, `admin/
 ## Fichiers modifiés
 
 - `templates/admin/dashboard/include/header.html.twig`
-- `templates/composants/buttons/button_utils.html.twig`
+- `templates/composants/buttons/button_utils.html.twig` (§4 : `variant: 'danger'` ; §5 : `variant: 'primary'`)
+- `templates/webapp/page/edit.html.twig` (§5 : bouton « Mettre à jour » en `primary`)
 - `templates/admin/etablissement/{new,edit,_form}.html.twig`
 - `templates/admin/user/{new,edit,_form}.html.twig`
 - `templates/webapp/page/{new,edit,_form}.html.twig`
