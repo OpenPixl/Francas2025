@@ -153,6 +153,7 @@ main .ck-editor{
 .ts-wrapper.ts-styled .ts-control {
     min-height: 1.875rem;
     padding: 0.25rem 0.5rem;                    /* px-2 py-1 */
+    align-items: center;                        /* centre verticalement puces + saisie */
     font-size: 0.875rem;                        /* text-sm */
     line-height: 1.25rem;
     color: #111827;                             /* text-gray-900 */

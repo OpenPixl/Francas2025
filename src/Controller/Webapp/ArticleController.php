@@ -57,7 +57,7 @@ class ArticleController extends AbstractController
         if ($searchForm->isSubmitted() && $searchForm->isValid() && !empty($searchForm->get('query')->getData())) {
             $boolQuery = new BoolQuery();
             $multiMatch = new MultiMatch();
-            $multiMatch->setFields(['title^3', 'theme.name^2', 'etablissement.name^2', 'content']);
+            $multiMatch->setFields(['title^3', 'themes.name^2', 'etablissement.name^2', 'content']);
             $multiMatch->setType(MultiMatch::TYPE_BEST_FIELDS);
             $multiMatch->setFuzziness(MultiMatch::FUZZINESS_AUTO);
             $multiMatch->setQuery($searchForm->get('query')->getData());
@@ -114,7 +114,7 @@ class ArticleController extends AbstractController
 
         $multiMatch = new MultiMatch();
         $multiMatch->setQuery($q);
-        $multiMatch->setFields(['title^3', 'theme.name^2', 'etablissement.name^2', 'content']);
+        $multiMatch->setFields(['title^3', 'themes.name^2', 'etablissement.name^2', 'content']);
         $multiMatch->setType(MultiMatch::TYPE_BEST_FIELDS);
         $multiMatch->setFuzziness(MultiMatch::FUZZINESS_AUTO);
 
@@ -142,21 +142,24 @@ class ArticleController extends AbstractController
     }
 
     #[Route(path: '/webapp/allArticles/', name: 'op_webapp_article_all_by_etablissement', methods: ['GET', 'POST'])]
-    public function listAllArticles(Request $request, ConfigRepository $configRepository, ArticleRepository $articleRepository): Response
+    public function listAllArticles(Request $request, ConfigRepository $configRepository, ArticleRepository $articleRepository, EntityManagerInterface $entityManager): Response
     {
         $config = $configRepository->find(1);
         $articles = $articleRepository->allArticles();
 
+        // Liste de tous les thèmes disponibles pour le filtre (l'article peut
+        // désormais en porter plusieurs : on ne peut plus les déduire ligne à ligne).
+        $themesChoices = [];
+        foreach ($entityManager->getRepository(Theme::class)->findBy([], ['name' => 'ASC']) as $theme) {
+            $themesChoices[$theme->getName()] = $theme->getId();
+        }
+
         $articlesByType = [];
         $etablissementsChoices = [];
-        $themesChoices = [];
         foreach ($articles as $e) {
             //dd($e);
             $type = $e['libelleEtablissement'] ?? 'Autre';
             $etablissementsChoices[$type] = $e['idTypeEtablissement'];
-            if (!empty($e['theme'])) {
-                $themesChoices[$e['theme']] = $e['idtheme'];
-            }
             $e['imageUrl'] = $this->mediaPathResolver->articleImageUrl($e['idEtablissement'], 0, $e['imageName']);
             $e['logoUrl'] = $this->mediaPathResolver->etablissementImageUrl($e['idEtablissement'], $e['logoEtablissement']);
             $articlesByType[$type][] = $e;
@@ -204,7 +207,7 @@ class ArticleController extends AbstractController
             // Filtre thème sélectionné
             if (!empty($data['theme'])) {
                 $themeTermQuery = new Term();
-                $themeTermQuery->setTerm('theme.id', $data['theme']);
+                $themeTermQuery->setTerm('themes.id', $data['theme']);
                 $boolQuery->addFilter($themeTermQuery);
             }
 
@@ -281,7 +284,7 @@ class ArticleController extends AbstractController
 
         if ($idtheme) {
             $themeTermQuery = new Term();
-            $themeTermQuery->setTerm('theme.id', $idtheme);
+            $themeTermQuery->setTerm('themes.id', $idtheme);
             $boolQuery->addFilter($themeTermQuery);
         }
 

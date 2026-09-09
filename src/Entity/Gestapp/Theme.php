@@ -34,7 +34,7 @@ class Theme
     /**
      * @var Collection<int, Article>
      */
-    #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'theme')]
+    #[ORM\ManyToMany(targetEntity: Article::class, mappedBy: 'themes')]
     private Collection $articles;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
@@ -102,7 +102,7 @@ class Theme
     {
         if (!$this->articles->contains($article)) {
             $this->articles->add($article);
-            $article->setTheme($this);
+            $article->addTheme($this);
         }
 
         return $this;
@@ -111,10 +111,7 @@ class Theme
     public function removeArticle(Article $article): static
     {
         if ($this->articles->removeElement($article)) {
-            // set the owning side to null (unless already changed)
-            if ($article->getTheme() === $this) {
-                $article->setTheme(null);
-            }
+            $article->removeTheme($this);
         }
 
         return $this;

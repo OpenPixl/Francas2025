@@ -65,11 +65,13 @@ class Articles2Type extends AbstractType
                 'label'=> "Contenu de l'article",
                 'required' => false
             ])
-            ->add('theme',EntityType::class,[
+            ->add('themes',EntityType::class,[
                 'class' => Theme::class,
-                'placeholder' => '-- Choisir le thème --',
+                'multiple' => true,
+                'expanded' => false,
                 'required' => false,
-                'label'=> "Thème du projet",
+                'by_reference' => false,
+                'label'=> "Thèmes du projet",
             ])
             ->add('support',EntityType::class,[
                 'class' => Support::class,

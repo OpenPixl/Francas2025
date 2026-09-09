@@ -9,7 +9,7 @@
                    class="block px-3 py-2 hover:bg-sky-50">
                     <span class="block text-sm font-medium text-gray-800">{{ a.title }}</span>
                     <span class="block text-xs text-gray-500">
-                        {%- if a.theme %}{{ a.theme.name }}{% endif -%}
+                        {%- if a.theme %}{{ a.theme }}{% endif -%}
                         {%- if a.theme and a.etablissement %} · {% endif -%}
                         {%- if a.etablissement %}{{ a.etablissement.name }}{% endif -%}
                         {%- if (a.theme or a.etablissement) and a.updatedAt %} · {% endif -%}

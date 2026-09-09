@@ -81,8 +81,12 @@ class Article
     #[ORM\ManyToOne(inversedBy: 'articles')]
     private ?Etablissement $etablissement = null;
 
-    #[ORM\ManyToOne(inversedBy: 'articles')]
-    private ?Theme $theme = null;
+    /**
+     * @var Collection<int, Theme>
+     */
+    #[ORM\ManyToMany(targetEntity: Theme::class, inversedBy: 'articles')]
+    #[ORM\JoinTable(name: 'article_theme')]
+    private Collection $themes;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     private ?Support $support = null;
@@ -115,6 +119,7 @@ class Article
     {
         $this->sections = new ArrayCollection();
         $this->section = new ArrayCollection();
+        $this->themes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -378,16 +383,44 @@ class Article
         return $this;
     }
 
-    public function getTheme(): ?Theme
+    /**
+     * @return Collection<int, Theme>
+     */
+    public function getThemes(): Collection
     {
-        return $this->theme;
+        return $this->themes;
     }
 
-    public function setTheme(?Theme $theme): static
+    public function addTheme(Theme $theme): static
     {
-        $this->theme = $theme;
+        if (!$this->themes->contains($theme)) {
+            $this->themes->add($theme);
+        }
 
         return $this;
+    }
+
+    public function removeTheme(Theme $theme): static
+    {
+        $this->themes->removeElement($theme);
+
+        return $this;
+    }
+
+    /**
+     * Libellé des thèmes de l'article, séparés par une virgule.
+     *
+     * Commodité d'affichage : les templates historiques lisaient `article.theme`
+     * (relation unique). Depuis le passage en ManyToMany, cette méthode renvoie
+     * la liste concaténée « Thème A, Thème B » et reste compatible avec les
+     * gardes `{% if article.theme %}` (chaîne vide = falsy).
+     */
+    public function getTheme(): string
+    {
+        return implode(', ', array_map(
+            static fn (Theme $theme): string => (string) $theme->getName(),
+            $this->themes->toArray()
+        ));
     }
 
     public function getSupport(): ?Support

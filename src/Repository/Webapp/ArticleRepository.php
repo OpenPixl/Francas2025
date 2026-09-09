@@ -17,8 +17,59 @@ class ArticleRepository extends ServiceEntityRepository
     }
 
     /**
+     * Complète des lignes à hydratation scalaire (chacune identifiée par une clé
+     * `id`) d'une propriété `theme` contenant les libellés des thèmes de
+     * l'article concaténés (« Thème A, Thème B »).
+     *
+     * Depuis le passage de `Article.theme` (ManyToOne) à `Article.themes`
+     * (ManyToMany), on ne peut plus sélectionner `t.name as theme` directement
+     * dans ces requêtes (multiplication des lignes par thème, et
+     * `getOneOrNullResult()` qui lèverait une exception). On agrège donc les
+     * libellés en une seule requête complémentaire.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function withThemeLabels(array $rows): array
+    {
+        if (!$rows) {
+            return $rows;
+        }
+
+        $ids = array_values(array_filter(array_map(
+            static fn ($row) => $row['id'] ?? null,
+            $rows
+        )));
+
+        $labels = [];
+        if ($ids) {
+            $pairs = $this->createQueryBuilder('a')
+                ->select('a.id AS aid', 't.name AS tname')
+                ->join('a.themes', 't')
+                ->where('a.id IN (:ids)')
+                ->setParameter('ids', $ids)
+                ->orderBy('t.name', 'ASC')
+                ->getQuery()
+                ->getScalarResult();
+
+            foreach ($pairs as $pair) {
+                $labels[$pair['aid']][] = $pair['tname'];
+            }
+        }
+
+        foreach ($rows as &$row) {
+            $id = $row['id'] ?? null;
+            $row['theme'] = ($id !== null && isset($labels[$id]))
+                ? implode(', ', $labels[$id])
+                : null;
+        }
+
+        return $rows;
+    }
+
+    /**
      * Recharge en une seule requête des articles (avec les relations utilisées
-     * à l'affichage : établissement, type d'établissement, thème, support) à
+     * à l'affichage : établissement, type d'établissement, thèmes, support) à
      * partir d'une liste d'IDs — typiquement ceux renvoyés par une recherche
      * Elasticsearch. Évite le N+1 provoqué par l'itération sur les entités
      * hydratées par le finder. L'ordre des IDs (pertinence ES) est conservé.
@@ -37,7 +88,7 @@ class ArticleRepository extends ServiceEntityRepository
             ->addSelect('e', 'te', 't', 'su')
             ->leftJoin('a.etablissement', 'e')
             ->leftJoin('e.typeEtablissement', 'te')
-            ->leftJoin('a.theme', 't')
+            ->leftJoin('a.themes', 't')
             ->leftJoin('a.support', 'su')
             ->andWhere('a.id IN (:ids)')
             ->setParameter('ids', $ids)
@@ -60,10 +111,9 @@ class ArticleRepository extends ServiceEntityRepository
     }
 
     public function allArticles(){
-        return $this->createQueryBuilder('a')
+        $rows = $this->createQueryBuilder('a')
             ->leftJoin('a.etablissement', 'e')
             ->leftJoin('e.typeEtablissement', 'te')
-            ->leftJoin('a.theme', 't')
             ->leftJoin('a.support' , 'su')
             ->addSelect('
                 a.id as id,
@@ -76,8 +126,6 @@ class ArticleRepository extends ServiceEntityRepository
                 a.isShowCreated as isShowCreated,
                 a.updatedAt as updatedAt,
                 a.doc as doc,
-                t.id as idtheme,
-                t.name as theme,
                 a.imageName,
                 su.id as idSupport,
                 su.name as support,
@@ -95,14 +143,15 @@ class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
             ;
+
+        return $this->withThemeLabels($rows);
     }
 
     public function listArticlesBySection($idsection)
     {
-        return $this->createQueryBuilder('a')
+        $row = $this->createQueryBuilder('a')
             ->leftJoin('a.sections', 's')
             ->leftJoin('a.etablissement', 'e')
-            ->leftJoin('a.theme', 't')
             ->leftJoin('a.support' , 'su')
             ->leftJoin('a.author', 'au')
             ->addSelect('
@@ -114,8 +163,6 @@ class ArticleRepository extends ServiceEntityRepository
                 a.content as content,
                 a.isArchived as isArchived,
                 a.isShowCreated as isShowCreated,
-                t.id as idtheme,
-                t.name as theme,
                 a.imageName,
                 a.createdAt,
                 a.doc as doc,
@@ -133,6 +180,8 @@ class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
             ;
+
+        return $row ? $this->withThemeLabels([$row])[0] : $row;
     }
 
     public function listArticlesByEtablissements($idsection)
@@ -150,14 +199,12 @@ class ArticleRepository extends ServiceEntityRepository
 
     public function listArticlesByEtablissement($idetablissement)
     {
-        return $this->createQueryBuilder('a')
+        $rows = $this->createQueryBuilder('a')
             ->addSelect('
                 a.id as id,
                 a.slug,
                 a.title as title,
                 a.content as content,
-                t.id as idtheme,
-                t.name as theme,
                 a.imageName,
                 a.createdAt,
                 a.updatedAt,
@@ -169,7 +216,6 @@ class ArticleRepository extends ServiceEntityRepository
                 e.logoName As logoNameEtablissement
                 ')
             ->leftJoin('a.etablissement', 'e')
-            ->leftJoin('a.theme', 't')
             ->leftJoin('a.support' , 's')
             ->andWhere('e.id = :idetablissement')
             ->setParameter('idetablissement', $idetablissement)
@@ -179,14 +225,15 @@ class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
             ;
+
+        return $this->withThemeLabels($rows);
     }
 
     public function listFiveArticles($category)
     {
-        return $this->createQueryBuilder('a')
+        $rows = $this->createQueryBuilder('a')
             ->leftJoin('a.etablissement', 'e')
             ->leftJoin('a.author', 'u')
-            ->leftJoin('a.theme', 't')
             ->addSelect('
                 a.id as id,
                 a.slug as slug,
@@ -197,8 +244,7 @@ class ArticleRepository extends ServiceEntityRepository
                 e.id AS idetablissement,
                 e.logoName AS logoName,
                 u.typeuser as typeuser,
-                u.id as idauthor,
-                t.name as theme
+                u.id as idauthor
                  ')
             ->where('u.typeuser = :typeuser')
             ->setParameter('typeuser', 'etablissement')
@@ -207,6 +253,8 @@ class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
             ;
+
+        return $this->withThemeLabels($rows);
     }
 
     /**
@@ -217,7 +265,7 @@ class ArticleRepository extends ServiceEntityRepository
      */
     public function articleEtablissementSlug($id)
     {
-        return $this->createQueryBuilder('a')
+        $row = $this->createQueryBuilder('a')
             ->addSelect('
                 a.id as id,
                 a.slug,
@@ -226,8 +274,6 @@ class ArticleRepository extends ServiceEntityRepository
                 a.doc,
                 a.isArchived as isArchived,
                 a.isShowCreated as isShowCreated,
-                t.id as idtheme,
-                t.name as theme,
                 a.imageName,
                 a.isTitleShow,
                 a.intro,
@@ -243,7 +289,6 @@ class ArticleRepository extends ServiceEntityRepository
                 au.id as idauthor
                  ')
             ->leftJoin('a.etablissement', 'e')
-            ->leftJoin('a.theme', 't')
             ->leftJoin('a.support' , 's')
             ->leftJoin('a.category', 'ca')
             ->leftJoin('a.author', 'au')
@@ -254,24 +299,7 @@ class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
             ;
-    }
 
-    /**
-     * Recherche les articles a partir du moteur de recherche
-     * @return void
-     */
-    public function searchArticles($title = null, $author = null){
-        $query = $this->createQueryBuilder("a");
-        if($title != null){
-            $query
-                ->andWhere('MATCH_AGAINST(a.title) AGAINST (:title boolean)>0')
-                ->setParameter('title', $title);
-        }
-        if($author !=null){
-            $query->join('a.author', 'u');
-            $query->andWhere('u.id = :id')
-                ->setParameter('id', $author);
-        }
-        return $query->getQuery()->getResult();
+        return $row ? $this->withThemeLabels([$row])[0] : $row;
     }
 }

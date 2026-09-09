@@ -48,7 +48,7 @@ fos_elastica:
                     type: text
                 content:
                     type: text
-                theme:
+                themes:
                     type: object
                     properties:
                         id: ~

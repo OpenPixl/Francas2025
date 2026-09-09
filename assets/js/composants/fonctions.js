@@ -74,23 +74,31 @@ export function initSearchSelects(root = document) {
         }
 
         const isRequired = select.hasAttribute('required') && !select.disabled;
+        const isMultiple = select.multiple;
         const emptyOption = select.querySelector('option[value=""]');
         const placeholder = select.dataset.placeholder
             || (emptyOption ? emptyOption.textContent.trim() : '')
-            || 'Rechercher…';
+            || (isMultiple ? 'Sélectionner…' : 'Rechercher…');
+
+        // En mode multi : chips avec croix de retrait + vidage global ; pas de
+        // limite d'items. En mode simple : bouton d'effacement si non requis.
+        const plugins = isMultiple
+            ? ['remove_button', 'clear_button']
+            : (isRequired ? [] : ['clear_button']);
 
         try {
             new TomSelect(select, {
                 create: false,
                 allowEmptyOption: !isRequired,
                 maxOptions: null,
+                maxItems: isMultiple ? null : 1,
                 placeholder: placeholder,
                 wrapperClass: 'ts-wrapper ts-styled',
                 dropdownClass: 'ts-dropdown ts-styled-dropdown',
                 // Le champ est souvent dans un conteneur overflow-hidden : on sort
                 // le menu du flux pour éviter qu'il soit rogné.
                 dropdownParent: 'body',
-                plugins: isRequired ? [] : ['clear_button'],
+                plugins: plugins,
                 // Conserve l'ordre des <option> fourni par le serveur.
                 sortField: { field: '$order' },
             });

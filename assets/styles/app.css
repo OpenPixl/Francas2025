@@ -2,6 +2,12 @@
 @import "tom-select/dist/css/tom-select.css";
 @source not "../../public";
 
+/* TomSelect : centre verticalement les puces et le champ de saisie
+   (le .ts-control est un flex sans align-items par défaut). */
+.ts-wrapper .ts-control {
+    align-items: center;
+}
+
 @layer base {
     body {
         min-height: 100vh;

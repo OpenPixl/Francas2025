@@ -30,14 +30,14 @@
     <div class="col-span-2">
         <h5 class="font-normal border-b border-slate-900 mb-2">Options de l'article</h5>
         <div class="mb-1">
-            {% include 'composants/forms/input_text_horizontal.html.twig' with {
+            {% include 'composants/forms/input_selectMulti_horizontale.html.twig' with {
                 'legend_width' : 'w-3/12',
                 'col_width' : 'w-9/12',
-                'label' : 'Theme',
-                form : form.theme,
-                'placeholder': 'inscrire le titre',
-                'input_width' : 'w-60',
-                'oninput': ''
+                'label' : 'Thèmes',
+                form : form.themes,
+                'placeholder': 'Choisir un ou plusieurs thèmes',
+                'input_width' : 'w-full',
+                'onchange': ''
             } %}
         </div>
 
