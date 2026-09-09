@@ -26,6 +26,19 @@
                 'oninput': ''
             } %}
         </div>
+        <div class="mb-1">
+            {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+                'legend_width' : 'w-3/12',
+                'col_width' : 'w-9/12',
+                'label' : 'Image d\'illustration',
+                'entity_id': page.id,
+                'entity_name': page.image,
+                form : form.imageFile,
+                'url_file': '/uploads/images/pages/',
+                'input_width' : 'w-full',
+                'delete_url': page.id ? path('op_webapp_page_delete_media', {'id': page.id}) : '',
+            } %}
+        </div>
     </div>
     <div class="col-span-2">
         <h5 class="font-normal border-b border-slate-900 mb-2">Options de la page</h5>

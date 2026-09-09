@@ -11,6 +11,7 @@ parameters:
     user_directory: '%kernel.project_dir%/public/uploads/images/user'
     etablissement_directory: '%kernel.project_dir%/public/uploads/images/etablissements'
     config_directory: '%kernel.project_dir%/public/uploads/images/config'
+    page_directory: '%kernel.project_dir%/public/uploads/images/pages'
     # Nouvelle arborescence des médias, rangés par propriétaire (établissement ou admin) puis par type
     etablissements_media_directory: '%kernel.project_dir%/public/uploads/etablissements'
     admins_media_directory: '%kernel.project_dir%/public/uploads/admins'

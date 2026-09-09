@@ -28,6 +28,10 @@ class Page implements \Stringable
     #[ORM\Column(type: 'text', nullable: true)]
     private $intro;
 
+    /** Image d'illustration de la page (affichée dans le hero). */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $image = null;
+
     #[ORM\Column(type: 'string', length: 100)]
     private $state;
 
@@ -236,6 +240,18 @@ class Page implements \Stringable
     public function setIntro(?string $intro): self
     {
         $this->intro = $intro;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }

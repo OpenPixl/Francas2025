@@ -19,7 +19,9 @@
             </div>
             <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div class="flex shrink-0 items-center">
-                    <img class="h-8 w-auto" src="{{ asset('/uploads/images/fixes/logo-cc.png') }}" alt="">
+                    <img class="h-10 w-auto max-h-12 object-contain"
+                         src="{{ site_logo_path() ? asset(site_logo_path()) : asset('/uploads/images/fixes/logo-cc.png') }}"
+                         alt="{{ config is defined and config ? config.name : '' }}">
                 </div>
                 <div class="hidden sm:ml-6 sm:block">
                     <div class="flex space-x-4">

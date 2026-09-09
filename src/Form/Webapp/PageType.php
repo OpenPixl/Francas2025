@@ -7,9 +7,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class PageType extends AbstractType
 {
@@ -18,6 +20,18 @@ class PageType extends AbstractType
         $builder
             ->add('title')
             ->add('intro', TextareaType::class)
+            ->add('imageFile', FileType::class, [
+                'label' => 'Image d\'illustration (png ou jpg)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '100000k',
+                        'mimeTypes' => ['image/png', 'image/jpeg', 'image/jpg'],
+                        'mimeTypesMessage' => 'Attention, veuillez charger un fichier au format jpg ou png',
+                    ]),
+                ],
+            ])
             ->add('state', ChoiceType::class, [
                 'choices'  => [
                     'Brouillon' => 'draft',

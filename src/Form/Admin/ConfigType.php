@@ -53,6 +53,22 @@ class ConfigType extends AbstractType
                     ])
                 ],
             ])
+            ->add('logoFile', FileType::class, [
+                'label' => 'Logo du site au format : png ou jpg',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '100000k',
+                        'mimeTypes' => [
+                            'image/png',
+                            'image/jpeg',
+                            'image/jpg'
+                        ],
+                        'mimeTypesMessage' => 'Attention, veuillez charger un fichier au format jpg ou png',
+                    ])
+                ],
+            ])
         ;
     }
 

@@ -98,6 +98,13 @@ class ConfigController extends AbstractController
                 $config->setVignetteName($this->storeConfigFile($vignetteFile, $slugger));
             }
 
+            // Logo du site (navbar + hero d'accueil) : idem.
+            $logoFile = $form->get('logoFile')->getData();
+            if ($logoFile) {
+                $this->deleteConfigFile($config->getLogoName());
+                $config->setLogoName($this->storeConfigFile($logoFile, $slugger));
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('op_admin_config_edit', [
@@ -123,19 +130,22 @@ class ConfigController extends AbstractController
     }
 
     /**
-     * Suppression AJAX d'un média du site (bandeau ou vignette) depuis la page
-     * Paramètres — même principe que op_admin_etablissement_delete_media.
+     * Suppression AJAX d'un média du site (bandeau, vignette ou logo) depuis la
+     * page Paramètres — même principe que op_admin_etablissement_delete_media.
      */
     #[Route(path: '/opadmin/config/{id}/delete-media/{field}', name: 'op_admin_config_delete_media', methods: ['POST'])]
     public function deleteMedia(Config $config, string $field, EntityManagerInterface $entityManager): Response
     {
-        if (!in_array($field, ['header', 'vignette'], true)) {
+        if (!in_array($field, ['header', 'vignette', 'logo'], true)) {
             return $this->json(['code' => 400, 'message' => 'Champ invalide'], 400);
         }
 
         if ($field === 'header') {
             $this->deleteConfigFile($config->getHeaderName());
             $config->setHeaderName(null);
+        } elseif ($field === 'logo') {
+            $this->deleteConfigFile($config->getLogoName());
+            $config->setLogoName(null);
         } else {
             $this->deleteConfigFile($config->getVignetteName());
             $config->setVignetteName(null);

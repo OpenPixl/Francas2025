@@ -7,15 +7,21 @@
 {% endblock %}
 
 {% block main %}
-    <section class="mx-auto mt-8 max-w-7xl px-2 py-2 sm:px-6 lg:px-8">
+    {% set site_logo = site_logo_path() ? asset(site_logo_path()) : null %}
+    {% set page_image = page.image ? asset('uploads/images/pages/' ~ page.image) : null %}
 
-        {% if page.isTitleShow == 1 %}
+    {% if page.isIntroShow == 1 %}
+        <twig:HeroIntro
+            :title="page.isTitleShow == 1 ? page.title : null"
+            :intro="page.intro"
+            :image="page_image"
+            :logo="site_logo"
+            :media_alt="page_image ? page.title : (site_config() ? site_config().name : '')" />
+    {% elseif page.isTitleShow == 1 %}
+        <section class="mx-auto mt-8 max-w-7xl px-2 py-2 sm:px-6 lg:px-8">
             <h1 class="font-semibold text-xl text-gray-700 border-b border-b-gray-700">{{ page.title|upper }}</h1>
-        {% endif %}
-        {% if page.isIntroShow == 1 %}
-            <p>{{ page.intro|raw }}</p>
-        {% endif %}
+        </section>
+    {% endif %}
 
-    </section>
     {{ render(controller('App\\Controller\\Webapp\\SectionController::ListAllSections', {page: page.id})) }}
 {% endblock %}

@@ -11,9 +11,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * Class PageController
@@ -58,7 +60,7 @@ class PageController extends AbstractController
      * CRUD classique d'ajout d'une page
      */
     #[Route(path: '/webapp/page/new/', name: 'op_webapp_page_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         // OPn déclare les variablezs utiles à la méthode
         $member = $this->getUser();
@@ -71,6 +73,11 @@ class PageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $page->setImage($this->storePageImage($imageFile, $slugger));
+            }
+
             // on persiste en base de donée le nouvel objet
             $entityManager->persist($page);
             $entityManager->flush();
@@ -99,7 +106,7 @@ class PageController extends AbstractController
      * CRUD depuis la page
      */
     #[Route(path: '/webapp/page/new/{position}', name: 'op_webapp_page_newposition', methods: ['GET', 'POST'])]
-    public function newPosition(Request $request, $position, EntityManagerInterface $entityManager): Response
+    public function newPosition(Request $request, $position, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         // OPn déclare les variablezs utiles à la méthode
         $member = $this->getUser();
@@ -113,6 +120,11 @@ class PageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $page->setImage($this->storePageImage($imageFile, $slugger));
+            }
+
             // on persiste en base de donée le nouvel objet
             $entityManager->persist($page);
             $entityManager->flush();
@@ -163,15 +175,20 @@ class PageController extends AbstractController
     }
 
     #[Route(path: '/webapp/page/{id}/edit', name: 'op_webapp_page_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Page $page, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Page $page, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $form = $this->createForm(PageType::class, $page);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Image d'illustration : remplacement si un fichier est renseigné.
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $this->deletePageImage($page->getImage());
+                $page->setImage($this->storePageImage($imageFile, $slugger));
+            }
+
             $entityManager->flush();
-
-
 
             return $this->redirectToRoute('op_webapp_page_index');
         }
@@ -191,6 +208,48 @@ class PageController extends AbstractController
         }
 
         return $this->redirectToRoute('op_webapp_page_index');
+    }
+
+    /**
+     * Suppression AJAX de l'image d'illustration d'une page.
+     */
+    #[Route(path: '/webapp/page/{id}/delete-media', name: 'op_webapp_page_delete_media', methods: ['POST'])]
+    public function deleteMedia(Page $page, EntityManagerInterface $entityManager): Response
+    {
+        $this->deletePageImage($page->getImage());
+        $page->setImage(null);
+        $entityManager->flush();
+
+        return $this->json(['code' => 200, 'message' => 'Image supprimée avec succès'], 200);
+    }
+
+    /**
+     * Range une image uploadée dans public/uploads/images/pages/ et renvoie son
+     * nom généré.
+     */
+    private function storePageImage(UploadedFile $file, SluggerInterface $slugger): string
+    {
+        $safeName = $slugger->slug(pathinfo((string) $file->getClientOriginalName(), PATHINFO_FILENAME));
+        $newName = $safeName.'-'.uniqid().'.'.$file->guessExtension();
+
+        $file->move($this->getParameter('page_directory'), $newName);
+
+        return $newName;
+    }
+
+    /**
+     * Supprime du disque l'image d'illustration d'une page, si elle existe.
+     */
+    private function deletePageImage(?string $fileName): void
+    {
+        if (!$fileName) {
+            return;
+        }
+
+        $path = $this->getParameter('page_directory').'/'.$fileName;
+        if (is_file($path)) {
+            unlink($path);
+        }
     }
 
     /**

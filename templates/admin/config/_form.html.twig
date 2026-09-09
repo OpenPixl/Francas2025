@@ -62,6 +62,19 @@
                 'delete_url': config.id ? path('op_admin_config_delete_media', {'id': config.id, 'field': 'vignette'}) : '',
             } %}
         </div>
+        <div class="mb-1">
+            {% include 'composants/forms/blocs/bloc_insert_image.html.twig' with {
+                'legend_width' : 'w-2/12',
+                'col_width' : 'w-10/12',
+                'label' : 'Logo du site (navbar + accueil)',
+                'entity_id': config.id,
+                'entity_name': config.logoName,
+                form : form.logoFile,
+                'url_file': '/uploads/images/config/',
+                'input_width' : 'w-200',
+                'delete_url': config.id ? path('op_admin_config_delete_media', {'id': config.id, 'field': 'logo'}) : '',
+            } %}
+        </div>
         {% if hide_submit_button is not defined or not hide_submit_button %}
         <div id="bouton_form">
             <button id="" class="border border-sky-700 text-sm text-sky-700 rounded px-1.5 py-1.5 hover:bg-sky-700 hover:text-white">

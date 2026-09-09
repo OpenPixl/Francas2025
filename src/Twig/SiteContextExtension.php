@@ -18,7 +18,16 @@ class SiteContextExtension extends AbstractExtension
         return [
             new TwigFunction('site_config', $this->siteConfig(...)),
             new TwigFunction('menu_pages', $this->menuPages(...)),
+            new TwigFunction('site_logo_path', $this->siteLogoPath(...)),
         ];
+    }
+
+    /**
+     * Chemin (à passer à `asset()`) du logo du site, ou null si absent.
+     */
+    public function siteLogoPath(): ?string
+    {
+        return $this->siteContext->getLogoWebPath();
     }
 
     public function siteConfig(): ?Config

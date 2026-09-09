@@ -64,6 +64,15 @@ class DashboardController extends AbstractController
     }
 
     /**
+     * Slug de la page qui alimente le hero d'introduction de la page d'accueil
+     * (titre + intro + image d'illustration). Figé ici : cette page doit rester
+     * publiée et hors menu (is_menu = 0). Le slug étant dérivé du titre
+     * (Page::initializeSlug()), renommer la page impose de mettre à jour cette
+     * constante.
+     */
+    private const HOMEPAGE_SLUG = 'radio-francas-40';
+
+    /**
      * Affiche automatiquement la page d'accueil
      */
     #[Route(path: '/home', name: 'op_webapp_public_homepage')]
@@ -76,9 +85,15 @@ class DashboardController extends AbstractController
 
         $sections = $entityManager->getRepository(Section::class)->findBy(['favorites' => 1], ['position' => 'ASC']);
 
+        $homePage = $entityManager->getRepository(Page::class)->findOneBy([
+            'slug' => self::HOMEPAGE_SLUG,
+            'isPublish' => 1,
+        ]);
+
         return $this->render('webapp/public/index.html.twig',[
             'config' => $config,
             'sections' => $sections,
+            'homePage' => $homePage,
         ]);
     }
 
