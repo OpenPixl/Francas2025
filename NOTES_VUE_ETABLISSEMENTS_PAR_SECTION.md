@@ -244,3 +244,46 @@ jamais pré-remplis côté serveur au chargement initial, cela revient en pratiq
   token) : chargement (GET) 200, soumission sans filtre 200 avec résultats complets, soumission avec filtre
   type 200, lien "voir tous" (>8 résultats) sans erreur.
 - `GET /_cat/indices?v` avant/après suppression de l'index `articles` et ré-indexation de `etablissement`.
+
+---
+
+## Mise à jour du 09/09/2026 — Vignettes de la mosaïque
+
+Les deux templates de la mosaïque (`include/_listesearch.html.twig` et
+`listetablissementsbytype.html.twig`) dupliquaient le même bloc `<a><img>…</a>` par établissement, avec
+des `alt` incohérents (dont un placeholder Tailwind UI resté en dur) et un rendu `object-contain` +
+`bg-gray-200` qui laissait un cadre gris autour des images non carrées / plus petites que la case.
+
+### Composant partagé `include/_card.html.twig`
+
+Nouveau partiel `templates/admin/etablissement/include/_card.html.twig` (params : `etablissement`,
+`config`), inclus dans les deux templates à la place du markup inline.
+
+- **`object-cover`** (au lieu de `object-contain`), `bg-gray-200` retiré : l'image remplit toujours le
+  carré `aspect-square`, quitte à agrandir/pixelliser une petite image — **plus aucune bordure grise**.
+- Image par défaut (établissement **sans** `logoName`) selon le type :
+  - **Collège** (`etablissement.idTypeEtablissement == 1`) →
+    `uploads/images/fixes/Collegiens_Citoyens-verticale.png` ;
+  - tout autre type → image « support de l'article » de la config
+    (`config.vignetteName`, colonne `config.vignette_name`) — comportement inchangé.
+- `alt` unifié : `« {nom} — {ville} »`.
+
+Aucune modification côté contrôleur / entité / BDD : `idTypeEtablissement` (= `t.id`) est déjà
+sélectionné par `EtablissementRepository::listEtablissementsBySection()` /
+`listEtablissementsByType()` et par le rechargement post-Elasticsearch.
+
+### Fichiers
+
+- **créé** : `templates/admin/etablissement/include/_card.html.twig`
+- **modifiés** : `templates/admin/etablissement/include/_listesearch.html.twig`,
+  `templates/admin/etablissement/listetablissementsbytype.html.twig`
+
+### Vérifications
+
+- `lint:twig` OK, `yarn dev` OK.
+- `/webapp/etablissement/type/1` (Collège) : les établissements sans logo affichent
+  `Collegiens_Citoyens-verticale.png`, toutes les vignettes en `object-cover`, plus de `bg-gray-200`.
+- `/app/les-radios-educatives` (section `ALL_ETABLISSEMENTS`, id 73) : mosaïque OK, 3 collèges sans
+  logo → visuel Collégiens-Citoyens, 8 vignettes `object-cover`, aucun `bg-gray-200`.
+- Branche « type non collège sans logo » non exerçable en l'état (aucun établissement actif non
+  collège sans logo en base) mais logique identique à l'existant (repli `config.vignetteName`).

@@ -1,0 +1,28 @@
+{#
+   Vignette d'un établissement dans la mosaïque « par type »
+   (listetablissementsbysection / listetablissementsbytype / _listesearch).
+
+   Params :
+     etablissement : tableau { id, name, city, logoName, logoUrl, idTypeEtablissement }
+     config        : configuration du site (pour l'image « support de l'article » par défaut)
+
+   Image :
+     - logo de l'établissement si présent ;
+     - sinon, pour un Collège (idTypeEtablissement == 1) : visuel Collégiens-Citoyens ;
+     - sinon : image « support de l'article » de la config (config.vignetteName).
+   object-cover : l'image remplit le carré (petites images upscalées / pixellisées),
+   pas de bordure grise.
+#}
+{% set img_src = etablissement.logoName
+    ? asset(etablissement.logoUrl)
+    : (etablissement.idTypeEtablissement == 1
+        ? asset('uploads/images/fixes/Collegiens_Citoyens-verticale.png')
+        : asset('uploads/images/config/' ~ config.vignetteName)) %}
+
+<a href="{{ path('op_webapp_etablissement_show2', {'id': etablissement.id}) }}" class="group">
+    <img src="{{ img_src }}"
+         alt="{{ etablissement.name }} — {{ etablissement.city }}"
+         class="aspect-square w-full rounded-lg object-cover group-hover:opacity-75" />
+    <h3 class="mt-3 text-sm text-[#d84519]">{{ etablissement.name }}</h3>
+    <p class="font-semibold text-gray-900">{{ etablissement.city }}</p>
+</a>
