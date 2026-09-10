@@ -6,6 +6,10 @@
     {{ parent() }}
 {% endblock %}
 
+{% block undernav %}
+    {{ include('webapp/page/_undernav_zone.html.twig', { undernav_page: page }) }}
+{% endblock %}
+
 {% block main %}
     {% set site_logo = site_logo_path() ? asset(site_logo_path()) : null %}
     {% set page_image = page.image ? asset('uploads/images/pages/' ~ page.image) : null %}

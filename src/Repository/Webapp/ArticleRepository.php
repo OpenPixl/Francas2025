@@ -258,6 +258,32 @@ class ArticleRepository extends ServiceEntityRepository
     }
 
     /**
+     * Les dernières publications « audio » (support = Audio, id 1), non
+     * archivées et pourvues d'un fichier joint. Utilisé par le lecteur affiché
+     * sous la navbar. Entités complètes pour bénéficier des helpers Twig
+     * (article_doc_url / article_image_url).
+     *
+     * @return Article[]
+     */
+    public function listLatestAudioArticles(int $max = 5): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.support', 'su')->addSelect('su')
+            ->leftJoin('a.etablissement', 'e')->addSelect('e')
+            ->andWhere('su.id = :audioSupport')
+            ->andWhere('a.isArchived = :notArchived')
+            ->andWhere('a.doc IS NOT NULL')
+            ->andWhere("a.doc <> ''")
+            ->setParameter('audioSupport', 1)
+            ->setParameter('notArchived', false)
+            ->orderBy('a.createdAt', 'DESC')
+            ->addOrderBy('a.id', 'DESC')
+            ->setMaxResults($max)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @param $slug
      * @return int|mixed|string|null
      * @throws \Doctrine\ORM\NonUniqueResultException

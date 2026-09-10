@@ -1,0 +1,21 @@
+{#
+   Zone paramétrable affichée directement sous la navbar.
+
+   Selon la configuration de la page (gestion des pages) :
+     - underNavHidden = true/null  -> rien
+     - underNavType   = 'player'   -> lecteur des 5 dernières publications audio
+     - underNavType   = 'banner'   -> bannière du site (admin/config/headershow)
+
+   Paramètre attendu : undernav_page (entité Page), éventuellement null.
+#}
+{% set _page = undernav_page is defined ? undernav_page : null %}
+
+{% if _page and _page.underNavHidden is same as(false) %}
+    {% if _page.underNavType == 'player' %}
+        {{ include('webapp/composants/audio_player_bar.html.twig', {
+            tracks: latest_audio_articles(5),
+        }, with_context = false) }}
+    {% elseif _page.underNavType == 'banner' %}
+        {{ include('admin/config/headershow.html.twig', { config: site_config() }, with_context = false) }}
+    {% endif %}
+{% endif %}

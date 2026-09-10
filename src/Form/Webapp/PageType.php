@@ -69,6 +69,19 @@ class PageType extends AbstractType
                 'label' => 'Afficher l\'intro',
                 'required' => false,
             ])
+            ->add('underNavHidden', CheckboxType::class, [
+                'label' => 'Ne rien afficher sous la navbar',
+                'required' => false,
+            ])
+            ->add('underNavType', ChoiceType::class, [
+                'label' => 'Contenu sous la navbar',
+                'required' => false,
+                'placeholder' => 'Choisir…',
+                'choices' => [
+                    'Lecteur des 5 dernières publications audio' => 'player',
+                    'Bannière du site' => 'banner',
+                ],
+            ])
         ;
     }
 

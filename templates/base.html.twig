@@ -23,16 +23,13 @@
     </head>
     <body data-page="{{ app.current_route }}">
             <header>
-                {% block header %}
-                    {% if app.request.attributes.get('_route') == 'op_webapp_public_homepage'%}
-                        {% include 'admin/config/headershow.html.twig' with { config: site_config() } %}
-                    {% endif %}
-                {% endblock %}
+                {% block header %}{% endblock %}
             </header>
             {% block mainnav %}
                 {% include 'webapp/page/listmenu.html.twig' with { pages: menu_pages(), config: site_config() } %}
             {% endblock %}
             <main>
+                {% block undernav %}{% endblock %}
                 {% block main %}
                 {% endblock %}
                 <section id="spinner" class="hidden">

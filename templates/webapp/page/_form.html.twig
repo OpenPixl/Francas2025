@@ -86,6 +86,28 @@
                 'oninput': ''
             } %}
         </div>
+
+        <h6 class="font-normal text-shadow-slate-900 mt-3">Zone sous la navbar</h6>
+        <div id="under-nav-options">
+            <div class="mb-1">
+                {% include 'composants/forms/input_switch.html.twig' with {
+                    'legend_width' : 'w-6/12',
+                    'col_width' : 'w-6/12',
+                    form : form.underNavHidden,
+                    'oninput': ''
+                } %}
+            </div>
+            <div class="mb-1" data-under-nav-type>
+                {% include 'composants/forms/input_select_horizontal.html.twig' with {
+                    'legend_width' : 'w-3/12',
+                    'col_width' : 'w-9/12',
+                    'label' : 'Contenu',
+                    form : form.underNavType,
+                    'search': false,
+                } %}
+            </div>
+        </div>
+
         <h6 class="font-normal text-shadow-slate-900">Dates de publication de la page</h6>
         <div class="mb-1">
             {% include 'composants/forms/input_text_horizontal.html.twig' with {
@@ -137,3 +159,25 @@
 </div>
 {{ form_rest(form) }}
 {{ form_end(form) }}
+
+<script>
+    (function () {
+        // Grise le choix « Contenu sous la navbar » quand « Ne rien afficher » est coché.
+        var wrapper = document.getElementById('under-nav-options');
+        if (!wrapper) return;
+        var hidden = wrapper.querySelector('#{{ form.underNavHidden.vars.id }}');
+        var typeRow = wrapper.querySelector('[data-under-nav-type]');
+        var typeSelect = wrapper.querySelector('#{{ form.underNavType.vars.id }}');
+        if (!hidden || !typeRow || !typeSelect) return;
+
+        function sync() {
+            var off = hidden.checked;
+            typeSelect.disabled = off;
+            typeRow.style.opacity = off ? '0.4' : '';
+            typeRow.style.pointerEvents = off ? 'none' : '';
+        }
+
+        hidden.addEventListener('change', sync);
+        sync();
+    })();
+</script>

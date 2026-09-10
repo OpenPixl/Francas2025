@@ -32,6 +32,21 @@ class Page implements \Stringable
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $image = null;
 
+    /**
+     * Zone paramétrable affichée directement sous la navbar.
+     * true (ou null) = ne rien afficher ; false = afficher selon underNavType.
+     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $underNavHidden = true;
+
+    /**
+     * Type de contenu de la zone sous la navbar quand elle est visible :
+     * 'player' (lecteur des 5 dernières publications audio) ou 'banner'
+     * (bannière du site).
+     */
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $underNavType = null;
+
     #[ORM\Column(type: 'string', length: 100)]
     private $state;
 
@@ -252,6 +267,30 @@ class Page implements \Stringable
     public function setImage(?string $image): self
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getUnderNavHidden(): ?bool
+    {
+        return $this->underNavHidden;
+    }
+
+    public function setUnderNavHidden(?bool $underNavHidden): self
+    {
+        $this->underNavHidden = $underNavHidden;
+
+        return $this;
+    }
+
+    public function getUnderNavType(): ?string
+    {
+        return $this->underNavType;
+    }
+
+    public function setUnderNavType(?string $underNavType): self
+    {
+        $this->underNavType = $underNavType;
 
         return $this;
     }

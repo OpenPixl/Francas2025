@@ -1,0 +1,109 @@
+{#
+   Lecteur des dernières publications « audio », affiché sous la navbar.
+   Inspiré du player RadioKing, simplifié : play/pause, pochette, titre,
+   barre de progression, volume, et un sélecteur listant les pistes.
+   Pas de vote / partage / téléchargement / lien HD.
+
+   Paramètre : tracks = Article[] (support Audio), déjà limité à 5.
+   JS : assets/js/composants/audio_player_bar.js (initAudioPlayerBar).
+#}
+{% set tracks = tracks|default([]) %}
+
+<div id="audio-player-bar" class="w-full bg-slate-900 text-white shadow-md">
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        {% if tracks is empty %}
+            <div class="flex h-12 items-center text-sm text-slate-300">
+                <i class="fa-solid fa-podcast mr-2 text-[#d84519]"></i>
+                Aucune publication audio disponible pour le moment.
+            </div>
+        {% else %}
+            <div class="relative flex h-16 items-center gap-3 sm:h-20 sm:gap-4">
+
+                {# Play / Pause / Chargement.
+                   Chaque icône est enveloppée dans un <span> : Font Awesome remplace
+                   le <i> par un <svg> et sa règle « .svg-inline--fa { display:inline-block } »
+                   l'emporterait sur la classe utilitaire .hidden posée sur le <i>. #}
+                <button type="button"
+                        class="control-play inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-[#d84519] text-lg text-white shadow-md transition hover:bg-[#F26438] sm:size-12"
+                        aria-label="Lecture">
+                    <span class="player-ico-play"><i class="fa-solid fa-play"></i></span>
+                    <span class="player-ico-pause hidden"><i class="fa-solid fa-pause"></i></span>
+                    <span class="player-ico-loader hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
+                </button>
+
+                {# Pochette #}
+                <span class="control-cover hidden size-12 shrink-0 overflow-hidden rounded-md bg-slate-700 sm:block">
+                    <img class="media-cover size-full object-cover" src="" alt="" hidden>
+                    <span class="media-cover-fallback grid size-full place-content-center text-slate-400"><i class="fa-solid fa-music"></i></span>
+                </span>
+
+                {# Titre + barre de progression #}
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-baseline gap-2">
+                        <span class="player-title truncate text-sm font-semibold sm:text-base">—</span>
+                        <span class="player-artist truncate text-xs text-slate-400"></span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2">
+                        <span class="player-current text-[11px] tabular-nums text-slate-400">0:00</span>
+                        <div class="player-rail relative h-1.5 flex-1 cursor-pointer rounded-full bg-slate-700">
+                            <div class="player-played absolute left-0 top-0 h-1.5 w-0 rounded-full bg-[#d84519]"></div>
+                            <div class="player-thumb absolute -top-1 size-3.5 -translate-x-1/2 rounded-full border border-[#d84519] bg-white shadow" style="left:0%"></div>
+                        </div>
+                        <span class="player-duration text-[11px] tabular-nums text-slate-400">0:00</span>
+                    </div>
+                </div>
+
+                {# Volume #}
+                <div class="hidden items-center gap-2 sm:flex">
+                    <button type="button" class="control-mute text-slate-300 hover:text-white" aria-label="Couper le son">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <input type="range" min="0" max="1" step="0.01" value="1"
+                           class="player-volume h-1 w-20 accent-[#d84519]" aria-label="Volume">
+                </div>
+
+                {# Sélecteur de pistes #}
+                <div class="playlist-wrapper relative shrink-0">
+                    <button type="button"
+                            class="playlist-toggle flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-slate-200 hover:bg-white/10"
+                            aria-expanded="false" aria-label="Voir les publications audio">
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span class="hidden lg:inline">Publications</span>
+                    </button>
+                    <ul class="playlist-list absolute right-0 top-full z-50 mt-2 hidden w-80 max-w-[85vw] overflow-hidden rounded-lg bg-white text-slate-800 shadow-xl ring-1 ring-black/10">
+                        {% for article in tracks %}
+                            {% set cover = article_image_url(article) %}
+                            <li>
+                                <button type="button"
+                                        class="playlist-item flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-slate-100"
+                                        data-src="{{ asset(article_doc_url(article)) }}"
+                                        data-title="{{ article.title }}"
+                                        data-artist="{{ article.etablissement ? article.etablissement.name : '' }}"
+                                        data-cover="{{ cover ? asset(cover) : '' }}"
+                                        data-href="{{ path('op_webapp_articles_show', { id: article.id }) }}">
+                                    <span class="grid size-10 shrink-0 place-content-center overflow-hidden rounded bg-slate-200">
+                                        {% if cover %}
+                                            <img src="{{ asset(cover) }}" alt="" class="size-full object-cover">
+                                        {% else %}
+                                            <i class="fa-solid fa-music text-slate-400"></i>
+                                        {% endif %}
+                                    </span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block truncate text-sm font-medium">{{ article.title }}</span>
+                                        <span class="block truncate text-xs text-slate-500">
+                                            {{ article.etablissement ? article.etablissement.name : 'Radio Francas' }}
+                                            · {{ article.createdAt ? article.createdAt|date('d/m/Y') : '' }}
+                                        </span>
+                                    </span>
+                                    <i class="fa-solid fa-circle-play text-[#d84519]"></i>
+                                </button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <audio class="player-audio" preload="metadata"></audio>
+            </div>
+        {% endif %}
+    </div>
+</div>

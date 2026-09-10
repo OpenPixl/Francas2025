@@ -17,6 +17,7 @@ import { initNewEditMessage } from "./js/admin/webapp/NewEditMessage";
 import { initNewEditArticle } from "./js/app/article/NewEditArticles";
 import { initIndexAdminArticle } from "./js/admin/webapp/IndexArticles";
 import { initSearchSelects } from "./js/composants/fonctions";
+import { initAudioPlayerBar } from "./js/composants/audio_player_bar";
 
 
 /**
@@ -36,6 +37,9 @@ onReady(() => {
 
     // Listes déroulantes « recherche + sélection » (data-search-select).
     initSearchSelects();
+
+    // Lecteur audio sous la navbar (présent seulement si la page l'active).
+    initAudioPlayerBar();
 
     // Affectation du JS selon la page
     const page = document.body.dataset.page;
