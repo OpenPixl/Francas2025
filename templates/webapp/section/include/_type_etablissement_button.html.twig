@@ -1,0 +1,11 @@
+{# Section « un type d'établissement » (section.content == 'ONE_TYPE_ETABLISSEMENT').
+   Affiche un bouton vers la page dédiée du type d'établissement.
+   Param : section (App\Entity\Webapp\Section) #}
+{% if section.typeEtablissement %}
+    <div class="mt-3">
+        <a href="{{ path('op_webapp_etablissement_bytype', {'idtype': section.typeEtablissement.id}) }}"
+           class="inline-block rounded-md bg-[#d84519] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#c03d16]">
+            Voir les {{ section.typeEtablissement.libelle }}
+        </a>
+    </div>
+{% endif %}

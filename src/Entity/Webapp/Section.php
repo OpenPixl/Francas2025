@@ -3,6 +3,7 @@
 namespace App\Entity\Webapp;
 
 use App\Entity\Admin\Etablissement;
+use App\Entity\Admin\TypeEtablissement;
 use App\Entity\Gestapp\RessourceCat;
 use App\Repository\Webapp\SectionRepository;
 use Cocur\Slugify\Slugify;
@@ -62,6 +63,9 @@ class Section
 
     #[ORM\ManyToOne(inversedBy: 'sections')]
     private ?Etablissement $singleEtablissement = null;
+
+    #[ORM\ManyToOne]
+    private ?TypeEtablissement $typeEtablissement = null;
 
     #[ORM\ManyToOne(inversedBy: 'sections')]
     private ?Page $page = null;
@@ -296,6 +300,18 @@ class Section
     public function setSingleEtablissement(?Etablissement $singleEtablissement): static
     {
         $this->singleEtablissement = $singleEtablissement;
+
+        return $this;
+    }
+
+    public function getTypeEtablissement(): ?TypeEtablissement
+    {
+        return $this->typeEtablissement;
+    }
+
+    public function setTypeEtablissement(?TypeEtablissement $typeEtablissement): static
+    {
+        $this->typeEtablissement = $typeEtablissement;
 
         return $this;
     }

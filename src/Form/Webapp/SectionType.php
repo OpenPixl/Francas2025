@@ -34,6 +34,7 @@ class SectionType extends AbstractType
                     ],
                     'Établissements' =>[
                         "un établissement" => "ONE_ETABLISSEMENT",
+                        "un type d'établissement" => 'ONE_TYPE_ETABLISSEMENT',
                         "tous les établissements" => 'ALL_ETABLISSEMENTS'
                     ],
                     'DIVERS' => [
@@ -69,6 +70,7 @@ class SectionType extends AbstractType
             ->add('category')
             ->add('ressourcesCat')
             ->add('oneArticle')
+            ->add('typeEtablissement')
         ;
     }
 
