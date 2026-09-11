@@ -29,6 +29,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ;
     }
 
+    public function indexAdministrateursOnly()
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.typeuser LIKE :role')
+            ->setParameter('role', 'administrator')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */

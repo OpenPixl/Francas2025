@@ -39,6 +39,20 @@ class userController extends AbstractController
         ]);
     }
 
+    #[Route(path: '/admin/user/administrateurs', name: 'op_admin_user_list_administrateur', methods: ['GET'])]
+    public function listAdministrateur(userRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
+    {
+        $data = $userRepository->indexAdministrateursOnly();
+        $users = $paginator->paginate(
+            $data,
+            $request->query->getInt('page', 1),
+            15
+        );
+        return $this->render('admin/user/index.html.twig', [
+            'users' => $users
+        ]);
+    }
+
     #[Route(path: '/admin/user/new', name: 'op_admin_user_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
