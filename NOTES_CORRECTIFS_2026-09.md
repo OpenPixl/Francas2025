@@ -105,6 +105,31 @@ lisait l'image dans `uploads/images/collections/` alors que tous les autres cons
 d'où l'effet « masqué » jusqu'au premier vrai changement d'image. `headershow.html.twig` corrigé vers
 `uploads/images/config/`.
 
+## 5. Dropdown utilisateur non fonctionnel dans la navbar admin
+
+Symptôme (11/09/2026) : dans la navbar admin, le dropdown sous l'avatar (dernier élément à
+droite, représentant l'utilisateur connecté) ne s'ouvrait plus au clic.
+
+Cause : `#menu-button` / `#menu-dropdown` (`templates/admin/include/navbar_admin.html.twig`)
+sont un extrait de template Tailwind UI (normalement piloté par Alpine.js/React), collé sans
+JS de câblage. Le mécanisme générique de `assets/admin.js` ne gère que les éléments porteurs de
+la classe `.dropdown-toggle` (dropdowns « Sites » / « Ressources » / « Paramètres » de la barre
+horizontale) — l'avatar n'a pas cette classe, donc aucun écouteur ne se déclenchait. Les 3 liens
+du menu (« Votre profil », « Paramètres », « Déconnexion ») pointaient en plus vers `href="#"`,
+y compris la déconnexion.
+
+### Correctif
+
+- **`assets/admin.js`** : ajout d'un bloc dédié — clic sur `#menu-button` bascule la classe
+  `hidden` de `#menu-dropdown` ; clic en dehors des deux éléments referme le menu. Volontairement
+  séparé du mécanisme `.dropdown-toggle` existant (structure DOM différente : le bouton et le
+  menu ne sont pas des frères directs ici).
+- **`templates/admin/include/navbar_admin.html.twig`** : les 3 liens pointent désormais vers de
+  vraies routes — « Paramètres » → `op_admin_user_edit` (fiche du user connecté), « Déconnexion »
+  → `op_admin_security_logout`. Le 1er lien (« Votre profil ») a ensuite été repurposé en
+  « Administrateurs » → `op_admin_user_list_administrateur`, cf.
+  `NOTES_ADMIN_LISTE_ADMINISTRATEURS.md`.
+
 ---
 
 ## Fichiers modifiés
@@ -118,6 +143,8 @@ d'où l'effet « masqué » jusqu'au premier vrai changement d'image. `headersho
 - `templates/admin/config/_form.html.twig` (§4 : `delete_url`)
 - `templates/admin/config/headershow.html.twig` (§4 : dossier `collections/` → `config/`)
 - `assets/js/admin/admin/EditConfig.js` (§4 : handler `delete-media`)
+- `assets/admin.js` (§5 : câblage du dropdown utilisateur)
+- `templates/admin/include/navbar_admin.html.twig` (§5 : liens du dropdown utilisateur)
 
 ## Fichiers créés
 

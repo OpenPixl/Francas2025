@@ -121,6 +121,23 @@ onReady(() => {
         }
     })
 
+    // User menu dropdown (navbar, à droite)
+    const userMenuButton = document.getElementById("menu-button")
+    const userMenuDropdown = document.getElementById("menu-dropdown")
+
+    if (userMenuButton && userMenuDropdown) {
+        userMenuButton.addEventListener("click", (e) => {
+            e.stopPropagation()
+            userMenuDropdown.classList.toggle("hidden")
+        })
+
+        window.addEventListener("click", (e) => {
+            if (!userMenuDropdown.contains(e.target) && !userMenuButton.contains(e.target)) {
+                userMenuDropdown.classList.add("hidden")
+            }
+        })
+    }
+
     // Mobile menu toggle
 
     const mobileMenuButton = document.querySelector('.mobile-menu-button')
