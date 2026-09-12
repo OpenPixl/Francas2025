@@ -74,13 +74,26 @@ class EtablissementEditType extends AbstractType
                 'class' => User::class,
                 'placeholder' => '-- Choisir l\'administrateur --',
                 'required' => false,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('u')
+                'query_builder' => function (EntityRepository $er) use ($options) {
+                    $etablissement = $options['data'] ?? null;
+                    $currentUser = $etablissement instanceof Etablissement ? $etablissement->getUser() : null;
+
+                    $qb = $er->createQueryBuilder('u')
                         ->where('u.isActiv = :isActiv')
                         ->andWhere('u.roles LIKE :role')
                         ->setParameter('isActiv', 1)
                         ->setParameter('role', '%"ROLE_ETABLISSEMENT"%')
                         ->orderBy('u.id', 'ASC');
+
+                    // L'utilisateur déjà lié doit rester sélectionnable même s'il n'a pas
+                    // (ou plus) le statut actif, sinon le champ ne peut pas l'afficher/le
+                    // conserver comme valeur pré-remplie.
+                    if ($currentUser) {
+                        $qb->orWhere('u.id = :currentUserId')
+                            ->setParameter('currentUserId', $currentUser->getId());
+                    }
+
+                    return $qb;
                 },
             ])
         ;

@@ -51,6 +51,7 @@ onReady(() => {
             break;
         case 'op_admin_etablissement_new':
         case 'op_admin_etablissement_edit':
+        case 'op_admin_etablissement_newetablissementadmin':
             initNewEditEtablissement();
             break;
         case 'op_admin_etablissement_index':
