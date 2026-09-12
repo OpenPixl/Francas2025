@@ -1,0 +1,20 @@
+{# Suggestions de recherche instantanée (Elasticsearch) — injecté dans #navbar_search_results #}
+{% if etablissements is empty %}
+    <p class="px-3 py-2 text-sm text-gray-500">Aucun résultat pour «&nbsp;{{ query }}&nbsp;».</p>
+{% else %}
+    <ul class="divide-y divide-gray-100">
+        {% for e in etablissements %}
+            <li>
+                <a href="{{ path('op_admin_etablissement_edit', {'id': e.id}) }}"
+                   class="block px-3 py-2 hover:bg-sky-50">
+                    <span class="block text-sm font-medium text-gray-800">{{ e.name }}</span>
+                    <span class="block text-xs text-gray-500">
+                        {%- if e.zipcode %}{{ e.zipcode }}{% endif -%}
+                        {%- if e.zipcode and e.city %}&nbsp;{% endif -%}
+                        {%- if e.city %}{{ e.city }}{% endif -%}
+                    </span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {showNotification, showDialog, hideDialog} from "../../composants/tailwind";
+import {initNavbarSearch} from "../../composants/fonctions";
 
 
 export function initIndexUser(){
@@ -100,4 +101,6 @@ export function initIndexUser(){
 
     reload();
 
+    // Formulaire de recherche instancié dans la navbar (NavbarSearchController)
+    initNavbarSearch('liste', reload);
 }

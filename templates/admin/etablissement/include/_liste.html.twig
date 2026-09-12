@@ -44,4 +44,18 @@
         </tr>
     {% endfor %}
     </tbody>
+    <tbody>
+    <tr>
+        <td colspan="6" class="py-1.5 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
+            <div class="relative flex flex-row w-full">
+                <div class="flex-1">
+                    <p class="text-sm">Nombre de résultats : {{ etablissements.getTotalItemCount }}</p>
+                </div>
+                <div class="flex-1">
+                    {{ knp_pagination_render(etablissements, 'include/pagination.html.twig') }}
+                </div>
+            </div>
+        </td>
+    </tr>
+    </tbody>
 </table>

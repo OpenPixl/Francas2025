@@ -109,6 +109,98 @@ export function initSearchSelects(root = document) {
 }
 
 /**
+ * Câble le formulaire de recherche instancié dans la navbar admin (NavbarSearchController)
+ * sur une page de liste : Entrée = recherche complète (rechargement AJAX de la liste),
+ * saisie à partir de MIN_CHARS caractères = suggestions instantanées Elasticsearch dans
+ * le panneau #navbar_search_results sous le champ.
+ *
+ * @param {string} listSelector id du conteneur de la liste à remplacer par la réponse AJAX
+ * @param {Function} [onListLoaded] rappelé après remplacement de la liste (ex : réattacher des écouteurs)
+ */
+export function initNavbarSearch(listSelector, onListLoaded) {
+    const searchForm = document.getElementById('navbar_search_form');
+    if (!searchForm) return;
+
+    searchForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const params = new URLSearchParams(new FormData(searchForm));
+        axios
+            .get(searchForm.action + '?' + params.toString())
+            .then(function (response) {
+                document.getElementById(listSelector).innerHTML = response.data.liste;
+                if (typeof onListLoaded === 'function') onListLoaded();
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    });
+
+    initNavbarLiveSearch(searchForm);
+}
+
+function initNavbarLiveSearch(form) {
+    const MIN_CHARS = 5;
+    const input = form.querySelector('input[type="search"]');
+    const panel = document.getElementById('navbar_search_results');
+    const liveUrl = form.dataset.liveUrl;
+
+    if (!input || !panel || !liveUrl) return;
+
+    let debounceId;
+    let lastQuery = null;
+    let requestId = 0;
+
+    function hide() {
+        panel.classList.add('hidden');
+        panel.innerHTML = '';
+        lastQuery = null;
+    }
+
+    function show() {
+        panel.classList.remove('hidden');
+    }
+
+    input.addEventListener('input', function () {
+        const q = input.value.trim();
+        window.clearTimeout(debounceId);
+
+        if (q.length < MIN_CHARS) {
+            hide();
+            return;
+        }
+
+        debounceId = window.setTimeout(function () {
+            if (q === lastQuery) return;
+            lastQuery = q;
+            const current = ++requestId;
+
+            axios
+                .get(liveUrl, { params: { q: q } })
+                .then(function (response) {
+                    if (current !== requestId) return; // réponse obsolète
+                    panel.innerHTML = response.data.html || '';
+                    show();
+                })
+                .catch(function () {
+                    if (current === requestId) hide();
+                });
+        }, 250);
+    });
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            hide();
+            input.blur();
+        }
+    });
+
+    // Ferme le panneau au clic en dehors du formulaire de recherche.
+    document.addEventListener('click', function (e) {
+        if (!form.contains(e.target)) hide();
+    });
+}
+
+/**
  * Le bouton "Enregistrer"/"Mettre à jour" du header (sous la navbar) est en dehors du <form> :
  * il ne peut donc pas déclencher nativement la soumission. On le relie ici au <form> de la page.
  */

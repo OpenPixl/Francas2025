@@ -40,6 +40,23 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
+     * Recherche (formulaire de la navbar admin) parmi les membres établissements
+     * uniquement, sur le nom affiché et l'email.
+     */
+    public function searchEtablissementsOnly(string $query)
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.typeuser LIKE :role')
+            ->andWhere('u.loginName LIKE :query OR u.email LIKE :query')
+            ->setParameter('role', 'etablissement')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('u.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+    /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void

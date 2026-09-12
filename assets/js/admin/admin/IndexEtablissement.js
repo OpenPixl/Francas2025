@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {initNavbarSearch} from "../../composants/fonctions";
 
 export function initIndexEtablissement(){
     console.log('Bienvenue sur la page de gestions des établissements.')
@@ -30,4 +31,7 @@ export function initIndexEtablissement(){
     }
 
     reload();
+
+    // Formulaire de recherche instancié dans la navbar (NavbarSearchController)
+    initNavbarSearch('liste', reload);
 }

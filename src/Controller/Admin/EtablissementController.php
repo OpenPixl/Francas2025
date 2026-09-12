@@ -11,6 +11,7 @@ use App\Entity\Webapp\Message;
 use App\Form\Admin\EtablissementEditType;
 use App\Form\Admin\EtablissementType;
 use App\Form\Search\EtablissementSearchType;
+use App\Form\Search\NavbarEtablissementSearchType;
 use App\Repository\Admin\EtablissementRepository;
 use App\Repository\Admin\ConfigRepository;
 use App\Repository\Webapp\ArticleRepository;
@@ -46,8 +47,30 @@ class EtablissementController extends AbstractController
     #[Route(path: '/op_admin/etablissement', name: 'op_admin_etablissement_index', methods: ['GET'])]
     public function index(EtablissementRepository $etablissementRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        // QueryBuilder : pagination SQL (LIMIT) plutôt que findAll() + découpe mémoire.
-        $data = $etablissementRepository->createQueryBuilder('e')->orderBy('e.id', 'ASC');
+        // Recherche Elastica issue du formulaire de la navbar admin (NavbarSearchController)
+        $searchForm = $this->createForm(NavbarEtablissementSearchType::class, null, [
+            'method' => 'GET',
+            'csrf_protection' => false,
+        ]);
+        $searchForm->handleRequest($request);
+
+        if ($searchForm->isSubmitted() && $searchForm->isValid() && !empty($searchForm->get('query')->getData())) {
+            $boolQuery = new BoolQuery();
+            $multiMatch = new MultiMatch();
+            $multiMatch->setFields(['name^3', 'city^2', 'zipcode']);
+            $multiMatch->setType(MultiMatch::TYPE_BEST_FIELDS);
+            $multiMatch->setFuzziness(MultiMatch::FUZZINESS_AUTO);
+            $multiMatch->setQuery($searchForm->get('query')->getData());
+            $boolQuery->addMust($multiMatch);
+
+            $esQuery = new Query($boolQuery);
+            $esQuery->setSort(['_score' => ['order' => 'desc']]);
+
+            $data = $this->finder->find($esQuery);
+        } else {
+            // QueryBuilder : pagination SQL (LIMIT) plutôt que findAll() + découpe mémoire.
+            $data = $etablissementRepository->createQueryBuilder('e')->orderBy('e.id', 'ASC');
+        }
 
         $etablissements = $paginator->paginate(
             $data,
@@ -55,8 +78,64 @@ class EtablissementController extends AbstractController
             15
         );
 
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'liste' => $this->renderView('admin/etablissement/include/_liste.html.twig', [
+                    'etablissements' => $etablissements,
+                ]),
+            ]);
+        }
+
         return $this->render('admin/etablissement/index.html.twig', [
             'etablissements' => $etablissements,
+        ]);
+    }
+
+    /**
+     * Suggestions de recherche instantanée (moteur Elasticsearch) affichées sous
+     * le champ de la navbar sur la liste des établissements.
+     *
+     * Déclenchée par le JS à partir de MIN_CHARS caractères (cf. IndexEtablissement.js).
+     * Recherche sur le nom, la commune et le code postal. Doit être déclarée avant
+     * la route "{id}" ci-dessous (op_admin_etablissement_show).
+     */
+    public const SEARCH_LIVE_MIN_CHARS = 5;
+
+    #[Route(path: '/op_admin/etablissement/search-live', name: 'op_admin_etablissement_search_live', methods: ['GET'])]
+    public function searchLive(Request $request): Response
+    {
+        $q = trim((string) $request->query->get('q', ''));
+
+        if (mb_strlen($q) < self::SEARCH_LIVE_MIN_CHARS) {
+            return $this->json(['html' => '', 'count' => 0]);
+        }
+
+        $multiMatch = new MultiMatch();
+        $multiMatch->setQuery($q);
+        $multiMatch->setFields(['name^3', 'city^2', 'zipcode']);
+        $multiMatch->setType(MultiMatch::TYPE_BEST_FIELDS);
+        $multiMatch->setFuzziness(MultiMatch::FUZZINESS_AUTO);
+
+        $boolQuery = new BoolQuery();
+        $boolQuery->addMust($multiMatch);
+
+        $esQuery = new Query($boolQuery);
+        $esQuery->setSize(10);
+        $esQuery->setSort(['_score' => ['order' => 'desc']]);
+
+        try {
+            $results = $this->finder->find($esQuery);
+        } catch (\Throwable $e) {
+            // Elasticsearch indisponible : on ne casse pas la saisie, panneau vide.
+            return $this->json(['html' => '', 'count' => 0]);
+        }
+
+        return $this->json([
+            'html' => $this->renderView('admin/etablissement/include/_search_suggestions.html.twig', [
+                'etablissements' => $results,
+                'query' => $q,
+            ]),
+            'count' => \count($results),
         ]);
     }
 

@@ -1,0 +1,18 @@
+{# Suggestions de recherche instantanée — injecté dans #navbar_search_results #}
+{% if users is empty %}
+    <p class="px-3 py-2 text-sm text-gray-500">Aucun résultat pour «&nbsp;{{ query }}&nbsp;».</p>
+{% else %}
+    <ul class="divide-y divide-gray-100">
+        {% for u in users %}
+            <li>
+                <a href="{{ path('op_admin_user_edit', {'id': u.id}) }}"
+                   class="block px-3 py-2 hover:bg-sky-50">
+                    <span class="block text-sm font-medium text-gray-800">
+                        {{ u.loginName is not empty ? u.loginName : 'non précisé' }}
+                    </span>
+                    <span class="block text-xs text-gray-500">{{ u.email }}</span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

@@ -7,6 +7,7 @@ use App\Entity\Admin\User;
 use App\Entity\Webapp\Article;
 use App\Form\Admin\userEditType;
 use App\Form\Admin\userType;
+use App\Form\Search\NavbarUserSearchType;
 use App\Repository\Admin\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -28,14 +29,64 @@ class userController extends AbstractController
     #[Route(path: '/admin/user/', name: 'op_admin_user_index', methods: ['GET'])]
     public function index(userRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        $data = $userRepository->indexEtablissementsOnly();
+        // Recherche issue du formulaire de la navbar admin (NavbarSearchController).
+        // Pas d'index Elasticsearch sur User : recherche SQL classique (LIKE).
+        $searchForm = $this->createForm(NavbarUserSearchType::class, null, [
+            'method' => 'GET',
+            'csrf_protection' => false,
+        ]);
+        $searchForm->handleRequest($request);
+
+        if ($searchForm->isSubmitted() && $searchForm->isValid() && !empty($searchForm->get('query')->getData())) {
+            $data = $userRepository->searchEtablissementsOnly($searchForm->get('query')->getData());
+        } else {
+            $data = $userRepository->indexEtablissementsOnly();
+        }
+
         $users = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
             15
         );
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'liste' => $this->renderView('admin/user/include/_liste.html.twig', [
+                    'users' => $users,
+                ]),
+            ]);
+        }
+
         return $this->render('admin/user/index.html.twig', [
             'users' => $users
+        ]);
+    }
+
+    /**
+     * Suggestions de recherche instantanée affichées sous le champ de la navbar
+     * sur la liste des membres. Déclenchée par le JS à partir de MIN_CHARS
+     * caractères (cf. IndexUser.js). Pas d'Elasticsearch sur User : recherche SQL.
+     * Doit être déclarée avant la route "{id}" ci-dessous (op_admin_user_show).
+     */
+    public const SEARCH_LIVE_MIN_CHARS = 5;
+
+    #[Route(path: '/admin/user/search-live', name: 'op_admin_user_search_live', methods: ['GET'])]
+    public function searchLive(Request $request, userRepository $userRepository): Response
+    {
+        $q = trim((string) $request->query->get('q', ''));
+
+        if (mb_strlen($q) < self::SEARCH_LIVE_MIN_CHARS) {
+            return $this->json(['html' => '', 'count' => 0]);
+        }
+
+        $results = \array_slice($userRepository->searchEtablissementsOnly($q), 0, 10);
+
+        return $this->json([
+            'html' => $this->renderView('admin/user/include/_search_suggestions.html.twig', [
+                'users' => $results,
+                'query' => $q,
+            ]),
+            'count' => \count($results),
         ]);
     }
 
