@@ -16,7 +16,7 @@
 {% set img_src = etablissement.logoName
     ? asset(etablissement.logoUrl)
     : (etablissement.idTypeEtablissement == 1
-        ? asset('uploads/images/fixes/Collegiens_Citoyens-verticale.png')
+        ? asset('uploads/images/fixes/logo_radio_francas.png')
         : asset('uploads/images/config/' ~ config.vignetteName)) %}
 
 <a href="{{ path('op_webapp_etablissement_show2', {'id': etablissement.id}) }}" class="group">
