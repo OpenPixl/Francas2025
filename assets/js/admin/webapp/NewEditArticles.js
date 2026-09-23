@@ -1,8 +1,10 @@
+import axios from 'axios';
 import {bindHeaderSaveButton, bindHeaderDeleteButton} from "../../composants/fonctions";
 import {showNotification, showDialog} from "../../composants/tailwind";
 import {richTextConfig} from "../../composants/ckeditor";
 
 export function initNewEditArticle(){
+    console.log('Bienvenue sur la page d\'édition d\'un article');
     bindHeaderSaveButton();
     bindHeaderDeleteButton();
 
