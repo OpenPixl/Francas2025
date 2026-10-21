@@ -16,14 +16,10 @@
                 {% endif %}
                 {% if article.idsupport == 0 %}
                 {% elseif article.idsupport == 1 %}
-                    <div class="col-12" id="content_support">
-                        <h3 class="text-center mt-3">
-                        <audio class="text-center" controls="controls">
-                            <source src="{{ asset(article.docUrl) }}" type="audio/mp3" />
-                            Votre navigateur ne supporte pas la balise AUDIO.
-                        </audio>
-                        </h3>
-                    </div>
+                    {{ include('webapp/composants/audio_player_article.html.twig', {
+                        'src': asset(article.docUrl),
+                        'title': article.title,
+                    }) }}
                 {% elseif article.idsupport == 2 %}
                     <div class="shadow shadow-slate-300 m-2" id="content_support">
                         <video controls width="100%">
@@ -62,14 +58,10 @@
                 {% endif %}
                 {% if article.idsupport == 0 %}
                 {% elseif article.idsupport == 1 %}
-                    <div class="col-12" id="content_support">
-                        <h3 class="text-center mt-3">
-                            <audio class="text-center" controls="controls">
-                                <source src="{{ asset(article.docUrl) }}" type="audio/mp3" />
-                                Votre navigateur ne supporte pas la balise AUDIO.
-                            </audio>
-                        </h3>
-                    </div>
+                    {{ include('webapp/composants/audio_player_article.html.twig', {
+                        'src': asset(article.docUrl),
+                        'title': article.title,
+                    }) }}
                 {% elseif article.idsupport == 2 %}
                     <div class="shadow shadow-slate-300 m-2" id="content_support">
                         <video controls width="100%">

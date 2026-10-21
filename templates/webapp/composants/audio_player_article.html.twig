@@ -1,0 +1,57 @@
+{#
+   Lecteur audio d'un article (support Audio), sur toute la largeur de l'article.
+   Reprend le visuel du lecteur sous la navbar (audio_player_bar.html.twig) :
+   bouton orange play/pause, titre, progression, volume. Pas de pochette :
+   le lecteur est affiché dans l'article lui-même.
+
+   Paramètres :
+     src    : URL du fichier audio (déjà passée par asset())
+     title  : titre affiché
+     artist : sous-titre (établissement), optionnel
+   JS : assets/js/composants/audio_player_article.js (initAudioPlayersArticle).
+#}
+<div class="audio-player-article mt-6 w-full rounded-2xl bg-slate-900 p-3 text-white shadow-md sm:p-4">
+    <div class="flex items-center gap-3 sm:gap-4">
+
+        {# Play / Pause / Chargement — icônes dans un <span> (cf. audio_player_bar.html.twig) #}
+        <button type="button"
+                class="control-play inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-[#d84519] text-lg text-white shadow-md transition hover:bg-[#F26438] sm:size-14 sm:text-xl"
+                aria-label="Lecture">
+            <span class="player-ico-play"><i class="fa-solid fa-play"></i></span>
+            <span class="player-ico-pause hidden"><i class="fa-solid fa-pause"></i></span>
+            <span class="player-ico-loader hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
+        </button>
+
+        {# Titre + barre de progression #}
+        <div class="min-w-0 flex-1">
+            <p class="text-[11px] font-medium uppercase tracking-wide text-[#F26438]">
+                <i class="fa-solid fa-podcast mr-1"></i> Écouter l'émission radio
+            </p>
+            <div class="flex items-baseline gap-2">
+                <span class="truncate text-sm font-semibold sm:text-base">{{ title }}</span>
+                {% if artist|default(null) %}
+                    <span class="hidden truncate text-xs text-slate-400 sm:inline">{{ artist }}</span>
+                {% endif %}
+            </div>
+            <div class="mt-1.5 flex items-center gap-2">
+                <span class="player-current text-[11px] tabular-nums text-slate-400">0:00</span>
+                <div class="player-rail relative h-1.5 flex-1 cursor-pointer rounded-full bg-slate-700">
+                    <div class="player-played absolute left-0 top-0 h-1.5 w-0 rounded-full bg-[#d84519]"></div>
+                    <div class="player-thumb absolute -top-1 size-3.5 -translate-x-1/2 cursor-pointer rounded-full border border-[#d84519] bg-white shadow" style="left:0%"></div>
+                </div>
+                <span class="player-duration text-[11px] tabular-nums text-slate-400">0:00</span>
+            </div>
+        </div>
+
+        {# Volume #}
+        <div class="hidden items-center gap-2 sm:flex">
+            <button type="button" class="control-mute text-slate-300 hover:text-white" aria-label="Couper le son">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <input type="range" min="0" max="1" step="0.01" value="1"
+                   class="player-volume h-1 w-24 accent-[#d84519]" aria-label="Volume">
+        </div>
+
+        <audio class="player-audio" src="{{ src }}" preload="metadata"></audio>
+    </div>
+</div>

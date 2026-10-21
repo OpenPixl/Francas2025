@@ -9,7 +9,6 @@ import './stimulus_bootstrap.js';
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
 import { initHomePage } from "./js/app/page/home";
-import { initArticleIndex } from "./js/app/etablissement/article";
 import { initShowRessource } from "./js/app/ressources/show";
 import { initShowPage } from "./js/app/page/show";
 import { initNewEditEtablissement } from "./js/app/etablissement/newEditEtablissement";
@@ -19,6 +18,7 @@ import { initIndexArticle } from "./js/app/article/IndexArticles";
 import { initIndexAdminArticle } from "./js/admin/webapp/IndexArticles";
 import { initSearchSelects } from "./js/composants/fonctions";
 import { initAudioPlayerBar } from "./js/composants/audio_player_bar";
+import { initAudioPlayersArticle } from "./js/composants/audio_player_article";
 
 
 /**
@@ -42,13 +42,12 @@ onReady(() => {
     // Lecteur audio sous la navbar (présent seulement si la page l'active).
     initAudioPlayerBar();
 
+    // Lecteurs audio des articles (page article, page établissement, sections de page).
+    initAudioPlayersArticle();
+
     // Affectation du JS selon la page
     const page = document.body.dataset.page;
     switch (page) {
-        case 'op_webapp_articles_articleSlug':
-        case 'op_webapp_articles_show':
-            initArticleIndex();
-            break;
         case 'op_webapp_ressources_ressourceshow':
             initShowRessource();
             break;

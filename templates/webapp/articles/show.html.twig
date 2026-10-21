@@ -59,50 +59,11 @@
             {{ article.content|raw }}
 
             {% if article.support.id == 1 %}
-                <h4 class="font-normal text-xl text-gray-700 mt-6 mb-3">Ecouter l'émission radio</h4>
-                <div class="flex items-center gap-4 bg-white/90 border border-slate-200 rounded-3xl shadow-sm p-4 max-w-xl">
-
-                    <!-- Bouton Play -->
-                    <button id="playBtn" class="size-12 rounded-full bg-[#d84519] text-white grid place-content-center text-xl shadow-md hover:bg-[#F26438] transition">
-                        ►
-                    </button>
-
-                    <!-- Bloc central -->
-                    <div class="flex-1 min-w-0">
-
-                        <!-- TITRE -->
-                        <div class="mb-2">
-                            <div id="mp3Title" class="text-slate-900 font-semibold truncate">
-                                {{ article.doc }}
-                            </div>
-                            <!-- Sous-titre optionnel -->
-                            <div id="mp3Artist" class="text-slate-500 text-xs truncate hidden">
-                                Source / Auteur
-                            </div>
-                        </div>
-
-                        <!-- Infos temps -->
-                        <div class="flex justify-between text-sm text-slate-600 mb-1">
-                            <span id="currentTime">0:00</span>
-                            <span id="duration">0:00</span>
-                        </div>
-
-                        <!-- Barre de progression -->
-                        <div id="rail" class="relative h-2 bg-slate-200 rounded-full cursor-pointer">
-                            <div id="played" class="absolute h-2 bg-[#d84519] rounded-full left-0 top-0 w-[0%]"></div>
-                            <div id="thumb"
-                                 class="absolute -top-1.5 size-4 bg-white border border-[#d84519] rounded-full shadow -translate-x-1/2 cursor-pointer"
-                                 style="left: 0%;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Volume -->
-                    <input id="volume" type="range" min="0" max="1" step="0.01"
-                           class="w-24 accent-[#d84519]" value="1">
-                </div>
-
-                <audio id="audio" src="{{ asset(article_doc_url(article)) }}" preload="metadata"></audio>
+                {{ include('webapp/composants/audio_player_article.html.twig', {
+                    'src': asset(article_doc_url(article)),
+                    'title': article.title,
+                    'artist': article.etablissement ? article.etablissement.name : null,
+                }) }}
 
             {% elseif article.support.id == 2 %}
                 <h4 class="font-normal text-xl text-gray-700 mt-6 mb-3">Visionner la vidéo</h4>

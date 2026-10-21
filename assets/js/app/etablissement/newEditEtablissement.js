@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {showNotification, showDialog, hideDialog} from "../../composants/tailwind";
-import {player_audio} from "../../composants/fonctions";
 
 export function initNewEditEtablissement(){
     console.log('Bienvenu sur la page d\'edition d\'un établissement.');
