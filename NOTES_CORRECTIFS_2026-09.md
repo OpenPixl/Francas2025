@@ -1,6 +1,6 @@
 # Correctifs divers — septembre 2026
 
-Petits correctifs (à partir du 08/09/2026, §6 du 21/10/2026) qui ne relèvent d'aucun des chantiers documentés séparément
+Petits correctifs (à partir du 08/09/2026, §6-7 du 21/10/2026) qui ne relèvent d'aucun des chantiers documentés séparément
 (`NOTES_RECHERCHE_ARTICLES.md`, `NOTES_GESTION_PAGES.md`, `NOTES_TOMSELECT_ET_TURBO.md`).
 
 ---
@@ -185,6 +185,63 @@ $data = $articleRepository->findBy(
 Les deux listes (chargement initial et rafraîchissement AJAX) appliquent désormais le même filtre.
 NB : un article dont `is_archived` serait `NULL` est masqué dans les deux cas.
 
+## 7. Articles archivés exclus de toutes les listes, tri homogène
+
+Suite du §6 (21/10/2026) : contrôle de toutes les listes d'articles (admin et front) pour qu'elles
+excluent les archivés et soient triées par date de modification décroissante.
+
+| Liste | Avant | Après |
+|---|---|---|
+| Admin `op_webapp_articles_index` (+ rechargement après suppression `op_webapp_article_del`) | archivés inclus, tri `id DESC` | `ArticleRepository::queryByArchived()` : non archivés (onglet par défaut), `updatedAt DESC, id DESC` |
+| Dashboard admin (`Admin\DashboardController::index`, 10 derniers) | archivés inclus, tri `id DESC` | filtre `isArchived = false`, `updatedAt DESC, id DESC` |
+| Tableau de bord espace établissement (`op_webapp_espetab`, compteur « N publiés ») | archivés comptés, sans tri | `findBy([…, 'isArchived' => 0], ['updatedAt' => 'DESC'])` |
+| Carrousel `listFiveArticles()` | archivés inclus | filtre `isArchived = 0` (tri `updatedAt DESC` déjà présent) |
+| Recherches Elasticsearch : admin (navbar), suggestions `search-live`, `op_webapp_article_all_by_etablissement`, `op_webapp_articles_bytype` | archivés inclus (champ non indexé) | `addMustNot(Term isArchived = true)` |
+
+Déjà conformes : `allArticles()`, `listArticlesByEtablissement()`, `listArticlesBySection()`,
+`listLatestAudioArticles()`, `articleEtablissementSlug()`.
+
+**Elasticsearch** : ajout de `isArchived: { type: boolean }` au mapping de l'index `article`
+(`config/packages/fos_elastica.yaml`). Le filtre est un `must_not isArchived = true` (et non un
+`filter isArchived = false`) : tant que l'index n'est pas reconstruit, les documents sans le champ
+restent visibles au lieu de disparaître tous. Le listener Doctrine réindexe l'article à l'archivage.
+
+### Filtre « Archivés » dans la liste admin
+
+Pour que l'admin garde l'accès aux archivés, la liste `op_webapp_articles_index` a deux onglets
+**En ligne / Archivés** (avec compteurs), pilotés par `?archived=1` :
+
+- `ArticleRepository::queryByArchived(bool $archived)` (remplace `queryNotArchived()`).
+- `index()` : lit `archived` ; recherche ES → `filter isArchived = true` en vue archivés,
+  `must_not` sinon ; compteurs via `count(['isArchived' => …])`.
+- `DelEvent()` : relit `archived` pour recharger la bonne liste après suppression ; le lien de
+  suppression de `_liste.html.twig` transmet `archived=1` quand le filtre est actif.
+- `assets/js/admin/webapp/IndexArticles.js` : en vue archivés, ajoute un `<input hidden name="archived">`
+  au formulaire de recherche de la navbar (hors du préfixe `navbar_article_search[…]`, donc ignoré
+  par la validation du formulaire).
+- La pagination KNP conserve le paramètre automatiquement.
+
+Limite : les suggestions instantanées (`search-live`) n'affichent toujours que les articles en
+ligne.
+
+### Désarchivage depuis l'onglet « Archivés »
+
+- **`ArticleController::unarchived()`** : `POST /webapp/article/unarchived/{id}/{page}`
+  (`op_webapp_article_unarchived`) → `setIsArchived(false)`, réponse JSON `{code, message, liste,
+  countOnline, countArchived}` avec la liste des archivés rechargée. Le listener Elastica réindexe
+  l'article.
+- **`_liste.html.twig`** : icône `fa-box-open` affichée seulement si `archived`, classe `openDialog`
+  avec `data-dialog-title` / `data-dialog-message`.
+- **`IndexArticles.js` (admin)** : `openDialog()` lit le titre/message du bouton (suppression par
+  défaut) ; `submitModal()` met à jour les compteurs des onglets (`#countOnline`, `#countArchived`,
+  renvoyés aussi par `DelEvent()`) et affiche le message en notification.
+- **Bug corrigé au passage** : l'écouteur `submitModal` du bouton « Valider » de la modale (hors de
+  `#liste`) était rebranché à chaque `reload()` → après une première action AJAX, la confirmation
+  suivante envoyait la requête **en double** (2ᵉ suppression en 404). Il est désormais branché une
+  seule fois.
+
+Non traité : `listArticlesByEtablissements()` (tri `id ASC`) n'est appelée nulle part (code mort).
+
 ---
 
 ## Fichiers modifiés
@@ -203,7 +260,14 @@ NB : un article dont `is_archived` serait `NULL` est masqué dans les deux cas.
 - `assets/js/app/article/IndexArticles.js` (§6 : modale + requête d'archivage)
 - `assets/app.js` (§6 : branchement sur `op_espetab_articles_byetablissement`)
 - `templates/webapp/articles/articlesbyetablissement.html.twig` (§6 : retrait script Bootstrap, `#listeArticles`)
-- `src/Controller/Webapp/ArticleController.php` (§6 : `archived()` → `withArticleMediaUrls` ; `articlesByEtablissement()` → filtre `isArchived = 0`)
+- `src/Controller/Webapp/ArticleController.php` (§6 : `archived()` → `withArticleMediaUrls` ; `articlesByEtablissement()` → filtre `isArchived = 0` ; §7 : filtres ES + `queryByArchived()`, filtre admin)
+- `src/Repository/Webapp/ArticleRepository.php` (§7 : `queryByArchived()`, filtre dans `listFiveArticles()`)
+- `src/Controller/Admin/DashboardController.php` (§7)
+- `src/Controller/App/DashboardController.php` (§7)
+- `config/packages/fos_elastica.yaml` (§7 : champ `isArchived`)
+- `templates/webapp/articles/index.html.twig` (§7 : onglets En ligne / Archivés)
+- `templates/webapp/articles/include/_liste.html.twig` (§7 : `archived` sur le lien de suppression, bouton de désarchivage)
+- `assets/js/admin/webapp/IndexArticles.js` (§7 : `archived` transmis à la recherche navbar, désarchivage, écouteur `submitModal` unique)
 
 ## Fichiers créés
 
@@ -216,4 +280,6 @@ NB : un article dont `is_archived` serait `NULL` est masqué dans les deux cas.
 - **§4 : `php bin/console doctrine:migrations:migrate`** (colonne `vignette_name` nullable) — sans
   cette migration, la suppression de la vignette renvoie une 500 sur `flush` (la suppression du bandeau
   fonctionne sans, `header_name` étant déjà nullable).
-- Rien côté Elasticsearch.
+- **§7 : `php bin/console fos:elastica:populate --index=article`** (nouveau champ `isArchived`) — sans
+  cela les archivés restent visibles dans les listes issues d'une recherche ES.
+- Vidage du cache (`cache:clear`) pour §6/§7.

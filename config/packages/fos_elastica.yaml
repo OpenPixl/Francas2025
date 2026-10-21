@@ -68,3 +68,5 @@ fos_elastica:
                     property_path: etablissement?.typeEtablissement?.id
                 updatedAt:
                     type: date
+                isArchived:
+                    type: boolean

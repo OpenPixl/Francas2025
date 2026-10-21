@@ -133,7 +133,7 @@ class DashboardController extends AbstractController
 
         $etablissement = $entityManager->getRepository(Etablissement::class)->EtablissementByUser($user);
         $messages = $messageRepository->listMessagesByUser($user->getId());
-        $articles = $articleRepository->findBy(['etablissement' => $etablissement]);
+        $articles = $articleRepository->findBy(['etablissement' => $etablissement, 'isArchived' => 0], ['updatedAt' => 'DESC']);
         $ressources = $ressourcesRepository->findBy(['etablissement' => $etablissement]);
 
         return $this->render('espace_etablissement/dashboard/espetab.html.twig', [

@@ -32,8 +32,27 @@
 
     <section id="op_admin_content_body">
 
-        <h2 class="font-normal uppercase text-xl text-sky-700">Liste des articles</h2>
-        <p class="text-sm font-light">Créer, Modifier ou supprimer des articles du site</p>
+        <div class="flex flex-wrap items-end justify-between gap-3">
+            <div>
+                <h2 class="font-normal uppercase text-xl text-sky-700">Liste des articles</h2>
+                <p class="text-sm font-light">Créer, Modifier ou supprimer des articles du site</p>
+            </div>
+
+            {# Filtre en ligne / archivés (?archived=1) #}
+            <nav class="inline-flex rounded" aria-label="Filtre des articles">
+                {% for tab in [
+                    {'label': 'En ligne', 'id': 'countOnline', 'count': countOnline, 'active': not archived, 'href': path('op_webapp_articles_index')},
+                    {'label': 'Archivés', 'id': 'countArchived', 'count': countArchived, 'active': archived, 'href': path('op_webapp_articles_index', {'archived': 1})}
+                ] %}
+                    <a href="{{ tab.href }}"
+                       {% if tab.active %}aria-current="page"{% endif %}
+                       class="inline-flex items-center gap-1.5 border px-2.5 py-1.5 text-sm {{ loop.first ? 'rounded-l' : 'rounded-r -ml-px' }} {{ tab.active ? 'border-sky-700 bg-sky-700 text-white' : 'border-slate-600 text-slate-700 hover:bg-gray-600 hover:text-white' }}">
+                        {{ tab.label }}
+                        <span id="{{ tab.id }}" class="rounded-full px-1.5 text-xs {{ tab.active ? 'bg-white/20' : 'bg-gray-100 text-gray-600' }}">{{ tab.count }}</span>
+                    </a>
+                {% endfor %}
+            </nav>
+        </div>
 
         <div id="liste" class="mt-3">
             {{ include('webapp/articles/include/_liste.html.twig') }}

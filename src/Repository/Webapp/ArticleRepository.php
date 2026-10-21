@@ -4,6 +4,7 @@ namespace App\Repository\Webapp;
 
 use App\Entity\Webapp\Article;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -108,6 +109,20 @@ class ArticleRepository extends ServiceEntityRepository
         }
 
         return $ordered;
+    }
+
+    /**
+     * Liste admin des articles, en ligne ou archivés selon $archived, les plus
+     * récemment modifiés en premier. QueryBuilder renvoyé tel quel pour une
+     * pagination en SQL (LIMIT).
+     */
+    public function queryByArchived(bool $archived = false): QueryBuilder
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.isArchived = :isArchived')
+            ->setParameter('isArchived', $archived)
+            ->orderBy('a.updatedAt', 'DESC')
+            ->addOrderBy('a.id', 'DESC');
     }
 
     public function allArticles(){
@@ -248,6 +263,8 @@ class ArticleRepository extends ServiceEntityRepository
                  ')
             ->where('u.typeuser = :typeuser')
             ->setParameter('typeuser', 'etablissement')
+            ->andWhere('a.isArchived = :isArchived')
+            ->setParameter('isArchived', 0)
             ->orderBy('a.updatedAt', 'DESC')
             ->setMaxResults(5)
             ->getQuery()

@@ -28,8 +28,15 @@
                 <td class="py-1.5 text-sm whitespace-nowrap text-gray-800 dark:text-gray-400">
                     <a href="{{ path('op_webapp_articles_show', {'id': a.id}) }}" class="hover:underline hover:text-sky-800"><i class="far fa-eye"></i></a>
                     <a href="{{ path('op_webapp_articles_edit_admin', {'id': a.id}) }}" class="hover:underline hover:text-sky-800"><i class="far fa-edit"></i></a>
+                    {% if archived|default(false) %}
+                        <a href="{{ path('op_webapp_article_unarchived', {'id': a.id, 'page' : app.request.query.get('page', 1)}) }}"
+                           class="openDialog ml-3 hover:underline hover:text-green-800"
+                           title="Remettre en ligne"
+                           data-dialog-title="Désarchivage"
+                           data-dialog-message="Vous êtes sur le point de remettre l'article en ligne. Il sera de nouveau visible sur le site."><i class="fas fa-box-open"></i></a>
+                    {% endif %}
                     |
-                    <a href="{{ path('op_webapp_article_del', {'id': a.id, 'page' : app.request.query.get('page', 1)}) }}" class="openDialog hover:underline hover:text-red-800"><i class="fas fa-eraser"></i></a>
+                    <a href="{{ path('op_webapp_article_del', {'id': a.id, 'page' : app.request.query.get('page', 1), 'archived': archived|default(false) ? 1 : null}) }}" class="openDialog hover:underline hover:text-red-800"><i class="fas fa-eraser"></i></a>
                 </td>
             </tr>
         {% else %}

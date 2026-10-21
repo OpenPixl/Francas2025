@@ -42,7 +42,10 @@ class DashboardController extends AbstractController
     {
         $listArticles = $articleRepository->createQueryBuilder('a')
             ->join('a.etablissement', 'e')
-            ->orderBy('a.id', 'DESC')   // ou 'a.createdAt' si tu as un champ de date
+            ->andWhere('a.isArchived = :isArchived')
+            ->setParameter('isArchived', false)
+            ->orderBy('a.updatedAt', 'DESC')
+            ->addOrderBy('a.id', 'DESC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult();

@@ -47,6 +47,9 @@ class ArticleController extends AbstractController
     #[Route(path: '/webapp/articles/', name: 'op_webapp_articles_index', methods: ['GET', 'POST'])]
     public function index(ArticleRepository $articleRepository, PaginatorInterface $paginator, Request $request): Response
     {
+        // Filtre « Archivés » de la liste admin (?archived=1)
+        $archived = $request->query->getBoolean('archived');
+
         // Recherche Elastica issue du formulaire de la navbar admin (NavbarSearchController)
         $searchForm = $this->createForm(NavbarArticleSearchType::class, null, [
             'method' => 'GET',
@@ -56,6 +59,11 @@ class ArticleController extends AbstractController
 
         if ($searchForm->isSubmitted() && $searchForm->isValid() && !empty($searchForm->get('query')->getData())) {
             $boolQuery = new BoolQuery();
+            if ($archived) {
+                $boolQuery->addFilter(new Term(['isArchived' => true]));
+            } else {
+                $boolQuery->addMustNot(new Term(['isArchived' => true]));
+            }
             $multiMatch = new MultiMatch();
             $multiMatch->setFields(['title^3', 'themes.name^2', 'etablissement.name^2', 'content']);
             $multiMatch->setType(MultiMatch::TYPE_BEST_FIELDS);
@@ -70,7 +78,7 @@ class ArticleController extends AbstractController
         } else {
             // QueryBuilder (et non un tableau d'entités) : la pagination se fait en
             // SQL (LIMIT) au lieu de tout hydrater puis découper en mémoire.
-            $data = $articleRepository->createQueryBuilder('a')->orderBy('a.id', 'DESC');
+            $data = $articleRepository->queryByArchived($archived);
         }
 
         $articles = $paginator->paginate(
@@ -83,6 +91,7 @@ class ArticleController extends AbstractController
             return $this->json([
                 'liste' => $this->renderView('webapp/articles/include/_liste.html.twig', [
                     'articles' => $articles,
+                    'archived' => $archived,
                 ]),
             ]);
         }
@@ -90,6 +99,9 @@ class ArticleController extends AbstractController
         return $this->render('webapp/articles/index.html.twig', [
             'articles' => $articles,
             'page' => $request->query->getInt('page', 1),
+            'archived' => $archived,
+            'countOnline' => $articleRepository->count(['isArchived' => false]),
+            'countArchived' => $articleRepository->count(['isArchived' => true]),
         ]);
     }
 
@@ -119,6 +131,7 @@ class ArticleController extends AbstractController
         $multiMatch->setFuzziness(MultiMatch::FUZZINESS_AUTO);
 
         $boolQuery = new BoolQuery();
+        $boolQuery->addMustNot(new Term(['isArchived' => true]));
         $boolQuery->addMust($multiMatch);
 
         $esQuery = new Query($boolQuery);
@@ -181,6 +194,7 @@ class ArticleController extends AbstractController
 
         // Construction de la requête Elasticsearch
         $boolQuery = new BoolQuery();
+        $boolQuery->addMustNot(new Term(['isArchived' => true]));
         // Ne garder que les articles rattachés à un établissement (ex: articles rédigés par les administrateurs)
         $boolQuery->addFilter(new Exists('etablissement'));
 
@@ -276,6 +290,7 @@ class ArticleController extends AbstractController
         $theme = $idtheme ? $entityManager->getRepository(Theme::class)->find($idtheme) : null;
 
         $boolQuery = new BoolQuery();
+        $boolQuery->addMustNot(new Term(['isArchived' => true]));
         $boolQuery->addFilter(new Exists('etablissement'));
 
         $typeTermQuery = new Term();
@@ -874,7 +889,9 @@ class ArticleController extends AbstractController
         $entityManager->remove($article);
         $entityManager->flush();
 
-        $data = $entityManager->getRepository(Article::class)->createQueryBuilder('a')->orderBy('a.id', 'DESC');
+        // Conserve le filtre « Archivés » de la liste admin (?archived=1)
+        $archived = $request->query->getBoolean('archived');
+        $data = $entityManager->getRepository(Article::class)->queryByArchived($archived);
         $articles = $paginator->paginate(
             $data,
             $request->query->getInt('page', $page),
@@ -886,8 +903,39 @@ class ArticleController extends AbstractController
             'message' => "L'article a été supprimé",
             'liste' => $this->renderView('webapp/articles/include/_liste.html.twig', [
                 'articles' => $articles,
+                'archived' => $archived,
             ]),
+            'countOnline' => $entityManager->getRepository(Article::class)->count(['isArchived' => false]),
+            'countArchived' => $entityManager->getRepository(Article::class)->count(['isArchived' => true]),
+        ], 200);
+    }
 
+    /**
+     * Désarchivage d'un article depuis l'onglet « Archivés » de la liste admin
+     */
+    #[Route(path: '/webapp/article/unarchived/{id}/{page}', name: 'op_webapp_article_unarchived', methods: ['POST'])]
+    public function unarchived(Request $request, Article $article, PaginatorInterface $paginator, EntityManagerInterface $entityManager, $page) : Response
+    {
+        $article->setIsArchived(false);
+        $entityManager->flush();
+
+        // Rechargement de la liste des archivés
+        $repository = $entityManager->getRepository(Article::class);
+        $articles = $paginator->paginate(
+            $repository->queryByArchived(true),
+            $request->query->getInt('page', $page),
+            15
+        );
+
+        return $this->json([
+            'code'=> 200,
+            'message' => "L'article a été remis en ligne",
+            'liste' => $this->renderView('webapp/articles/include/_liste.html.twig', [
+                'articles' => $articles,
+                'archived' => true,
+            ]),
+            'countOnline' => $repository->count(['isArchived' => false]),
+            'countArchived' => $repository->count(['isArchived' => true]),
         ], 200);
     }
 
