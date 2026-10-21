@@ -345,7 +345,10 @@ class ArticleController extends AbstractController
     ): Response
     {
         $etablissement = $etablissementRepository->find($idetablissement);
-        $data = $articleRepository->findBy(['etablissement' => $etablissement], ['updatedAt' => 'DESC']);
+        $data = $articleRepository->findBy(
+            ['etablissement' => $etablissement, 'isArchived' => 0],
+            ['updatedAt' => 'DESC']
+        );
         $articles = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
@@ -900,6 +903,7 @@ class ArticleController extends AbstractController
 
         // actualiser la liste des articles de l'établissement
         $listearticles = $entityManager->getRepository(Article::class)->listArticlesByEtablissement($idetablissement);
+        $listearticles = array_map($this->mediaPathResolver->withArticleMediaUrls(...), $listearticles);
 
         return $this->json([
             'code'=> 200,

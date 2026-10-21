@@ -15,6 +15,7 @@ import { initShowPage } from "./js/app/page/show";
 import { initNewEditEtablissement } from "./js/app/etablissement/newEditEtablissement";
 import { initNewEditMessage } from "./js/admin/webapp/NewEditMessage";
 import { initNewEditArticle } from "./js/app/article/NewEditArticles";
+import { initIndexArticle } from "./js/app/article/IndexArticles";
 import { initIndexAdminArticle } from "./js/admin/webapp/IndexArticles";
 import { initSearchSelects } from "./js/composants/fonctions";
 import { initAudioPlayerBar } from "./js/composants/audio_player_bar";
@@ -61,6 +62,9 @@ onReady(() => {
             break;
         case 'op_espetab_etablissement_edit':
             initNewEditEtablissement();
+            break;
+        case 'op_espetab_articles_byetablissement':
+            initIndexArticle();
             break;
         case 'op_webapp_articles_new':
         case 'op_webapp_articles_edit':

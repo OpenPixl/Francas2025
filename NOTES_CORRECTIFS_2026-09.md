@@ -1,6 +1,6 @@
 # Correctifs divers — septembre 2026
 
-Petits correctifs du 08/09/2026 qui ne relèvent d'aucun des chantiers documentés séparément
+Petits correctifs (à partir du 08/09/2026, §6 du 21/10/2026) qui ne relèvent d'aucun des chantiers documentés séparément
 (`NOTES_RECHERCHE_ARTICLES.md`, `NOTES_GESTION_PAGES.md`, `NOTES_TOMSELECT_ET_TURBO.md`).
 
 ---
@@ -130,6 +130,61 @@ y compris la déconnexion.
   « Administrateurs » → `op_admin_user_list_administrateur`, cf.
   `NOTES_ADMIN_LISTE_ADMINISTRATEURS.md`.
 
+## 6. Archivage d'un article depuis l'espace Établissement
+
+Symptôme (21/10/2026) : sur la liste des articles de l'espace « gestion » d'un établissement
+(`op_espetab_articles_byetablissement`, à ne pas confondre avec la liste admin), le bouton
+`a.btnArchived` suivait simplement son lien (GET sur une route `POST` uniquement) : ni modale
+d'avertissement, ni archivage.
+
+Cause :
+
+1. Le JS de la page était un `<script>` inline dans `articlesbyetablissement.html.twig`, encore écrit
+   pour **Bootstrap** (`bootstrap.Modal`, `#ModalWarning`, `#btnPushReq`, `bootstrap.Toast`) — plus
+   chargé sur le site, qui est passé aux modales/notifications Tailwind.
+2. `assets/js/app/article/IndexArticles.js` (copie de ce script, avec un `openModal()` vide) n'était
+   importé nulle part dans `assets/app.js`.
+3. La réponse AJAX remplace `#listeArticles`… qui n'existait pas dans le template.
+4. `ArticleController::archived()` rend `_listebyetablissement.html.twig` avec les lignes de
+   `listArticlesByEtablissement()` (tableaux, pas des entités) **sans** passer par
+   `withArticleMediaUrls` : le template retombe alors sur `article_image_url(article)`, typé
+   `Article` ⇒ `TypeError` / 500 dès qu'un article de l'établissement a une image.
+
+### Correctif — calqué sur la liste admin (`assets/js/admin/webapp/IndexArticles.js`)
+
+- **`assets/js/app/article/IndexArticles.js`** réécrit : clic sur `a.btnArchived` →
+  `showDialog(href, titre, message, onConfirm)` (API 4 args, un seul écouteur délégué sur
+  `#validModal`, cf. `NOTES_BOUTON_ENREGISTRER_HEADER.md` §4) ; à la validation, `axios.post(url)`,
+  remplacement de `#listeArticles` par `response.data.listeArticles`, `showNotification('success', …)`,
+  puis `reload()` pour rebrancher les boutons de la nouvelle liste. Erreur →
+  `showNotification('warning', …)`.
+- **`assets/app.js`** : import de `initIndexArticle` et `case 'op_espetab_articles_byetablissement'`
+  dans l'aiguillage par `data-page`.
+- **`templates/webapp/articles/articlesbyetablissement.html.twig`** : suppression du bloc
+  `javascripts` inline Bootstrap ; include de la liste enveloppé dans `<div id="listeArticles">`.
+- **`ArticleController::archived()`** : `array_map($this->mediaPathResolver->withArticleMediaUrls(...), …)`
+  sur la liste renvoyée, comme dans `listArticlesByEtablissement()`.
+
+### Correctif complémentaire — articles archivés réaffichés au rechargement
+
+Après archivage, l'article disparaissait bien de la liste (réponse AJAX) mais **réapparaissait au
+rechargement de la page**. Contrôle en base : `article.is_archived = 1` → la requête d'archivage
+aboutit, c'est l'affichage initial qui ne filtrait pas.
+
+`articlesByEtablissement()` listait tous les articles de l'établissement via
+`findBy(['etablissement' => …])`, archivés compris, alors que la liste renvoyée après archivage
+(`listArticlesByEtablissement()`) filtre `isArchived = 0`. Ajout du critère au `findBy` :
+
+```php
+$data = $articleRepository->findBy(
+    ['etablissement' => $etablissement, 'isArchived' => 0],
+    ['updatedAt' => 'DESC']
+);
+```
+
+Les deux listes (chargement initial et rafraîchissement AJAX) appliquent désormais le même filtre.
+NB : un article dont `is_archived` serait `NULL` est masqué dans les deux cas.
+
 ---
 
 ## Fichiers modifiés
@@ -145,6 +200,10 @@ y compris la déconnexion.
 - `assets/js/admin/admin/EditConfig.js` (§4 : handler `delete-media`)
 - `assets/admin.js` (§5 : câblage du dropdown utilisateur)
 - `templates/admin/include/navbar_admin.html.twig` (§5 : liens du dropdown utilisateur)
+- `assets/js/app/article/IndexArticles.js` (§6 : modale + requête d'archivage)
+- `assets/app.js` (§6 : branchement sur `op_espetab_articles_byetablissement`)
+- `templates/webapp/articles/articlesbyetablissement.html.twig` (§6 : retrait script Bootstrap, `#listeArticles`)
+- `src/Controller/Webapp/ArticleController.php` (§6 : `archived()` → `withArticleMediaUrls` ; `articlesByEtablissement()` → filtre `isArchived = 0`)
 
 ## Fichiers créés
 
@@ -153,7 +212,7 @@ y compris la déconnexion.
 
 ## Déploiement
 
-- Rebuild des assets pour §3 et §4.
+- Rebuild des assets pour §3, §4 et §6 (`npm run build`).
 - **§4 : `php bin/console doctrine:migrations:migrate`** (colonne `vignette_name` nullable) — sans
   cette migration, la suppression de la vignette renvoie une 500 sur `flush` (la suppression du bandeau
   fonctionne sans, `header_name` étant déjà nullable).
